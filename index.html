@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="수학모험">
+<meta name="theme-color" content="#5b2a86">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%235b2a86'/><text x='90' y='130' font-size='120' text-anchor='middle'>🧙</text></svg>">
+<title>수학 왕국의 모험</title>
+<style>
+  * {
+    box-sizing: border-box; margin: 0; padding: 0;
+    user-select: none; -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  html, body {
+    height: 100%;
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    overscroll-behavior: none;
+  }
+  #app {
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .screen {
+    width: min(900px, 95vw);
+    height: min(640px, 95vh);
+    background: #fff8f0;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ===== 시작 화면 ===== */
+  .title-screen {
+    text-align: center;
+    background: linear-gradient(180deg, #fff8f0 0%, #ffe4a8 100%);
+    justify-content: center;
+    align-items: center;
+  }
+  .title-screen h1 {
+    font-size: 64px;
+    color: #5b2a86;
+    text-shadow: 4px 4px 0 #ffd700, 8px 8px 20px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .title-screen .hero-preview {
+    font-size: 120px;
+    margin: 20px 0;
+    animation: wiggle 3s infinite;
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+  .title-screen p {
+    font-size: 22px;
+    color: #5b2a86;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+  .btn {
+    background: linear-gradient(180deg, #ff9a56 0%, #ff6b35 100%);
+    color: white;
+    border: none;
+    padding: 18px 48px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #c84a1a, 0 8px 20px rgba(0,0,0,0.2);
+    transition: all 0.1s;
+    font-family: inherit;
+  }
+  .btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #c84a1a, 0 6px 15px rgba(0,0,0,0.2); }
+  .btn:active { transform: translateY(6px); box-shadow: 0 0 0 #c84a1a; }
+  .btn.small { padding: 10px 24px; font-size: 18px; box-shadow: 0 4px 0 #c84a1a; }
+  .btn.blue { background: linear-gradient(180deg, #56a3ff 0%, #3578e5 100%); box-shadow: 0 6px 0 #1a4ec8; }
+  .btn.green { background: linear-gradient(180deg, #5cd95c 0%, #2eb82e 100%); box-shadow: 0 6px 0 #1a8c1a; }
+  .btn.purple { background: linear-gradient(180deg, #b066ff 0%, #8a2be2 100%); box-shadow: 0 6px 0 #5a1aa8; }
+
+  /* ===== 지도 화면 ===== */
+  .map-screen { background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 100%); }
+  .map-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .map-title { font-size: 32px; color: #2c5f7c; font-weight: bold; }
+  .player-stats {
+    display: flex; gap: 16px; font-size: 20px;
+    background: rgba(255,255,255,0.7);
+    padding: 8px 16px; border-radius: 20px;
+  }
+  .stat { display: flex; align-items: center; gap: 4px; }
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    flex: 1;
+    align-content: center;
+  }
+  .world-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    border: 4px solid transparent;
+    position: relative;
+  }
+  .world-card:hover:not(.locked) {
+    transform: translateY(-4px) scale(1.03);
+    border-color: #ffd700;
+  }
+  .world-card.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.7); }
+  .world-card.cleared { border-color: #ffd700; background: linear-gradient(180deg, #fff8d0 0%, #ffe888 100%); }
+  .world-icon { font-size: 64px; margin-bottom: 8px; }
+  .world-name { font-size: 22px; font-weight: bold; color: #333; margin-bottom: 4px; }
+  .world-topic { font-size: 14px; color: #666; }
+  .world-stars { font-size: 22px; margin-top: 8px; }
+  .lock-overlay {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+  }
+
+  /* ===== 전투/문제 화면 ===== */
+  .battle-screen {
+    background: linear-gradient(180deg, #2c3e50 0%, #4a6989 100%);
+    color: white;
+  }
+  .battle-screen.forest { background: linear-gradient(180deg, #2d5016 0%, #5a8c3a 100%); }
+  .battle-screen.castle { background: linear-gradient(180deg, #8b4513 0%, #d2691e 100%); }
+  .battle-screen.cave { background: linear-gradient(180deg, #2c2c2c 0%, #555 100%); }
+  .battle-screen.village { background: linear-gradient(180deg, #ff9a8b 0%, #ffd194 100%); }
+  .battle-screen.island { background: linear-gradient(180deg, #00b4db 0%, #0083b0 100%); }
+
+  .battle-top {
+    display: flex; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .battle-info { font-size: 18px; }
+  .hp-bar {
+    background: rgba(0,0,0,0.4);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 20px;
+  }
+  .battle-arena {
+    display: flex; justify-content: space-around; align-items: center;
+    flex: 1; position: relative;
+  }
+  .hero, .enemy {
+    text-align: center;
+    transition: transform 0.3s;
+  }
+  .hero-emoji, .enemy-emoji { font-size: 100px; display: block; }
+  .hero-name, .enemy-name {
+    background: rgba(0,0,0,0.5);
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-top: 8px;
+    font-size: 16px;
+  }
+  .vs { font-size: 40px; font-weight: bold; }
+  .attack-anim { animation: attack 0.5s; }
+  @keyframes attack {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(100px) scale(1.2); }
+    100% { transform: translateX(0); }
+  }
+  .hurt { animation: hurt 0.5s; }
+  @keyframes hurt {
+    0%, 100% { transform: translateX(0); filter: none; }
+    25% { transform: translateX(-15px); filter: hue-rotate(180deg) brightness(0.5); }
+    75% { transform: translateX(15px); filter: hue-rotate(180deg) brightness(0.5); }
+  }
+  .question-box {
+    background: rgba(255,255,255,0.95);
+    color: #333;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 12px;
+  }
+  .question-text {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+    min-height: 50px;
+  }
+  .question-visual {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 12px;
+    min-height: 0;
+  }
+  .answer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .answer-btn {
+    background: linear-gradient(180deg, #f0f9ff 0%, #c1e7ff 100%);
+    border: 3px solid #3578e5;
+    color: #1a3a6c;
+    padding: 16px;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .answer-btn:hover { transform: scale(1.05); background: linear-gradient(180deg, #c1e7ff 0%, #88ccff 100%); }
+  .answer-btn.correct { background: #5cd95c; border-color: #2eb82e; color: white; animation: pulse 0.5s; }
+  .answer-btn.wrong { background: #ff6b6b; border-color: #c0392b; color: white; animation: shake 0.5s; }
+  .answer-btn.disabled { pointer-events: none; opacity: 0.6; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+  }
+
+  /* ===== 메시지/대화창 ===== */
+  .dialog {
+    position: absolute;
+    bottom: 24px; left: 24px; right: 24px;
+    background: rgba(255,255,255,0.97);
+    border: 4px solid #5b2a86;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 20px;
+    color: #2c3e50;
+    z-index: 10;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  /* ===== 결과/엔딩 화면 ===== */
+  .result-screen {
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    color: #5b2a86;
+  }
+  .result-screen h2 {
+    font-size: 48px;
+    margin-bottom: 16px;
+    text-shadow: 3px 3px 0 white;
+  }
+  .result-screen .big-icon { font-size: 140px; margin: 16px 0; animation: bounce 1s infinite; }
+  .result-screen p { font-size: 22px; margin-bottom: 12px; }
+  .reward-list { font-size: 26px; margin: 16px 0; }
+
+  .floating-text {
+    position: absolute;
+    font-size: 32px;
+    font-weight: bold;
+    pointer-events: none;
+    animation: floatUp 1.5s forwards;
+    z-index: 100;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-100px); opacity: 0; }
+  }
+
+  /* 별/하트 표시 */
+  .hidden { display: none !important; }
+
+  /* iPad 세로 모드 안내 오버레이 */
+  #rotate-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #5b2a86 0%, #2c1450 100%);
+    color: white;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 9999;
+    padding: 40px;
+  }
+  #rotate-overlay .rotate-icon {
+    font-size: 120px;
+    animation: rotateHint 2s ease-in-out infinite;
+    margin-bottom: 20px;
+  }
+  #rotate-overlay h2 { font-size: 32px; margin-bottom: 12px; }
+  #rotate-overlay p { font-size: 20px; opacity: 0.9; line-height: 1.5; }
+  @keyframes rotateHint {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+  }
+  /* 모바일 가로 모드가 아니면(=세로) 오버레이 표시 */
+  @media (max-width: 1024px) and (orientation: portrait) {
+    #rotate-overlay { display: flex; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="rotate-overlay">
+  <div class="rotate-icon">📱</div>
+  <h2>iPad를 가로로 돌려주세요</h2>
+  <p>이 게임은 가로 화면에서<br>가장 재미있게 즐길 수 있어요!</p>
+</div>
+
+<script>
+// 더블탭 확대 방지 (iOS Safari)
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+
+// 핀치 줌 방지
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+
+// 스크롤 바운스 방지
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+</script>
+<script>
+// ========== 게임 데이터 ==========
+const HERO = '🧙‍♂️';
+const HERO_NAME = '용감한 모험가';
+
+const WORLDS = [
+  {
+    id: 'forest', name: '도형의 숲', icon: '🌳', topic: '도형 찾기',
+    bg: 'forest', enemies: ['🦊', '🦝', '🐺', '👹'],
+    enemyNames: ['세모여우', '네모너구리', '동그라미늑대', '도깨비대장'],
+    story: '도형의 숲에 도형을 훔쳐가는 도깨비가 나타났어요! 도형을 맞추고 숲을 구해주세요.'
+  },
+  {
+    id: 'castle', name: '구구단 성', icon: '🏰', topic: '곱셈 구구단',
+    bg: 'castle', enemies: ['🦇', '👻', '🧟', '🐉'],
+    enemyNames: ['박쥐기사', '유령병정', '좀비병장', '구구단 용'],
+    story: '구구단 성에 사악한 용이 살아요. 구구단 문제를 풀어 용을 물리쳐요!'
+  },
+  {
+    id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈',
+    bg: 'cave', enemies: ['🦂', '🕷️', '🐍', '👾'],
+    enemyNames: ['전갈', '거미', '독사', '동굴괴물'],
+    story: '깊고 어두운 동굴 속! 보물을 똑같이 나누어야 통과할 수 있어요.'
+  },
+  {
+    id: 'village', name: '덧셈 마을', icon: '🏘️', topic: '덧셈과 뺄셈',
+    bg: 'village', enemies: ['🐗', '🦏', '🐘', '🦖'],
+    enemyNames: ['멧돼지', '코뿔소', '코끼리', '공룡왕'],
+    story: '평화로운 마을에 큰 동물들이 쳐들어왔어요. 계산으로 막아내세요!'
+  },
+  {
+    id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수 기초',
+    bg: 'island', enemies: ['🦈', '🐙', '🐳', '🧜‍♂️'],
+    enemyNames: ['상어', '문어', '고래', '바다왕'],
+    story: '신비한 분수 섬! 케이크와 피자를 나누는 분수 문제를 풀어보아요.'
+  }
+];
+
+// 상태
+const state = {
+  currentWorld: null,
+  currentEnemyIndex: 0,
+  hp: 3,
+  maxHp: 3,
+  stars: 0,
+  crystals: 0,
+  cleared: {}, // worldId -> 별 개수(1~3)
+  questionCount: 0,
+  totalQuestions: 4 // 보스 포함 4마리
+};
+
+// ========== 문제 생성기 ==========
+function genQuestion(worldId, difficulty) {
+  // difficulty: 1~4 (보스가 4)
+  switch(worldId) {
+    case 'forest': return genShape();
+    case 'castle': return genMultiply(difficulty);
+    case 'cave': return genDivide(difficulty);
+    case 'village': return genAddSub(difficulty);
+    case 'island': return genFraction(difficulty);
+  }
+}
+
+function genShape() {
+  const shapes = [
+    { q: '변이 3개인 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 0 },
+    { q: '변이 4개인 도형은?', visual: '🔺 ⬜ ⭕ ⭐', opts: ['삼각형', '사각형', '원', '별'], a: 1 },
+    { q: '변이 없는 동그란 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 2 },
+    { q: '꼭짓점이 4개인 도형은?', visual: '🔺 ⬜ ⭕', opts: ['삼각형', '사각형', '원', '오각형'], a: 1 },
+    { q: '꼭짓점이 5개인 도형은?', visual: '⬜ 🔺 ⭐ ⭕', opts: ['사각형', '삼각형', '오각형', '원'], a: 2 },
+    { q: '직각이 4개 있는 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '직사각형', '원', '마름모'], a: 1 },
+    { q: '모든 변의 길이가 같은 사각형은?', visual: '⬜', opts: ['직사각형', '정사각형', '사다리꼴', '평행사변형'], a: 1 },
+    { q: '굴러갈 수 있는 입체도형은?', visual: '📦 ⚽ 🎲', opts: ['직육면체', '구', '주사위', '벽돌'], a: 1 },
+    { q: '주사위 모양의 입체도형은?', visual: '🎲', opts: ['구', '원기둥', '정육면체', '원뿔'], a: 2 },
+  ];
+  return shapes[Math.floor(Math.random() * shapes.length)];
+}
+
+function genMultiply(diff) {
+  // 작은 단(2~5) → 큰 단(6~9)으로 난이도 증가
+  const minTable = diff <= 2 ? 2 : 5;
+  const maxTable = diff <= 2 ? 5 : 9;
+  const a = randInt(minTable, maxTable);
+  const b = randInt(2, 9);
+  const ans = a * b;
+  return makeNumberQuestion(`${a} × ${b} = ?`, ans, '✖️');
+}
+
+function genDivide(diff) {
+  // 나누어떨어지는 문제만
+  const divisor = randInt(2, diff <= 2 ? 5 : 9);
+  const quotient = randInt(2, diff <= 2 ? 5 : 9);
+  const dividend = divisor * quotient;
+  return makeNumberQuestion(`${dividend} ÷ ${divisor} = ?`, quotient, '➗');
+}
+
+function genAddSub(diff) {
+  const op = Math.random() < 0.5 ? '+' : '-';
+  let a, b, ans;
+  if (diff <= 2) {
+    // 두 자리
+    a = randInt(20, 99);
+    b = randInt(10, 99);
+  } else {
+    // 세 자리
+    a = randInt(100, 800);
+    b = randInt(50, 200);
+  }
+  if (op === '+') { ans = a + b; }
+  else {
+    if (b > a) [a, b] = [b, a];
+    ans = a - b;
+  }
+  return makeNumberQuestion(`${a} ${op} ${b} = ?`, ans, op === '+' ? '➕' : '➖');
+}
+
+function genFraction(diff) {
+  // 그림 기반 분수
+  const denom = randInt(2, diff <= 2 ? 4 : 8);
+  const numer = randInt(1, denom - 1);
+  // 케이크 그림
+  const cake = '🍰';
+  const filled = '🟧'.repeat(numer) + '⬜'.repeat(denom - numer);
+  const types = [
+    () => ({
+      q: `색칠된 부분은 전체의 얼마일까요?`,
+      visual: filled,
+      opts: shuffleOpts([
+        `${numer}/${denom}`,
+        `${denom}/${numer}`,
+        `${numer}/${denom + 1}`,
+        `${numer + 1}/${denom}`
+      ], `${numer}/${denom}`),
+      a: 0
+    }),
+    () => {
+      const correct = `${numer}/${denom}`;
+      const opts = [correct,
+        `${numer}/${denom + 1}`,
+        `${numer + 1}/${denom}`,
+        `${denom - numer}/${denom}`];
+      const shuffled = shuffleArr(opts);
+      return {
+        q: `피자 ${denom}조각 중 ${numer}조각을 먹었어요. 먹은 양은?`,
+        visual: '🍕'.repeat(numer) + '⬜'.repeat(denom - numer),
+        opts: shuffled,
+        a: shuffled.indexOf(correct)
+      };
+    }
+  ];
+  return types[Math.floor(Math.random() * types.length)]();
+}
+
+function makeNumberQuestion(q, ans, visual) {
+  // 오답 3개 생성
+  const wrongs = new Set();
+  while (wrongs.size < 3) {
+    let w = ans + randInt(-9, 9);
+    if (w !== ans && w >= 0) wrongs.add(w);
+  }
+  const opts = shuffleArr([ans, ...wrongs]);
+  return { q, visual, opts: opts.map(String), a: opts.indexOf(ans) };
+}
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function shuffleOpts(opts, correct) {
+  const shuffled = shuffleArr(opts);
+  return shuffled;
+}
+function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+// ========== 화면 렌더링 ==========
+const app = document.getElementById('app');
+
+function render(html) {
+  app.innerHTML = html;
+}
+
+function renderTitle() {
+  render(`
+    <div class="screen title-screen">
+      <h1>수학 왕국의 모험</h1>
+      <div class="hero-preview">${HERO}</div>
+      <p>5개의 신비한 세계를 모험하며<br>수학 문제를 풀고 왕국을 구해주세요!</p>
+      <button class="btn" onclick="startGame()">모험 시작! 🚀</button>
+      ${Object.keys(state.cleared).length > 0 ? '<button class="btn small blue" style="margin-top:16px" onclick="resetGame()">처음부터 다시</button>' : ''}
+    </div>
+  `);
+}
+
+function startGame() {
+  state.hp = state.maxHp;
+  renderMap();
+}
+
+function resetGame() {
+  state.cleared = {};
+  state.stars = 0;
+  state.crystals = 0;
+  state.hp = state.maxHp;
+  renderTitle();
+}
+
+function renderMap() {
+  const worldsHtml = WORLDS.map((w, i) => {
+    const stars = state.cleared[w.id] || 0;
+    const prevCleared = i === 0 || state.cleared[WORLDS[i-1].id];
+    const isCleared = stars > 0;
+    const locked = !prevCleared;
+    return `
+      <div class="world-card ${locked ? 'locked' : ''} ${isCleared ? 'cleared' : ''}"
+           onclick="${locked ? '' : `enterWorld('${w.id}')`}">
+        <div class="world-icon">${w.icon}</div>
+        <div class="world-name">${w.name}</div>
+        <div class="world-topic">${w.topic}</div>
+        <div class="world-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+        ${locked ? '<div class="lock-overlay">🔒</div>' : ''}
+      </div>
+    `;
+  }).join('');
+
+  const allCleared = WORLDS.every(w => state.cleared[w.id]);
+
+  render(`
+    <div class="screen map-screen">
+      <div class="map-header">
+        <div class="map-title">🗺️ 모험 지도</div>
+        <div class="player-stats">
+          <div class="stat">❤️ ${state.hp}/${state.maxHp}</div>
+          <div class="stat">⭐ ${state.stars}</div>
+          <div class="stat">💎 ${state.crystals}</div>
+        </div>
+      </div>
+      <div class="map-grid">${worldsHtml}</div>
+      ${allCleared ? '<div style="text-align:center;margin-top:16px;font-size:24px;color:#5b2a86;font-weight:bold">🎉 모든 세계를 정복했어요! 🎉</div>' : ''}
+    </div>
+  `);
+}
+
+function enterWorld(worldId) {
+  const world = WORLDS.find(w => w.id === worldId);
+  state.currentWorld = world;
+  state.currentEnemyIndex = 0;
+  state.hp = state.maxHp;
+  state.questionCount = 0;
+  showWorldIntro(world);
+}
+
+function showWorldIntro(world) {
+  render(`
+    <div class="screen battle-screen ${world.bg}">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:white">
+        <div style="font-size:120px;margin-bottom:20px;animation:bounce 2s infinite">${world.icon}</div>
+        <h2 style="font-size:48px;margin-bottom:16px;text-shadow:3px 3px 6px rgba(0,0,0,0.5)">${world.name}</h2>
+        <p style="font-size:22px;line-height:1.6;max-width:600px;text-shadow:2px 2px 4px rgba(0,0,0,0.5)">${world.story}</p>
+        <button class="btn green" style="margin-top:30px" onclick="nextBattle()">출발! ⚔️</button>
+        <button class="btn small" style="margin-top:12px;background:rgba(255,255,255,0.3);box-shadow:none" onclick="renderMap()">지도로 돌아가기</button>
+      </div>
+    </div>
+  `);
+}
+
+function nextBattle() {
+  const world = state.currentWorld;
+  const idx = state.currentEnemyIndex;
+  if (idx >= state.totalQuestions) {
+    // 월드 클리어!
+    return worldClear();
+  }
+  const isBoss = idx === state.totalQuestions - 1;
+  const enemy = isBoss ? world.enemies[world.enemies.length - 1] : world.enemies[idx];
+  const enemyName = isBoss ? world.enemyNames[world.enemyNames.length - 1] : world.enemyNames[idx];
+  const question = genQuestion(world.id, idx + 1);
+  state.currentQuestion = question;
+  state.currentEnemy = { emoji: enemy, name: enemyName, isBoss };
+
+  renderBattle();
+}
+
+function renderBattle() {
+  const world = state.currentWorld;
+  const q = state.currentQuestion;
+  const enemy = state.currentEnemy;
+  const progress = `${state.currentEnemyIndex + 1}/${state.totalQuestions}${enemy.isBoss ? ' 👑 보스!' : ''}`;
+
+  render(`
+    <div class="screen battle-screen ${world.bg}">
+      <div class="battle-top">
+        <div class="battle-info">${world.icon} ${world.name}</div>
+        <div class="hp-bar">❤️ ${'❤️'.repeat(state.hp - 1)}${'🖤'.repeat(state.maxHp - state.hp)}</div>
+      </div>
+      <div style="text-align:center;color:white;font-size:18px;margin-bottom:8px">${progress}</div>
+      <div class="battle-arena">
+        <div class="hero" id="hero">
+          <div class="hero-emoji">${HERO}</div>
+          <div class="hero-name">${HERO_NAME}</div>
+        </div>
+        <div class="vs" style="color:white">⚔️</div>
+        <div class="enemy" id="enemy">
+          <div class="enemy-emoji" style="font-size:${enemy.isBoss ? '140px' : '100px'}">${enemy.emoji}</div>
+          <div class="enemy-name">${enemy.name}</div>
+        </div>
+      </div>
+      <div class="question-box">
+        <div class="question-visual">${q.visual || ''}</div>
+        <div class="question-text">${q.q}</div>
+        <div class="answer-grid">
+          ${q.opts.map((opt, i) => `<button class="answer-btn" data-i="${i}" onclick="answer(${i})">${opt}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function answer(i) {
+  const q = state.currentQuestion;
+  const buttons = document.querySelectorAll('.answer-btn');
+  buttons.forEach(b => b.classList.add('disabled'));
+  const correct = i === q.a;
+
+  if (correct) {
+    buttons[i].classList.add('correct');
+    floatText(document.getElementById('enemy'), '+1 💎', '#5cd95c');
+    document.getElementById('hero').classList.add('attack-anim');
+    document.getElementById('enemy').classList.add('hurt');
+    state.crystals++;
+    setTimeout(() => {
+      state.currentEnemyIndex++;
+      nextBattle();
+    }, 1100);
+  } else {
+    buttons[i].classList.add('wrong');
+    buttons[q.a].classList.add('correct');
+    document.getElementById('hero').classList.add('hurt');
+    floatText(document.getElementById('hero'), '-1 ❤️', '#ff6b6b');
+    state.hp--;
+    if (state.hp <= 0) {
+      setTimeout(() => gameOver(), 1500);
+    } else {
+      setTimeout(() => {
+        state.currentEnemyIndex++;
+        nextBattle();
+      }, 1800);
+    }
+  }
+}
+
+function floatText(target, text, color) {
+  const rect = target.getBoundingClientRect();
+  const ft = document.createElement('div');
+  ft.className = 'floating-text';
+  ft.textContent = text;
+  ft.style.color = color;
+  ft.style.left = (rect.left + rect.width / 2) + 'px';
+  ft.style.top = (rect.top + 20) + 'px';
+  document.body.appendChild(ft);
+  setTimeout(() => ft.remove(), 1500);
+}
+
+function worldClear() {
+  const worldId = state.currentWorld.id;
+  // 별 계산: HP가 많을수록 별을 많이 줌
+  const stars = state.hp >= 3 ? 3 : state.hp >= 2 ? 2 : 1;
+  const prevStars = state.cleared[worldId] || 0;
+  if (stars > prevStars) {
+    state.stars += (stars - prevStars);
+    state.cleared[worldId] = stars;
+  }
+
+  const allCleared = WORLDS.every(w => state.cleared[w.id]);
+
+  render(`
+    <div class="screen result-screen">
+      <h2>🎉 승리! 🎉</h2>
+      <div class="big-icon">${state.currentWorld.icon}</div>
+      <p><strong>${state.currentWorld.name}</strong>을(를) 정복했어요!</p>
+      <div class="reward-list">
+        ${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}<br>
+        💎 보석 ${state.crystals}개
+      </div>
+      ${allCleared ?
+        `<p style="font-size:26px;color:#c0392b;margin-top:20px">🏆 수학 왕국을 모두 구했어요! 🏆<br>당신은 진정한 수학 영웅입니다!</p>` :
+        `<p>다음 모험을 떠나볼까요?</p>`
+      }
+      <button class="btn green" style="margin-top:24px" onclick="renderMap()">지도로 돌아가기</button>
+    </div>
+  `);
+}
+
+function gameOver() {
+  render(`
+    <div class="screen result-screen" style="background:linear-gradient(135deg,#666 0%,#333 100%);color:white">
+      <h2 style="color:white;text-shadow:none">앗! 쓰러졌어요 😵</h2>
+      <div class="big-icon">💫</div>
+      <p>괜찮아요! 다시 도전해봐요.</p>
+      <p style="font-size:18px;margin-top:8px;opacity:0.8">실수해도 괜찮아요. 계속 풀다 보면 잘하게 돼요!</p>
+      <button class="btn green" style="margin-top:24px" onclick="enterWorld('${state.currentWorld.id}')">다시 도전!</button>
+      <button class="btn small blue" style="margin-top:12px" onclick="renderMap()">지도로</button>
+    </div>
+  `);
+}
+
+// 키보드 단축키 (1~4로 답하기)
+document.addEventListener('keydown', (e) => {
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 4) {
+    const btn = document.querySelector(`.answer-btn[data-i="${num-1}"]:not(.disabled)`);
+    if (btn) btn.click();
+  }
+});
+
+// 시작!
+renderTitle();
+</script>
+</body>
+</html>
