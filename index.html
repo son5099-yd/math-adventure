@@ -186,15 +186,22 @@
   .vs { font-size: 40px; font-weight: bold; }
   .attack-anim { animation: attack 0.5s; }
   @keyframes attack {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(100px) scale(1.2); }
-    100% { transform: translateX(0); }
+    0% { transform: translateX(0) scale(1); }
+    50% { transform: translateX(40px) scale(1.15) rotate(-10deg); }
+    100% { transform: translateX(0) scale(1); }
   }
-  .hurt { animation: hurt 0.5s; }
-  @keyframes hurt {
-    0%, 100% { transform: translateX(0); filter: none; }
-    25% { transform: translateX(-15px); filter: hue-rotate(180deg) brightness(0.5); }
-    75% { transform: translateX(15px); filter: hue-rotate(180deg) brightness(0.5); }
+  .hurt { animation: cheer 0.6s; }
+  @keyframes cheer {
+    0%, 100% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-20px) scale(1.15) rotate(-8deg); }
+    50% { transform: translateY(-10px) scale(1.1) rotate(0deg); }
+    75% { transform: translateY(-20px) scale(1.15) rotate(8deg); }
+  }
+  .think { animation: think 0.5s; }
+  @keyframes think {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
   }
   .question-box {
     background: rgba(255,255,255,0.95);
@@ -357,33 +364,33 @@ const HERO_NAME = '용감한 모험가';
 const WORLDS = [
   {
     id: 'forest', name: '도형의 숲', icon: '🌳', topic: '도형 찾기',
-    bg: 'forest', enemies: ['🦊', '🦝', '🐺', '👹'],
-    enemyNames: ['세모여우', '네모너구리', '동그라미늑대', '도깨비대장'],
-    story: '도형의 숲에 도형을 훔쳐가는 도깨비가 나타났어요! 도형을 맞추고 숲을 구해주세요.'
+    bg: 'forest', enemies: ['🦊', '🦝', '🐰', '🦉'],
+    enemyNames: ['여우 친구', '너구리 친구', '토끼 친구', '부엉이 어르신'],
+    story: '도형의 숲에 사는 친구들이 도형 모양을 잊어버렸대요! 함께 떠올려서 도와줘요.'
   },
   {
     id: 'castle', name: '구구단 성', icon: '🏰', topic: '곱셈 구구단',
-    bg: 'castle', enemies: ['🦇', '👻', '🧟', '🐉'],
-    enemyNames: ['박쥐기사', '유령병정', '좀비병장', '구구단 용'],
-    story: '구구단 성에 사악한 용이 살아요. 구구단 문제를 풀어 용을 물리쳐요!'
+    bg: 'castle', enemies: ['🐱', '🐶', '🦄', '🐲'],
+    enemyNames: ['고양이 마법사', '강아지 기사', '유니콘 친구', '구구단 용'],
+    story: '성에 사는 친구들이 곱셈 문제로 고민 중이에요. 함께 풀어주면 친구가 될 수 있어요!'
   },
   {
     id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈',
-    bg: 'cave', enemies: ['🦂', '🕷️', '🐍', '👾'],
-    enemyNames: ['전갈', '거미', '독사', '동굴괴물'],
-    story: '깊고 어두운 동굴 속! 보물을 똑같이 나누어야 통과할 수 있어요.'
+    bg: 'cave', enemies: ['🐹', '🦔', '🐢', '🐻'],
+    enemyNames: ['햄스터 친구', '고슴도치 친구', '거북이 친구', '곰 어르신'],
+    story: '동굴 친구들이 모은 도토리를 똑같이 나누고 싶대요. 나눗셈으로 도와줘요!'
   },
   {
     id: 'village', name: '덧셈 마을', icon: '🏘️', topic: '덧셈과 뺄셈',
-    bg: 'village', enemies: ['🐗', '🦏', '🐘', '🦖'],
-    enemyNames: ['멧돼지', '코뿔소', '코끼리', '공룡왕'],
-    story: '평화로운 마을에 큰 동물들이 쳐들어왔어요. 계산으로 막아내세요!'
+    bg: 'village', enemies: ['🐮', '🐷', '🐑', '🦒'],
+    enemyNames: ['소 친구', '돼지 친구', '양 친구', '기린 이장님'],
+    story: '마을에 큰 잔치가 열려요! 친구들이 음식 개수를 세는 걸 도와달래요.'
   },
   {
     id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수 기초',
-    bg: 'island', enemies: ['🦈', '🐙', '🐳', '🧜‍♂️'],
-    enemyNames: ['상어', '문어', '고래', '바다왕'],
-    story: '신비한 분수 섬! 케이크와 피자를 나누는 분수 문제를 풀어보아요.'
+    bg: 'island', enemies: ['🐠', '🐬', '🐙', '🧜‍♀️'],
+    enemyNames: ['물고기 친구', '돌고래 친구', '문어 친구', '인어 공주'],
+    story: '섬 친구들이 케이크와 피자를 똑같이 나누고 싶대요. 분수로 도와주세요!'
   }
 ];
 
@@ -537,9 +544,9 @@ function render(html) {
 function renderTitle() {
   render(`
     <div class="screen title-screen">
-      <h1>수학 왕국의 모험</h1>
+      <h1>수학 친구들의 모험</h1>
       <div class="hero-preview">${HERO}</div>
-      <p>5개의 신비한 세계를 모험하며<br>수학 문제를 풀고 왕국을 구해주세요!</p>
+      <p>5개의 세계를 모험하며<br>수학 문제로 고민하는 친구들을 도와줘요!</p>
       <button class="btn" onclick="startGame()">모험 시작! 🚀</button>
       ${Object.keys(state.cleared).length > 0 ? '<button class="btn small blue" style="margin-top:16px" onclick="resetGame()">처음부터 다시</button>' : ''}
     </div>
@@ -586,11 +593,11 @@ function renderMap() {
         <div class="player-stats">
           <div class="stat">❤️ ${state.hp}/${state.maxHp}</div>
           <div class="stat">⭐ ${state.stars}</div>
-          <div class="stat">💎 ${state.crystals}</div>
+          <div class="stat">💝 ${state.crystals}</div>
         </div>
       </div>
       <div class="map-grid">${worldsHtml}</div>
-      ${allCleared ? '<div style="text-align:center;margin-top:16px;font-size:24px;color:#5b2a86;font-weight:bold">🎉 모든 세계를 정복했어요! 🎉</div>' : ''}
+      ${allCleared ? '<div style="text-align:center;margin-top:16px;font-size:24px;color:#5b2a86;font-weight:bold">🎉 모든 친구를 만났어요! 🎉</div>' : ''}
     </div>
   `);
 }
@@ -611,7 +618,7 @@ function showWorldIntro(world) {
         <div style="font-size:120px;margin-bottom:20px;animation:bounce 2s infinite">${world.icon}</div>
         <h2 style="font-size:48px;margin-bottom:16px;text-shadow:3px 3px 6px rgba(0,0,0,0.5)">${world.name}</h2>
         <p style="font-size:22px;line-height:1.6;max-width:600px;text-shadow:2px 2px 4px rgba(0,0,0,0.5)">${world.story}</p>
-        <button class="btn green" style="margin-top:30px" onclick="nextBattle()">출발! ⚔️</button>
+        <button class="btn green" style="margin-top:30px" onclick="nextBattle()">친구 만나러 가기! 🌟</button>
         <button class="btn small" style="margin-top:12px;background:rgba(255,255,255,0.3);box-shadow:none" onclick="renderMap()">지도로 돌아가기</button>
       </div>
     </div>
@@ -639,7 +646,7 @@ function renderBattle() {
   const world = state.currentWorld;
   const q = state.currentQuestion;
   const enemy = state.currentEnemy;
-  const progress = `${state.currentEnemyIndex + 1}/${state.totalQuestions}${enemy.isBoss ? ' 👑 보스!' : ''}`;
+  const progress = `${state.currentEnemyIndex + 1}/${state.totalQuestions}${enemy.isBoss ? ' ✨ 마지막 친구!' : ''}`;
 
   render(`
     <div class="screen battle-screen ${world.bg}">
@@ -653,7 +660,7 @@ function renderBattle() {
           <div class="hero-emoji">${HERO}</div>
           <div class="hero-name">${HERO_NAME}</div>
         </div>
-        <div class="vs" style="color:white">⚔️</div>
+        <div class="vs" style="color:white">💭</div>
         <div class="enemy" id="enemy">
           <div class="enemy-emoji" style="font-size:${enemy.isBoss ? '140px' : '100px'}">${enemy.emoji}</div>
           <div class="enemy-name">${enemy.name}</div>
@@ -678,7 +685,8 @@ function answer(i) {
 
   if (correct) {
     buttons[i].classList.add('correct');
-    floatText(document.getElementById('enemy'), '+1 💎', '#5cd95c');
+    floatText(document.getElementById('enemy'), '+1 💝', '#ff8ec7');
+    floatText(document.getElementById('hero'), '🎉', '#ffd700');
     document.getElementById('hero').classList.add('attack-anim');
     document.getElementById('enemy').classList.add('hurt');
     state.crystals++;
@@ -689,8 +697,9 @@ function answer(i) {
   } else {
     buttons[i].classList.add('wrong');
     buttons[q.a].classList.add('correct');
-    document.getElementById('hero').classList.add('hurt');
-    floatText(document.getElementById('hero'), '-1 ❤️', '#ff6b6b');
+    document.getElementById('hero').classList.add('think');
+    document.getElementById('enemy').classList.add('think');
+    floatText(document.getElementById('hero'), '🤔', '#888');
     state.hp--;
     if (state.hp <= 0) {
       setTimeout(() => gameOver(), 1500);
@@ -729,16 +738,16 @@ function worldClear() {
 
   render(`
     <div class="screen result-screen">
-      <h2>🎉 승리! 🎉</h2>
+      <h2>🎉 친구가 되었어요! 🎉</h2>
       <div class="big-icon">${state.currentWorld.icon}</div>
-      <p><strong>${state.currentWorld.name}</strong>을(를) 정복했어요!</p>
+      <p><strong>${state.currentWorld.name}</strong>의 친구들과 모두 친해졌어요!</p>
       <div class="reward-list">
         ${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}<br>
-        💎 보석 ${state.crystals}개
+        💝 친구 ${state.crystals}명
       </div>
       ${allCleared ?
-        `<p style="font-size:26px;color:#c0392b;margin-top:20px">🏆 수학 왕국을 모두 구했어요! 🏆<br>당신은 진정한 수학 영웅입니다!</p>` :
-        `<p>다음 모험을 떠나볼까요?</p>`
+        `<p style="font-size:26px;color:#c0392b;margin-top:20px">🏆 모든 친구를 만났어요! 🏆<br>당신은 멋진 수학 친구예요!</p>` :
+        `<p>다음 친구들을 만나러 가볼까요?</p>`
       }
       <button class="btn green" style="margin-top:24px" onclick="renderMap()">지도로 돌아가기</button>
     </div>
@@ -747,11 +756,11 @@ function worldClear() {
 
 function gameOver() {
   render(`
-    <div class="screen result-screen" style="background:linear-gradient(135deg,#666 0%,#333 100%);color:white">
-      <h2 style="color:white;text-shadow:none">앗! 쓰러졌어요 😵</h2>
-      <div class="big-icon">💫</div>
-      <p>괜찮아요! 다시 도전해봐요.</p>
-      <p style="font-size:18px;margin-top:8px;opacity:0.8">실수해도 괜찮아요. 계속 풀다 보면 잘하게 돼요!</p>
+    <div class="screen result-screen" style="background:linear-gradient(135deg,#a0e7e5 0%,#b4f8c8 100%)">
+      <h2>잠깐 쉬어가요 😊</h2>
+      <div class="big-icon">🌈</div>
+      <p>친구들이 기다리고 있어요!</p>
+      <p style="font-size:18px;margin-top:8px;opacity:0.8">처음에는 어려워도 괜찮아요.<br>계속 해보면 분명히 잘할 수 있어요!</p>
       <button class="btn green" style="margin-top:24px" onclick="enterWorld('${state.currentWorld.id}')">다시 도전!</button>
       <button class="btn small blue" style="margin-top:12px" onclick="renderMap()">지도로</button>
     </div>
