@@ -396,8 +396,8 @@
     0%, 100% { transform: rotate(0deg); }
     50% { transform: rotate(-90deg); }
   }
-  /* 모바일 가로 모드가 아니면(=세로) 오버레이 표시 */
-  @media (max-width: 1024px) and (orientation: portrait) {
+  /* 터치 기기(iPad/iPhone)에서 세로 모드일 때만 오버레이 표시 */
+  @media (orientation: portrait) and (hover: none) and (pointer: coarse) {
     #rotate-overlay { display: flex; }
   }
 </style>
