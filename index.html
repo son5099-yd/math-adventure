@@ -300,6 +300,77 @@
   /* 별/하트 표시 */
   .hidden { display: none !important; }
 
+  /* ===== 풀이 오버레이 ===== */
+  .explain-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 20px;
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .explain-card {
+    background: white;
+    border-radius: 24px;
+    padding: 24px 28px;
+    max-width: 640px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: popIn 0.3s;
+    max-height: 90%;
+    overflow-y: auto;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .explain-header {
+    font-size: 26px;
+    color: #ff9800;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  .explain-question {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  .explain-visual {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  .explain-answer {
+    font-size: 24px;
+    color: white;
+    background: #2eb82e;
+    padding: 10px 20px;
+    border-radius: 16px;
+    display: inline-block;
+    margin: 8px 0 16px;
+    font-weight: bold;
+  }
+  .explain-text {
+    font-size: 18px;
+    color: #444;
+    background: #fff8d0;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    text-align: left;
+    white-space: pre-line;
+    border-left: 5px solid #ffd700;
+  }
+
   /* iPad 세로 모드 안내 오버레이 */
   #rotate-overlay {
     position: fixed;
@@ -465,63 +536,57 @@ function genQuestion(worldId, difficulty) {
 
 function genShape() {
   const shapes = [
-    { q: '변이 3개인 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 0 },
-    { q: '변이 4개인 도형은?', visual: '🔺 ⬜ ⭕ ⭐', opts: ['삼각형', '사각형', '원', '별'], a: 1 },
-    { q: '변이 없는 동그란 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 2 },
-    { q: '꼭짓점이 3개인 도형은?', visual: '🔺', opts: ['삼각형', '사각형', '원', '오각형'], a: 0 },
-    { q: '꼭짓점이 4개인 도형은?', visual: '🔺 ⬜ ⭕', opts: ['삼각형', '사각형', '원', '오각형'], a: 1 },
-    { q: '꼭짓점이 5개인 도형은?', visual: '⬜ 🔺 ⭐ ⭕', opts: ['사각형', '삼각형', '오각형', '원'], a: 2 },
-    { q: '꼭짓점이 6개인 도형은?', visual: '⬢', opts: ['오각형', '사각형', '육각형', '삼각형'], a: 2 },
-    { q: '직각이 4개 있는 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '직사각형', '원', '마름모'], a: 1 },
-    { q: '모든 변의 길이가 같은 사각형은?', visual: '⬜', opts: ['직사각형', '정사각형', '사다리꼴', '평행사변형'], a: 1 },
-    { q: '네 변의 길이가 같지 않은 사각형은?', visual: '▭', opts: ['정사각형', '직사각형', '마름모', '원'], a: 1 },
-    { q: '평행한 변이 한 쌍만 있는 사각형은?', visual: '⏢', opts: ['사다리꼴', '정사각형', '직사각형', '마름모'], a: 0 },
-    { q: '굴러갈 수 있는 입체도형은?', visual: '📦 ⚽ 🎲', opts: ['직육면체', '구', '주사위', '벽돌'], a: 1 },
-    { q: '주사위 모양의 입체도형은?', visual: '🎲', opts: ['구', '원기둥', '정육면체', '원뿔'], a: 2 },
-    { q: '뾰족한 꼭대기가 있는 입체도형은?', visual: '🍦', opts: ['구', '원기둥', '직육면체', '원뿔'], a: 3 },
-    { q: '동전 모양의 평면도형은?', visual: '🪙', opts: ['삼각형', '사각형', '원', '오각형'], a: 2 },
-    { q: '책의 표지 모양은?', visual: '📖', opts: ['원', '삼각형', '직사각형', '오각형'], a: 2 },
-    { q: '시계 모양은 어떤 도형일까요?', visual: '🕒', opts: ['삼각형', '원', '사각형', '별'], a: 1 },
-    { q: '교통 표지판 중 삼각형은?', visual: '⚠️', opts: ['주의 표지판', '주차 표지판', '횡단보도 표지판', '신호등'], a: 0 },
+    { q: '변이 3개인 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 0, explain: '삼각형(三角形)은 변이 3개, 꼭짓점도 3개인 도형이에요.' },
+    { q: '변이 4개인 도형은?', visual: '🔺 ⬜ ⭕ ⭐', opts: ['삼각형', '사각형', '원', '별'], a: 1, explain: '사각형은 변이 4개, 꼭짓점도 4개인 도형이에요.' },
+    { q: '변이 없는 동그란 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 2, explain: '원은 동그란 모양이라서 변과 꼭짓점이 없어요.' },
+    { q: '꼭짓점이 3개인 도형은?', visual: '🔺', opts: ['삼각형', '사각형', '원', '오각형'], a: 0, explain: '삼각형은 꼭짓점이 3개예요. 변의 수와 꼭짓점 수가 같답니다.' },
+    { q: '꼭짓점이 4개인 도형은?', visual: '🔺 ⬜ ⭕', opts: ['삼각형', '사각형', '원', '오각형'], a: 1, explain: '사각형은 꼭짓점이 4개예요.' },
+    { q: '꼭짓점이 5개인 도형은?', visual: '⬜ 🔺 ⭐ ⭕', opts: ['사각형', '삼각형', '오각형', '원'], a: 2, explain: '오각형(五角形)은 꼭짓점이 5개, 변도 5개예요. 별 모양과 비슷해요.' },
+    { q: '꼭짓점이 6개인 도형은?', visual: '⬢', opts: ['오각형', '사각형', '육각형', '삼각형'], a: 2, explain: '육각형(六角形)은 꼭짓점이 6개, 변도 6개예요. 벌집 모양이 육각형이에요.' },
+    { q: '직각이 4개 있는 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '직사각형', '원', '마름모'], a: 1, explain: '직사각형은 네 모서리가 모두 직각(90도)이에요.' },
+    { q: '모든 변의 길이가 같은 사각형은?', visual: '⬜', opts: ['직사각형', '정사각형', '사다리꼴', '평행사변형'], a: 1, explain: '정사각형은 네 변의 길이가 모두 같고, 네 모서리가 모두 직각이에요.' },
+    { q: '네 변의 길이가 같지 않은 사각형은?', visual: '▭', opts: ['정사각형', '직사각형', '마름모', '원'], a: 1, explain: '직사각형은 마주 보는 변끼리는 같지만, 가로와 세로 길이가 달라요.' },
+    { q: '평행한 변이 한 쌍만 있는 사각형은?', visual: '⏢', opts: ['사다리꼴', '정사각형', '직사각형', '마름모'], a: 0, explain: '사다리꼴은 마주 보는 변 중 한 쌍만 평행한 사각형이에요.' },
+    { q: '굴러갈 수 있는 입체도형은?', visual: '📦 ⚽ 🎲', opts: ['직육면체', '구', '주사위', '벽돌'], a: 1, explain: '구는 동그란 입체도형이라서 어느 방향으로든 굴러가요. 축구공이 구 모양이에요!' },
+    { q: '주사위 모양의 입체도형은?', visual: '🎲', opts: ['구', '원기둥', '정육면체', '원뿔'], a: 2, explain: '정육면체는 6개의 면이 모두 정사각형인 입체도형이에요.' },
+    { q: '뾰족한 꼭대기가 있는 입체도형은?', visual: '🍦', opts: ['구', '원기둥', '직육면체', '원뿔'], a: 3, explain: '원뿔은 아래는 동그란 원, 위는 뾰족한 꼭지점이 있어요. 아이스크림 콘 모양!' },
+    { q: '동전 모양의 평면도형은?', visual: '🪙', opts: ['삼각형', '사각형', '원', '오각형'], a: 2, explain: '동전은 둥글둥글한 원 모양이에요.' },
+    { q: '책의 표지 모양은?', visual: '📖', opts: ['원', '삼각형', '직사각형', '오각형'], a: 2, explain: '책의 표지는 가로와 세로 길이가 다른 직사각형이에요.' },
+    { q: '시계 모양은 어떤 도형일까요?', visual: '🕒', opts: ['삼각형', '원', '사각형', '별'], a: 1, explain: '동그란 시계의 모양은 원이에요.' },
+    { q: '교통 표지판 중 삼각형은?', visual: '⚠️', opts: ['주의 표지판', '주차 표지판', '횡단보도 표지판', '신호등'], a: 0, explain: '주의 표지판은 삼각형 모양으로 위험을 알려줘요.' },
   ];
   return shapes[Math.floor(R() * shapes.length)];
 }
 
 function genScience() {
   const questions = [
-    // 곤충/동물
-    { q: '곤충의 다리는 모두 몇 개일까요?', visual: '🐝', opts: ['4개', '6개', '8개', '10개'], a: 1 },
-    { q: '거미의 다리는 몇 개일까요?', visual: '🕷️', opts: ['6개', '8개', '10개', '4개'], a: 1 },
-    { q: '다음 중 곤충이 아닌 것은?', visual: '🐝 🐜 🕷️ 🦗', opts: ['벌', '개미', '거미', '메뚜기'], a: 2 },
-    { q: '나비는 무엇에서 태어날까요?', visual: '🦋', opts: ['알', '새끼', '씨앗', '구름'], a: 0 },
-    { q: '나비가 되기 전 단계는?', visual: '🐛', opts: ['알', '애벌레', '올챙이', '병아리'], a: 1 },
-    { q: '개구리는 어디에서 태어날까요?', visual: '🐸', opts: ['알', '새끼', '땅속', '구름'], a: 0 },
-    { q: '새끼를 낳는 동물은?', visual: '🐶 🐔 🐠 🐢', opts: ['닭', '강아지', '물고기', '거북이'], a: 1 },
-    // 자석
-    { q: '자석에 잘 붙는 것은?', visual: '🧲', opts: ['종이', '플라스틱컵', '쇠클립', '나무'], a: 2 },
-    { q: '자석의 양 끝을 무엇이라고 할까요?', visual: '🧲', opts: ['양 끝', '극', '머리', '발'], a: 1 },
-    { q: '자석의 같은 극끼리 만나면 어떻게 될까요?', visual: '🧲 🧲', opts: ['끌어당겨요', '밀어내요', '딱 붙어요', '아무 일도 없어요'], a: 1 },
-    { q: '자석의 다른 극끼리 만나면 어떻게 될까요?', visual: '🧲 🧲', opts: ['끌어당겨요', '밀어내요', '깨져요', '사라져요'], a: 0 },
-    // 물의 상태
-    { q: '얼음이 녹으면 무엇이 될까요?', visual: '🧊', opts: ['수증기', '물', '구름', '눈'], a: 1 },
-    { q: '물을 펄펄 끓이면 무엇이 될까요?', visual: '♨️', opts: ['얼음', '수증기', '눈', '비'], a: 1 },
-    { q: '물이 차가워져서 꽁꽁 얼면?', visual: '💧', opts: ['수증기', '얼음', '구름', '바람'], a: 1 },
-    { q: '물의 세 가지 상태가 아닌 것은?', visual: '💧 🧊 ♨️', opts: ['물', '얼음', '수증기', '바람'], a: 3 },
-    // 식물
-    { q: '식물이 자라는 데 꼭 필요하지 않은 것은?', visual: '🌱', opts: ['햇빛', '물', '공기', '소금'], a: 3 },
-    { q: '식물의 어느 부분이 땅속에서 물을 빨아들일까요?', visual: '🌳', opts: ['잎', '뿌리', '꽃', '열매'], a: 1 },
-    { q: '식물의 잎에서 일어나는 일은?', visual: '🍃 ☀️', opts: ['양분 만들기', '잠자기', '물 마시기', '소화시키기'], a: 0 },
-    { q: '나무에서 자라는 것은?', visual: '🌳', opts: ['열매', '돌', '얼음', '구름'], a: 0 },
-    // 우리 몸
-    { q: '음식을 소화시키는 우리 몸의 기관은?', visual: '🍱', opts: ['심장', '뇌', '위', '폐'], a: 2 },
-    { q: '숨을 쉴 수 있게 해주는 기관은?', visual: '🫁', opts: ['위', '폐', '간', '신장'], a: 1 },
-    { q: '온몸으로 피를 보내주는 기관은?', visual: '❤️', opts: ['뇌', '심장', '위', '폐'], a: 1 },
-    { q: '생각하고 기억하는 기관은?', visual: '🧠', opts: ['심장', '폐', '뇌', '위'], a: 2 },
-    // 지구와 우주
-    { q: '낮과 밤이 생기는 이유는?', visual: '🌍 ☀️', opts: ['지구가 돌아서', '달이 움직여서', '구름 때문에', '바람 때문에'], a: 0 },
-    { q: '지구 주위를 도는 천체는?', visual: '🌙', opts: ['해', '별', '달', '구름'], a: 2 },
-    { q: '우리가 사는 행성의 이름은?', visual: '🌍', opts: ['달', '태양', '지구', '화성'], a: 2 },
-    { q: '낮에 하늘에서 빛나는 것은?', visual: '☀️', opts: ['달', '태양', '별', '구름'], a: 1 },
+    { q: '곤충의 다리는 모두 몇 개일까요?', visual: '🐝', opts: ['4개', '6개', '8개', '10개'], a: 1, explain: '곤충은 다리가 6개예요! 몸이 머리·가슴·배 세 부분으로 나뉘어요.' },
+    { q: '거미의 다리는 몇 개일까요?', visual: '🕷️', opts: ['6개', '8개', '10개', '4개'], a: 1, explain: '거미는 다리가 8개라서 곤충이 아니에요. 거미는 절지동물에 속해요.' },
+    { q: '다음 중 곤충이 아닌 것은?', visual: '🐝 🐜 🕷️ 🦗', opts: ['벌', '개미', '거미', '메뚜기'], a: 2, explain: '거미는 다리가 8개! 곤충은 다리가 6개여야 해요.' },
+    { q: '나비는 무엇에서 태어날까요?', visual: '🦋', opts: ['알', '새끼', '씨앗', '구름'], a: 0, explain: '나비는 알 → 애벌레 → 번데기 → 나비 순서로 자라요.' },
+    { q: '나비가 되기 전 단계는?', visual: '🐛', opts: ['알', '애벌레', '올챙이', '병아리'], a: 1, explain: '나비는 애벌레 → 번데기를 거쳐서 나비가 돼요.' },
+    { q: '개구리는 어디에서 태어날까요?', visual: '🐸', opts: ['알', '새끼', '땅속', '구름'], a: 0, explain: '개구리는 알 → 올챙이 → 개구리 순서로 자라요.' },
+    { q: '새끼를 낳는 동물은?', visual: '🐶 🐔 🐠 🐢', opts: ['닭', '강아지', '물고기', '거북이'], a: 1, explain: '강아지·고양이 같은 포유류는 새끼를 낳아요. 닭·물고기·거북이는 알을 낳아요.' },
+    { q: '자석에 잘 붙는 것은?', visual: '🧲', opts: ['종이', '플라스틱컵', '쇠클립', '나무'], a: 2, explain: '자석에는 쇠로 된 물건만 붙어요. 종이·플라스틱·나무는 안 붙어요.' },
+    { q: '자석의 양 끝을 무엇이라고 할까요?', visual: '🧲', opts: ['양 끝', '극', '머리', '발'], a: 1, explain: '자석의 양 끝을 "극"이라고 해요. N극과 S극 두 가지가 있어요.' },
+    { q: '자석의 같은 극끼리 만나면 어떻게 될까요?', visual: '🧲 🧲', opts: ['끌어당겨요', '밀어내요', '딱 붙어요', '아무 일도 없어요'], a: 1, explain: '같은 극(N-N 또는 S-S)은 서로 밀어내요. 친한 친구가 아닌가봐요!' },
+    { q: '자석의 다른 극끼리 만나면 어떻게 될까요?', visual: '🧲 🧲', opts: ['끌어당겨요', '밀어내요', '깨져요', '사라져요'], a: 0, explain: '다른 극(N-S)은 서로 끌어당겨요. 딱 붙어버려요!' },
+    { q: '얼음이 녹으면 무엇이 될까요?', visual: '🧊', opts: ['수증기', '물', '구름', '눈'], a: 1, explain: '얼음(고체)은 따뜻해지면 녹아서 물(액체)이 돼요.' },
+    { q: '물을 펄펄 끓이면 무엇이 될까요?', visual: '♨️', opts: ['얼음', '수증기', '눈', '비'], a: 1, explain: '물(액체)은 끓이면 수증기(기체)가 되어 공기 중으로 날아가요.' },
+    { q: '물이 차가워져서 꽁꽁 얼면?', visual: '💧', opts: ['수증기', '얼음', '구름', '바람'], a: 1, explain: '물(액체)은 0도 이하로 차가워지면 얼음(고체)이 돼요.' },
+    { q: '물의 세 가지 상태가 아닌 것은?', visual: '💧 🧊 ♨️', opts: ['물', '얼음', '수증기', '바람'], a: 3, explain: '물의 세 가지 상태는 고체(얼음), 액체(물), 기체(수증기)예요. 바람은 공기의 움직임이에요.' },
+    { q: '식물이 자라는 데 꼭 필요하지 않은 것은?', visual: '🌱', opts: ['햇빛', '물', '공기', '소금'], a: 3, explain: '식물은 햇빛·물·공기가 꼭 필요해요. 소금은 오히려 식물에게 해로워요.' },
+    { q: '식물의 어느 부분이 땅속에서 물을 빨아들일까요?', visual: '🌳', opts: ['잎', '뿌리', '꽃', '열매'], a: 1, explain: '뿌리가 땅속에서 물과 양분을 빨아들여 식물을 자라게 해요.' },
+    { q: '식물의 잎에서 일어나는 일은?', visual: '🍃 ☀️', opts: ['양분 만들기', '잠자기', '물 마시기', '소화시키기'], a: 0, explain: '식물의 잎은 햇빛을 받아 양분을 만들어요. 이걸 "광합성"이라고 해요.' },
+    { q: '나무에서 자라는 것은?', visual: '🌳', opts: ['열매', '돌', '얼음', '구름'], a: 0, explain: '나무에서는 사과·배 같은 열매가 자라요.' },
+    { q: '음식을 소화시키는 우리 몸의 기관은?', visual: '🍱', opts: ['심장', '뇌', '위', '폐'], a: 2, explain: '위는 우리가 먹은 음식을 잘게 부수어 소화시켜요.' },
+    { q: '숨을 쉴 수 있게 해주는 기관은?', visual: '🫁', opts: ['위', '폐', '간', '신장'], a: 1, explain: '폐는 좋은 공기(산소)를 받아들이고, 나쁜 공기(이산화탄소)를 내보내요.' },
+    { q: '온몸으로 피를 보내주는 기관은?', visual: '❤️', opts: ['뇌', '심장', '위', '폐'], a: 1, explain: '심장은 펌프처럼 콩닥콩닥 뛰면서 온몸으로 피를 보내요.' },
+    { q: '생각하고 기억하는 기관은?', visual: '🧠', opts: ['심장', '폐', '뇌', '위'], a: 2, explain: '뇌는 생각하고 기억하고, 우리 몸을 움직이게 해주는 중요한 기관이에요.' },
+    { q: '낮과 밤이 생기는 이유는?', visual: '🌍 ☀️', opts: ['지구가 돌아서', '달이 움직여서', '구름 때문에', '바람 때문에'], a: 0, explain: '지구가 빙글빙글 돌아서(자전) 햇빛을 받는 쪽은 낮, 반대쪽은 밤이 돼요.' },
+    { q: '지구 주위를 도는 천체는?', visual: '🌙', opts: ['해', '별', '달', '구름'], a: 2, explain: '달이 지구 주위를 빙글빙글 돌아요. 지구는 태양 주위를 돌고요.' },
+    { q: '우리가 사는 행성의 이름은?', visual: '🌍', opts: ['달', '태양', '지구', '화성'], a: 2, explain: '우리가 사는 곳은 지구예요. 태양계의 세 번째 행성이랍니다.' },
+    { q: '낮에 하늘에서 빛나는 것은?', visual: '☀️', opts: ['달', '태양', '별', '구름'], a: 1, explain: '낮에는 태양이 하늘에서 환하게 빛나요. 우리에게 빛과 따뜻함을 줘요.' },
   ];
   return questions[Math.floor(R() * questions.length)];
 }
@@ -533,7 +598,8 @@ function genMultiply(diff) {
   const a = randInt(minTable, maxTable);
   const b = randInt(2, 9);
   const ans = a * b;
-  return makeNumberQuestion(`${a} × ${b} = ?`, ans, '✖️');
+  const explain = `${a} × ${b}은(는) ${a}을(를) ${b}번 더한 값이에요.\n${Array(b).fill(a).join(' + ')} = ${ans}`;
+  return makeNumberQuestion(`${a} × ${b} = ?`, ans, '✖️', explain);
 }
 
 function genDivide(diff) {
@@ -541,18 +607,17 @@ function genDivide(diff) {
   const divisor = randInt(2, diff <= 4 ? 5 : 9);
   const quotient = randInt(2, diff <= 4 ? 5 : 9);
   const dividend = divisor * quotient;
-  return makeNumberQuestion(`${dividend} ÷ ${divisor} = ?`, quotient, '➗');
+  const explain = `${dividend}을(를) ${divisor}묶음으로 똑같이 나누면 한 묶음에 ${quotient}씩이에요.\n곱셈으로 확인: ${divisor} × ${quotient} = ${dividend}`;
+  return makeNumberQuestion(`${dividend} ÷ ${divisor} = ?`, quotient, '➗', explain);
 }
 
 function genAddSub(diff) {
   const op = R() < 0.5 ? '+' : '-';
   let a, b, ans;
   if (diff <= 4) {
-    // 두 자리
     a = randInt(20, 99);
     b = randInt(10, 99);
   } else {
-    // 세 자리
     a = randInt(100, 800);
     b = randInt(50, 200);
   }
@@ -561,7 +626,10 @@ function genAddSub(diff) {
     if (b > a) [a, b] = [b, a];
     ans = a - b;
   }
-  return makeNumberQuestion(`${a} ${op} ${b} = ?`, ans, op === '+' ? '➕' : '➖');
+  const explain = op === '+'
+    ? `일의 자리부터 차근차근 더해보세요.\n${a} + ${b} = ${ans}`
+    : `일의 자리부터 차근차근 빼보세요. 모자라면 윗자리에서 빌려와요.\n${a} - ${b} = ${ans}`;
+  return makeNumberQuestion(`${a} ${op} ${b} = ?`, ans, op === '+' ? '➕' : '➖', explain);
 }
 
 function genFraction(diff) {
@@ -583,7 +651,8 @@ function genFraction(diff) {
         q: `색칠된 부분은 전체의 얼마일까요?`,
         visual: filled,
         opts,
-        a: opts.indexOf(correct)
+        a: opts.indexOf(correct),
+        explain: `전체 ${denom}칸 중에서 ${numer}칸이 색칠되어 있어요. 그래서 ${numer}/${denom} (${denom}분의 ${numer})이에요.\n분수는 "분모/분자" 순서가 아니라 아래(분모)부터 읽어요.`
       };
     },
     // 2. 피자 먹은 양
@@ -597,7 +666,8 @@ function genFraction(diff) {
         q: `피자 ${denom}조각 중 ${numer}조각을 먹었어요. 먹은 양은?`,
         visual: '🍕'.repeat(numer) + '⬜'.repeat(denom - numer),
         opts,
-        a: opts.indexOf(correct)
+        a: opts.indexOf(correct),
+        explain: `전체 ${denom}조각 중 ${numer}조각을 먹었어요.\n분수로 쓰면 ${numer}/${denom}이에요. 분모(${denom})는 전체, 분자(${numer})는 먹은 양!`
       };
     },
     // 3. 단위분수 비교 (분모가 작을수록 큰 분수)
@@ -610,7 +680,8 @@ function genFraction(diff) {
         q: `1/${a} 와 1/${b} 중 더 큰 분수는?`,
         visual: '🍰',
         opts,
-        a: opts.indexOf(correct)
+        a: opts.indexOf(correct),
+        explain: `케이크를 ${a}조각으로 나눈 것과 ${b}조각으로 나눈 것을 비교해봐요.\n조각이 적을수록(분모가 작을수록) 한 조각이 더 커요. 그래서 1/${a}이 1/${b}보다 더 커요.`
       };
     },
     // 4. 같은 분모 분수 비교
@@ -626,7 +697,8 @@ function genFraction(diff) {
         q: `${n1}/${d} 와 ${n2}/${d} 중 더 큰 분수는?`,
         visual: '🍩',
         opts,
-        a: opts.indexOf(correct)
+        a: opts.indexOf(correct),
+        explain: `분모가 같을 때(${d})는 분자가 큰 분수가 더 커요.\n${n1}과 ${n2} 중 더 큰 ${bigger}이 있는 ${bigger}/${d}이 정답이에요.`
       };
     },
     // 5. 남은 양 구하기
@@ -641,22 +713,22 @@ function genFraction(diff) {
         q: `초콜릿 ${denom}조각 중 ${numer}조각을 먹었어요. 남은 양은?`,
         visual: '🍫'.repeat(numer) + '⬜'.repeat(left),
         opts,
-        a: opts.indexOf(correct)
+        a: opts.indexOf(correct),
+        explain: `${denom}조각에서 ${numer}조각을 먹었으니 ${denom} - ${numer} = ${left}조각이 남았어요.\n남은 양을 분수로 쓰면 ${left}/${denom}이에요.`
       };
     }
   ];
   return types[Math.floor(R() * types.length)]();
 }
 
-function makeNumberQuestion(q, ans, visual) {
-  // 오답 3개 생성
+function makeNumberQuestion(q, ans, visual, explain) {
   const wrongs = new Set();
   while (wrongs.size < 3) {
     let w = ans + randInt(-9, 9);
     if (w !== ans && w >= 0) wrongs.add(w);
   }
   const opts = shuffleArr([ans, ...wrongs]);
-  return { q, visual, opts: opts.map(String), a: opts.indexOf(ans) };
+  return { q, visual, opts: opts.map(String), a: opts.indexOf(ans), explain };
 }
 
 function shuffleArr(arr) {
@@ -853,14 +925,38 @@ function answer(i) {
     document.getElementById('enemy').classList.add('think');
     floatText(document.getElementById('hero'), '🤔', '#888');
     state.hp--;
-    if (state.hp <= 0) {
-      setTimeout(() => gameOver(), 1500);
-    } else {
-      setTimeout(() => {
-        state.currentEnemyIndex++;
-        nextBattle();
-      }, 1800);
-    }
+    setTimeout(() => showExplanation(q), 900);
+  }
+}
+
+function showExplanation(q) {
+  const correctAns = q.opts[q.a];
+  const isGameOver = state.hp <= 0;
+  const html = `
+    <div class="explain-overlay" id="explain-overlay">
+      <div class="explain-card">
+        <div class="explain-header">💡 풀이를 함께 봐요!</div>
+        <div class="explain-question">${q.q}</div>
+        ${q.visual ? `<div class="explain-visual">${q.visual}</div>` : ''}
+        <div class="explain-answer">정답: ${correctAns}</div>
+        ${q.explain ? `<div class="explain-text">${q.explain}</div>` : ''}
+        <button class="btn green" onclick="continueAfterExplain()">
+          ${isGameOver ? '괜찮아요, 다시 해볼래요!' : '알겠어요! 다음 친구 만나기 →'}
+        </button>
+      </div>
+    </div>
+  `;
+  document.querySelector('.screen').insertAdjacentHTML('beforeend', html);
+}
+
+function continueAfterExplain() {
+  const overlay = document.getElementById('explain-overlay');
+  if (overlay) overlay.remove();
+  if (state.hp <= 0) {
+    gameOver();
+  } else {
+    state.currentEnemyIndex++;
+    nextBattle();
   }
 }
 
