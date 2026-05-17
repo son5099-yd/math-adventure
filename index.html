@@ -140,9 +140,13 @@
   .world-topic { font-size: 14px; color: #666; }
   .world-stars { font-size: 22px; margin-top: 8px; }
   .lock-overlay {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 60px;
+    position: absolute; top: 10px; right: 10px;
+    font-size: 28px;
+    background: rgba(255,255,255,0.9);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
 
   /* ===== 전투/문제 화면 ===== */
@@ -302,13 +306,13 @@
 
   /* ===== 풀이 오버레이 ===== */
   .explain-overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 50;
+    z-index: 1000;
     padding: 20px;
     animation: fadeIn 0.3s;
   }
@@ -946,7 +950,7 @@ function showExplanation(q) {
       </div>
     </div>
   `;
-  document.querySelector('.screen').insertAdjacentHTML('beforeend', html);
+  document.body.insertAdjacentHTML('beforeend', html);
 }
 
 function continueAfterExplain() {
