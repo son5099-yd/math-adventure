@@ -155,6 +155,7 @@
   .battle-screen.cave { background: linear-gradient(180deg, #2c2c2c 0%, #555 100%); }
   .battle-screen.village { background: linear-gradient(180deg, #ff9a8b 0%, #ffd194 100%); }
   .battle-screen.island { background: linear-gradient(180deg, #00b4db 0%, #0083b0 100%); }
+  .battle-screen.lab { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); }
 
   .battle-top {
     display: flex; justify-content: space-between;
@@ -364,33 +365,45 @@ const HERO_NAME = '꼬마 여우';
 const WORLDS = [
   {
     id: 'forest', name: '도형의 숲', icon: '🌳', topic: '도형 찾기',
-    bg: 'forest', enemies: ['🐿️', '🦝', '🐰', '🦉'],
-    enemyNames: ['다람쥐 친구', '너구리 친구', '토끼 친구', '부엉이 어르신'],
+    bg: 'forest',
+    enemies:     ['🐿️',       '🦝',        '🐰',       '🦋',       '🐝',       '🦉'],
+    enemyNames:  ['다람쥐 친구','너구리 친구','토끼 친구','나비 친구','꿀벌 친구','부엉이 어르신'],
     story: '도형의 숲에 사는 친구들이 도형 모양을 잊어버렸대요! 함께 떠올려서 도와줘요.'
   },
   {
     id: 'castle', name: '구구단 성', icon: '🏰', topic: '곱셈 구구단',
-    bg: 'castle', enemies: ['🐱', '🐶', '🦄', '🐲'],
-    enemyNames: ['고양이 마법사', '강아지 기사', '유니콘 친구', '구구단 용'],
+    bg: 'castle',
+    enemies:     ['🐱',           '🐶',         '🦄',          '🐴',       '🦓',         '🐲'],
+    enemyNames:  ['고양이 마법사','강아지 기사','유니콘 친구','말 기사','얼룩말 친구','구구단 용'],
     story: '성에 사는 친구들이 곱셈 문제로 고민 중이에요. 함께 풀어주면 친구가 될 수 있어요!'
   },
   {
     id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈',
-    bg: 'cave', enemies: ['🐹', '🦔', '🐢', '🐻'],
-    enemyNames: ['햄스터 친구', '고슴도치 친구', '거북이 친구', '곰 어르신'],
+    bg: 'cave',
+    enemies:     ['🐹',         '🦔',           '🐢',          '🦇',       '🐭',       '🐻'],
+    enemyNames:  ['햄스터 친구','고슴도치 친구','거북이 친구','박쥐 친구','생쥐 친구','곰 어르신'],
     story: '동굴 친구들이 모은 도토리를 똑같이 나누고 싶대요. 나눗셈으로 도와줘요!'
   },
   {
     id: 'village', name: '덧셈 마을', icon: '🏘️', topic: '덧셈과 뺄셈',
-    bg: 'village', enemies: ['🐮', '🐷', '🐑', '🦒'],
-    enemyNames: ['소 친구', '돼지 친구', '양 친구', '기린 이장님'],
+    bg: 'village',
+    enemies:     ['🐮',     '🐷',       '🐑',     '🐔',       '🐴',     '🦒'],
+    enemyNames:  ['소 친구','돼지 친구','양 친구','닭 친구','말 친구','기린 이장님'],
     story: '마을에 큰 잔치가 열려요! 친구들이 음식 개수를 세는 걸 도와달래요.'
   },
   {
     id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수 기초',
-    bg: 'island', enemies: ['🐠', '🐬', '🐙', '🧜‍♀️'],
-    enemyNames: ['물고기 친구', '돌고래 친구', '문어 친구', '인어 공주'],
+    bg: 'island',
+    enemies:     ['🐠',          '🐬',          '🐙',       '🦀',     '🐚',       '🧜‍♀️'],
+    enemyNames:  ['물고기 친구','돌고래 친구','문어 친구','게 친구','조개 친구','인어 공주'],
     story: '섬 친구들이 케이크와 피자를 똑같이 나누고 싶대요. 분수로 도와주세요!'
+  },
+  {
+    id: 'lab', name: '과학 실험실', icon: '🔬', topic: '재미있는 과학',
+    bg: 'lab',
+    enemies:     ['🐧',       '🦦',         '🐼',       '🐨',         '🦘',         '🦥'],
+    enemyNames:  ['펭귄 박사','수달 연구원','판다 학자','코알라 교수','캥거루 조수','나무늘보 교수님'],
+    story: '과학을 사랑하는 친구들이 신기한 문제를 같이 풀고 싶대요!'
   }
 ];
 
@@ -404,18 +417,19 @@ const state = {
   crystals: 0,
   cleared: {}, // worldId -> 별 개수(1~3)
   questionCount: 0,
-  totalQuestions: 4 // 보스 포함 4마리
+  totalQuestions: 8 // 보스 포함 8마리
 };
 
 // ========== 문제 생성기 ==========
 function genQuestion(worldId, difficulty) {
-  // difficulty: 1~4 (보스가 4)
+  // difficulty: 1~8 (보스가 8)
   switch(worldId) {
     case 'forest': return genShape();
     case 'castle': return genMultiply(difficulty);
     case 'cave': return genDivide(difficulty);
     case 'village': return genAddSub(difficulty);
     case 'island': return genFraction(difficulty);
+    case 'lab': return genScience();
   }
 }
 
@@ -424,20 +438,68 @@ function genShape() {
     { q: '변이 3개인 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 0 },
     { q: '변이 4개인 도형은?', visual: '🔺 ⬜ ⭕ ⭐', opts: ['삼각형', '사각형', '원', '별'], a: 1 },
     { q: '변이 없는 동그란 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '사각형', '원', '마름모'], a: 2 },
+    { q: '꼭짓점이 3개인 도형은?', visual: '🔺', opts: ['삼각형', '사각형', '원', '오각형'], a: 0 },
     { q: '꼭짓점이 4개인 도형은?', visual: '🔺 ⬜ ⭕', opts: ['삼각형', '사각형', '원', '오각형'], a: 1 },
     { q: '꼭짓점이 5개인 도형은?', visual: '⬜ 🔺 ⭐ ⭕', opts: ['사각형', '삼각형', '오각형', '원'], a: 2 },
+    { q: '꼭짓점이 6개인 도형은?', visual: '⬢', opts: ['오각형', '사각형', '육각형', '삼각형'], a: 2 },
     { q: '직각이 4개 있는 도형은?', visual: '🔺 ⬜ ⭕ 🔶', opts: ['삼각형', '직사각형', '원', '마름모'], a: 1 },
     { q: '모든 변의 길이가 같은 사각형은?', visual: '⬜', opts: ['직사각형', '정사각형', '사다리꼴', '평행사변형'], a: 1 },
+    { q: '네 변의 길이가 같지 않은 사각형은?', visual: '▭', opts: ['정사각형', '직사각형', '마름모', '원'], a: 1 },
+    { q: '평행한 변이 한 쌍만 있는 사각형은?', visual: '⏢', opts: ['사다리꼴', '정사각형', '직사각형', '마름모'], a: 0 },
     { q: '굴러갈 수 있는 입체도형은?', visual: '📦 ⚽ 🎲', opts: ['직육면체', '구', '주사위', '벽돌'], a: 1 },
     { q: '주사위 모양의 입체도형은?', visual: '🎲', opts: ['구', '원기둥', '정육면체', '원뿔'], a: 2 },
+    { q: '뾰족한 꼭대기가 있는 입체도형은?', visual: '🍦', opts: ['구', '원기둥', '직육면체', '원뿔'], a: 3 },
+    { q: '동전 모양의 평면도형은?', visual: '🪙', opts: ['삼각형', '사각형', '원', '오각형'], a: 2 },
+    { q: '책의 표지 모양은?', visual: '📖', opts: ['원', '삼각형', '직사각형', '오각형'], a: 2 },
+    { q: '시계 모양은 어떤 도형일까요?', visual: '🕒', opts: ['삼각형', '원', '사각형', '별'], a: 1 },
+    { q: '교통 표지판 중 삼각형은?', visual: '⚠️', opts: ['주의 표지판', '주차 표지판', '횡단보도 표지판', '신호등'], a: 0 },
   ];
   return shapes[Math.floor(Math.random() * shapes.length)];
 }
 
+function genScience() {
+  const questions = [
+    // 곤충/동물
+    { q: '곤충의 다리는 모두 몇 개일까요?', visual: '🐝', opts: ['4개', '6개', '8개', '10개'], a: 1 },
+    { q: '거미의 다리는 몇 개일까요?', visual: '🕷️', opts: ['6개', '8개', '10개', '4개'], a: 1 },
+    { q: '다음 중 곤충이 아닌 것은?', visual: '🐝 🐜 🕷️ 🦗', opts: ['벌', '개미', '거미', '메뚜기'], a: 2 },
+    { q: '나비는 무엇에서 태어날까요?', visual: '🦋', opts: ['알', '새끼', '씨앗', '구름'], a: 0 },
+    { q: '나비가 되기 전 단계는?', visual: '🐛', opts: ['알', '애벌레', '올챙이', '병아리'], a: 1 },
+    { q: '개구리는 어디에서 태어날까요?', visual: '🐸', opts: ['알', '새끼', '땅속', '구름'], a: 0 },
+    { q: '새끼를 낳는 동물은?', visual: '🐶 🐔 🐠 🐢', opts: ['닭', '강아지', '물고기', '거북이'], a: 1 },
+    // 자석
+    { q: '자석에 잘 붙는 것은?', visual: '🧲', opts: ['종이', '플라스틱컵', '쇠클립', '나무'], a: 2 },
+    { q: '자석의 양 끝을 무엇이라고 할까요?', visual: '🧲', opts: ['양 끝', '극', '머리', '발'], a: 1 },
+    { q: '자석의 같은 극끼리 만나면 어떻게 될까요?', visual: '🧲 🧲', opts: ['끌어당겨요', '밀어내요', '딱 붙어요', '아무 일도 없어요'], a: 1 },
+    { q: '자석의 다른 극끼리 만나면 어떻게 될까요?', visual: '🧲 🧲', opts: ['끌어당겨요', '밀어내요', '깨져요', '사라져요'], a: 0 },
+    // 물의 상태
+    { q: '얼음이 녹으면 무엇이 될까요?', visual: '🧊', opts: ['수증기', '물', '구름', '눈'], a: 1 },
+    { q: '물을 펄펄 끓이면 무엇이 될까요?', visual: '♨️', opts: ['얼음', '수증기', '눈', '비'], a: 1 },
+    { q: '물이 차가워져서 꽁꽁 얼면?', visual: '💧', opts: ['수증기', '얼음', '구름', '바람'], a: 1 },
+    { q: '물의 세 가지 상태가 아닌 것은?', visual: '💧 🧊 ♨️', opts: ['물', '얼음', '수증기', '바람'], a: 3 },
+    // 식물
+    { q: '식물이 자라는 데 꼭 필요하지 않은 것은?', visual: '🌱', opts: ['햇빛', '물', '공기', '소금'], a: 3 },
+    { q: '식물의 어느 부분이 땅속에서 물을 빨아들일까요?', visual: '🌳', opts: ['잎', '뿌리', '꽃', '열매'], a: 1 },
+    { q: '식물의 잎에서 일어나는 일은?', visual: '🍃 ☀️', opts: ['양분 만들기', '잠자기', '물 마시기', '소화시키기'], a: 0 },
+    { q: '나무에서 자라는 것은?', visual: '🌳', opts: ['열매', '돌', '얼음', '구름'], a: 0 },
+    // 우리 몸
+    { q: '음식을 소화시키는 우리 몸의 기관은?', visual: '🍱', opts: ['심장', '뇌', '위', '폐'], a: 2 },
+    { q: '숨을 쉴 수 있게 해주는 기관은?', visual: '🫁', opts: ['위', '폐', '간', '신장'], a: 1 },
+    { q: '온몸으로 피를 보내주는 기관은?', visual: '❤️', opts: ['뇌', '심장', '위', '폐'], a: 1 },
+    { q: '생각하고 기억하는 기관은?', visual: '🧠', opts: ['심장', '폐', '뇌', '위'], a: 2 },
+    // 지구와 우주
+    { q: '낮과 밤이 생기는 이유는?', visual: '🌍 ☀️', opts: ['지구가 돌아서', '달이 움직여서', '구름 때문에', '바람 때문에'], a: 0 },
+    { q: '지구 주위를 도는 천체는?', visual: '🌙', opts: ['해', '별', '달', '구름'], a: 2 },
+    { q: '우리가 사는 행성의 이름은?', visual: '🌍', opts: ['달', '태양', '지구', '화성'], a: 2 },
+    { q: '낮에 하늘에서 빛나는 것은?', visual: '☀️', opts: ['달', '태양', '별', '구름'], a: 1 },
+  ];
+  return questions[Math.floor(Math.random() * questions.length)];
+}
+
 function genMultiply(diff) {
   // 작은 단(2~5) → 큰 단(6~9)으로 난이도 증가
-  const minTable = diff <= 2 ? 2 : 5;
-  const maxTable = diff <= 2 ? 5 : 9;
+  const minTable = diff <= 4 ? 2 : 5;
+  const maxTable = diff <= 4 ? 5 : 9;
   const a = randInt(minTable, maxTable);
   const b = randInt(2, 9);
   const ans = a * b;
@@ -446,8 +508,8 @@ function genMultiply(diff) {
 
 function genDivide(diff) {
   // 나누어떨어지는 문제만
-  const divisor = randInt(2, diff <= 2 ? 5 : 9);
-  const quotient = randInt(2, diff <= 2 ? 5 : 9);
+  const divisor = randInt(2, diff <= 4 ? 5 : 9);
+  const quotient = randInt(2, diff <= 4 ? 5 : 9);
   const dividend = divisor * quotient;
   return makeNumberQuestion(`${dividend} ÷ ${divisor} = ?`, quotient, '➗');
 }
@@ -455,7 +517,7 @@ function genDivide(diff) {
 function genAddSub(diff) {
   const op = Math.random() < 0.5 ? '+' : '-';
   let a, b, ans;
-  if (diff <= 2) {
+  if (diff <= 4) {
     // 두 자리
     a = randInt(20, 99);
     b = randInt(10, 99);
@@ -474,35 +536,82 @@ function genAddSub(diff) {
 
 function genFraction(diff) {
   // 그림 기반 분수
-  const denom = randInt(2, diff <= 2 ? 4 : 8);
+  const denom = randInt(2, diff <= 4 ? 4 : 8);
   const numer = randInt(1, denom - 1);
-  // 케이크 그림
-  const cake = '🍰';
   const filled = '🟧'.repeat(numer) + '⬜'.repeat(denom - numer);
   const types = [
-    () => ({
-      q: `색칠된 부분은 전체의 얼마일까요?`,
-      visual: filled,
-      opts: shuffleOpts([
-        `${numer}/${denom}`,
+    // 1. 색칠된 부분 분수로 나타내기
+    () => {
+      const correct = `${numer}/${denom}`;
+      const opts = shuffleArr([
+        correct,
         `${denom}/${numer}`,
         `${numer}/${denom + 1}`,
         `${numer + 1}/${denom}`
-      ], `${numer}/${denom}`),
-      a: 0
-    }),
+      ]);
+      return {
+        q: `색칠된 부분은 전체의 얼마일까요?`,
+        visual: filled,
+        opts,
+        a: opts.indexOf(correct)
+      };
+    },
+    // 2. 피자 먹은 양
     () => {
       const correct = `${numer}/${denom}`;
-      const opts = [correct,
+      const opts = shuffleArr([correct,
         `${numer}/${denom + 1}`,
         `${numer + 1}/${denom}`,
-        `${denom - numer}/${denom}`];
-      const shuffled = shuffleArr(opts);
+        `${denom - numer}/${denom}`]);
       return {
         q: `피자 ${denom}조각 중 ${numer}조각을 먹었어요. 먹은 양은?`,
         visual: '🍕'.repeat(numer) + '⬜'.repeat(denom - numer),
-        opts: shuffled,
-        a: shuffled.indexOf(correct)
+        opts,
+        a: opts.indexOf(correct)
+      };
+    },
+    // 3. 단위분수 비교 (분모가 작을수록 큰 분수)
+    () => {
+      const a = randInt(2, 4);
+      const b = randInt(a + 1, 8);
+      const correct = `1/${a}`;
+      const opts = shuffleArr([`1/${a}`, `1/${b}`, `${a}/${b}`, `${b}/${a}`]);
+      return {
+        q: `1/${a} 와 1/${b} 중 더 큰 분수는?`,
+        visual: '🍰',
+        opts,
+        a: opts.indexOf(correct)
+      };
+    },
+    // 4. 같은 분모 분수 비교
+    () => {
+      const d = randInt(3, 8);
+      const n1 = randInt(1, d - 1);
+      let n2 = randInt(1, d - 1);
+      while (n2 === n1) n2 = randInt(1, d - 1);
+      const bigger = Math.max(n1, n2);
+      const correct = `${bigger}/${d}`;
+      const opts = shuffleArr([`${n1}/${d}`, `${n2}/${d}`, `${d}/${n1}`, `${d}/${n2}`]);
+      return {
+        q: `${n1}/${d} 와 ${n2}/${d} 중 더 큰 분수는?`,
+        visual: '🍩',
+        opts,
+        a: opts.indexOf(correct)
+      };
+    },
+    // 5. 남은 양 구하기
+    () => {
+      const left = denom - numer;
+      const correct = `${left}/${denom}`;
+      const opts = shuffleArr([correct,
+        `${numer}/${denom}`,
+        `${left}/${numer}`,
+        `${numer}/${left}`]);
+      return {
+        q: `초콜릿 ${denom}조각 중 ${numer}조각을 먹었어요. 남은 양은?`,
+        visual: '🍫'.repeat(numer) + '⬜'.repeat(left),
+        opts,
+        a: opts.indexOf(correct)
       };
     }
   ];
@@ -633,8 +742,9 @@ function nextBattle() {
     return worldClear();
   }
   const isBoss = idx === state.totalQuestions - 1;
-  const enemy = isBoss ? world.enemies[world.enemies.length - 1] : world.enemies[idx];
-  const enemyName = isBoss ? world.enemyNames[world.enemyNames.length - 1] : world.enemyNames[idx];
+  const lastIdx = world.enemies.length - 1;
+  const enemy = isBoss ? world.enemies[lastIdx] : world.enemies[idx % lastIdx];
+  const enemyName = isBoss ? world.enemyNames[lastIdx] : world.enemyNames[idx % lastIdx];
   const question = genQuestion(world.id, idx + 1);
   state.currentQuestion = question;
   state.currentEnemy = { emoji: enemy, name: enemyName, isBoss };
