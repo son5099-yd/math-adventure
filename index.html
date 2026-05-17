@@ -636,11 +636,40 @@ function genAddSub(diff) {
   return makeNumberQuestion(`${a} ${op} ${b} = ?`, ans, op === '+' ? '➕' : '➖', explain);
 }
 
+function svgBar(numer, denom, color) {
+  color = color || '#ff8c42';
+  const w = 320, h = 56;
+  const cw = w / denom;
+  let cells = '';
+  for (let i = 0; i < denom; i++) {
+    const fill = i < numer ? color : '#fff';
+    cells += `<rect x="${i*cw}" y="0" width="${cw}" height="${h}" fill="${fill}" stroke="#5b2a86" stroke-width="3"/>`;
+  }
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;margin:6px auto">${cells}</svg>`;
+}
+
+function svgCompareBars(label1, n1, d1, label2, n2, d2, color) {
+  color = color || '#ff8c42';
+  const w = 220, h = 48;
+  function bar(numer, denom) {
+    const cw = w / denom;
+    let cells = '';
+    for (let i = 0; i < denom; i++) {
+      const fill = i < numer ? color : '#fff';
+      cells += `<rect x="${i*cw}" y="0" width="${cw}" height="${h}" fill="${fill}" stroke="#5b2a86" stroke-width="3"/>`;
+    }
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${cells}</svg>`;
+  }
+  return `<div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin:6px 0">
+    <div style="text-align:center"><div style="font-weight:bold;color:#5b2a86;margin-bottom:4px;font-size:22px">${label1}</div>${bar(n1, d1)}</div>
+    <div style="text-align:center"><div style="font-weight:bold;color:#5b2a86;margin-bottom:4px;font-size:22px">${label2}</div>${bar(n2, d2)}</div>
+  </div>`;
+}
+
 function genFraction(diff) {
   // 그림 기반 분수
   const denom = randInt(2, diff <= 4 ? 4 : 8);
   const numer = randInt(1, denom - 1);
-  const filled = '🟧'.repeat(numer) + '⬜'.repeat(denom - numer);
   const types = [
     // 1. 색칠된 부분 분수로 나타내기
     () => {
@@ -653,10 +682,10 @@ function genFraction(diff) {
       ]);
       return {
         q: `색칠된 부분은 전체의 얼마일까요?`,
-        visual: filled,
+        visual: svgBar(numer, denom),
         opts,
         a: opts.indexOf(correct),
-        explain: `전체 ${denom}칸 중에서 ${numer}칸이 색칠되어 있어요. 그래서 ${numer}/${denom} (${denom}분의 ${numer})이에요.\n분수는 "분모/분자" 순서가 아니라 아래(분모)부터 읽어요.`
+        explain: `전체 ${denom}칸 중에서 ${numer}칸이 색칠되어 있어요. 그래서 ${numer}/${denom} (${denom}분의 ${numer})이에요.\n분수는 아래(분모)부터 읽어요.`
       };
     },
     // 2. 피자 먹은 양
@@ -667,8 +696,8 @@ function genFraction(diff) {
         `${numer + 1}/${denom}`,
         `${denom - numer}/${denom}`]);
       return {
-        q: `피자 ${denom}조각 중 ${numer}조각을 먹었어요. 먹은 양은?`,
-        visual: '🍕'.repeat(numer) + '⬜'.repeat(denom - numer),
+        q: `🍕 피자 ${denom}조각 중 ${numer}조각을 먹었어요. 먹은 양은?`,
+        visual: svgBar(numer, denom, '#e8a44c'),
         opts,
         a: opts.indexOf(correct),
         explain: `전체 ${denom}조각 중 ${numer}조각을 먹었어요.\n분수로 쓰면 ${numer}/${denom}이에요. 분모(${denom})는 전체, 분자(${numer})는 먹은 양!`
@@ -681,11 +710,11 @@ function genFraction(diff) {
       const correct = `1/${a}`;
       const opts = shuffleArr([`1/${a}`, `1/${b}`, `${a}/${b}`, `${b}/${a}`]);
       return {
-        q: `1/${a} 와 1/${b} 중 더 큰 분수는?`,
-        visual: '🍰',
+        q: `더 큰 분수는 어느 것일까요?`,
+        visual: svgCompareBars(`1/${a}`, 1, a, `1/${b}`, 1, b),
         opts,
         a: opts.indexOf(correct),
-        explain: `케이크를 ${a}조각으로 나눈 것과 ${b}조각으로 나눈 것을 비교해봐요.\n조각이 적을수록(분모가 작을수록) 한 조각이 더 커요. 그래서 1/${a}이 1/${b}보다 더 커요.`
+        explain: `같은 크기 케이크를 ${a}조각으로 나눈 것과 ${b}조각으로 나눈 것을 비교해봐요.\n조각이 적을수록(분모가 작을수록) 한 조각이 더 커요. 그래서 1/${a}이 1/${b}보다 더 커요.`
       };
     },
     // 4. 같은 분모 분수 비교
@@ -698,11 +727,11 @@ function genFraction(diff) {
       const correct = `${bigger}/${d}`;
       const opts = shuffleArr([`${n1}/${d}`, `${n2}/${d}`, `${d}/${n1}`, `${d}/${n2}`]);
       return {
-        q: `${n1}/${d} 와 ${n2}/${d} 중 더 큰 분수는?`,
-        visual: '🍩',
+        q: `더 큰 분수는 어느 것일까요?`,
+        visual: svgCompareBars(`${n1}/${d}`, n1, d, `${n2}/${d}`, n2, d),
         opts,
         a: opts.indexOf(correct),
-        explain: `분모가 같을 때(${d})는 분자가 큰 분수가 더 커요.\n${n1}과 ${n2} 중 더 큰 ${bigger}이 있는 ${bigger}/${d}이 정답이에요.`
+        explain: `분모가 같을 때(둘 다 ${d})는 분자가 큰 분수가 더 커요.\n${n1}과 ${n2} 중 더 큰 ${bigger}이 있는 ${bigger}/${d}이 정답이에요.`
       };
     },
     // 5. 남은 양 구하기
@@ -714,11 +743,11 @@ function genFraction(diff) {
         `${left}/${numer}`,
         `${numer}/${left}`]);
       return {
-        q: `초콜릿 ${denom}조각 중 ${numer}조각을 먹었어요. 남은 양은?`,
-        visual: '🍫'.repeat(numer) + '⬜'.repeat(left),
+        q: `🍫 초콜릿 ${denom}조각 중 ${numer}조각을 먹었어요. 남은 양(흰 부분)은?`,
+        visual: svgBar(numer, denom, '#8b4513'),
         opts,
         a: opts.indexOf(correct),
-        explain: `${denom}조각에서 ${numer}조각을 먹었으니 ${denom} - ${numer} = ${left}조각이 남았어요.\n남은 양을 분수로 쓰면 ${left}/${denom}이에요.`
+        explain: `${denom}조각에서 ${numer}조각을 먹었으니 ${denom} - ${numer} = ${left}조각이 남았어요.\n남은 양을 분수로 쓰면 ${left}/${denom}이에요. (그림에서 흰 부분의 개수)`
       };
     }
   ];
