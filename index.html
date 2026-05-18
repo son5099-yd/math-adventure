@@ -570,36 +570,66 @@ const Sound = {
   _startBgm() {
     if (this.bgmPlaying) return;
     this.bgmPlaying = true;
-    const chords = [
-      [261.63, 329.63, 392.00],   // C major
-      [220.00, 277.18, 329.63],   // A minor
-      [174.61, 220.00, 261.63],   // F major
-      [196.00, 246.94, 293.66]    // G major
+    // 베토벤 - 환희의 송가 (Ode to Joy), 1824년작, 퍼블릭 도메인
+    const C4=261.63, D4=293.66, E4=329.63, F4=349.23, G4=392.00;
+    const C3=130.81, G3=196.00;
+    const melody = [
+      [E4,1],[E4,1],[F4,1],[G4,1], [G4,1],[F4,1],[E4,1],[D4,1],
+      [C4,1],[C4,1],[D4,1],[E4,1], [E4,1.5],[D4,0.5],[D4,2],
+      [E4,1],[E4,1],[F4,1],[G4,1], [G4,1],[F4,1],[E4,1],[D4,1],
+      [C4,1],[C4,1],[D4,1],[E4,1], [D4,1.5],[C4,0.5],[C4,2],
     ];
-    let idx = 0;
-    const playChord = () => {
+    const bass = [
+      [C3,4],[G3,4],[C3,4],[G3,4],
+      [C3,4],[G3,4],[C3,4],[C3,4],
+    ];
+    const beatDur = 0.45;
+    const totalDur = 32 * beatDur;
+    let nextStart = this.ctx.currentTime + 0.1;
+    const scheduleLoop = () => {
       if (!this.bgmPlaying || !this.ctx) return;
-      const chord = chords[idx % chords.length];
-      const t = this.ctx.currentTime;
-      const dur = 4;
-      for (const freq of chord) {
+      const startT = nextStart;
+      // 멜로디 (삼각파, 밝고 또렷한 소리)
+      let t = startT;
+      for (const [freq, beats] of melody) {
+        const dur = beats * beatDur;
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
-        osc.type = 'sine';
+        osc.type = 'triangle';
         osc.frequency.value = freq;
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.035, t + 0.6);
-        g.gain.linearRampToValueAtTime(0.035, t + dur - 1);
-        g.gain.linearRampToValueAtTime(0, t + dur);
+        g.gain.linearRampToValueAtTime(0.11, t + 0.025);
+        g.gain.setValueAtTime(0.11, t + dur - 0.08);
+        g.gain.linearRampToValueAtTime(0, t + dur - 0.01);
         osc.connect(g);
         g.connect(this.master);
         osc.start(t);
         osc.stop(t + dur);
+        t += dur;
       }
-      idx++;
+      // 베이스 (사인파, 부드러운 반주)
+      let bt = startT;
+      for (const [freq, beats] of bass) {
+        const dur = beats * beatDur;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        g.gain.setValueAtTime(0, bt);
+        g.gain.linearRampToValueAtTime(0.05, bt + 0.15);
+        g.gain.setValueAtTime(0.05, bt + dur - 0.3);
+        g.gain.linearRampToValueAtTime(0, bt + dur - 0.02);
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(bt);
+        osc.stop(bt + dur);
+        bt += dur;
+      }
+      nextStart = startT + totalDur;
+      // 현재 루프 종료 0.4초 전에 다음 루프 예약 (이음새 없게)
+      this.bgmTimer = setTimeout(scheduleLoop, (totalDur - 0.4) * 1000);
     };
-    playChord();
-    this.bgmTimer = setInterval(playChord, 4000);
+    scheduleLoop();
   }
 };
 
