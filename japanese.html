@@ -445,6 +445,55 @@
     margin-bottom: 20px;
   }
 
+  /* 활용형 박스 */
+  .conjugations {
+    margin-top: 14px;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .conj-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .conj-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border-top: 1px solid #f3f4f6;
+  }
+  .conj-row:first-of-type { border-top: none; }
+  .conj-label {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+  .conj-form {
+    font-size: 17px;
+    color: #111827;
+    font-weight: 500;
+  }
+  .conj-form ruby rt {
+    font-size: 9px;
+    color: #6b7280;
+    font-weight: 400;
+  }
+
+  /* 단어장 확장 */
+  .word-item.expandable { cursor: pointer; }
+  .word-item.expanded { background: #fafbfc; }
+  .word-detail {
+    padding: 8px 4px 12px 4px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafbfc;
+  }
+
   /* 애니메이션 */
   @keyframes shake {
     0%,100% { transform: translateX(0); }
@@ -888,11 +937,192 @@ function buildQuestion(word) {
 // ===================================================================
 // 일본어 렌더링 (한자 + 후리가나)
 // ===================================================================
+function isKana(c) {
+  if (!c) return false;
+  const code = c.charCodeAt(0);
+  return (code >= 0x3040 && code <= 0x30FF);
+}
+
+// 한자 부분에만 ruby가 붙도록 분할 (예: 食べる → <ruby>食<rt>た</rt></ruby>べる)
+function renderRuby(kanjiForm, kanaForm) {
+  if (!kanjiForm) return kanaForm || '';
+  if (kanjiForm === kanaForm) return kanaForm;
+  let pi = 0;
+  while (pi < kanjiForm.length && pi < kanaForm.length
+         && kanjiForm[pi] === kanaForm[pi] && isKana(kanjiForm[pi])) pi++;
+  let si = 0;
+  while (kanjiForm.length - si - 1 >= pi && kanaForm.length - si - 1 >= pi
+         && kanjiForm[kanjiForm.length - 1 - si] === kanaForm[kanaForm.length - 1 - si]
+         && isKana(kanjiForm[kanjiForm.length - 1 - si])) si++;
+  const prefix = kanjiForm.slice(0, pi);
+  const midKanji = kanjiForm.slice(pi, kanjiForm.length - si);
+  const midKana = kanaForm.slice(pi, kanaForm.length - si);
+  const suffix = kanjiForm.slice(kanjiForm.length - si);
+  if (!midKanji) return kanaForm;
+  return `${prefix}<ruby>${midKanji}<rt>${midKana}</rt></ruby>${suffix}`;
+}
+
 function renderJp(word) {
-  if (word.kanji) {
-    return `<ruby>${word.kanji}<rt>${word.kana}</rt></ruby>`;
+  return renderRuby(word.kanji, word.kana);
+}
+
+// ===================================================================
+// 활용형 (Conjugation)
+// ===================================================================
+// 형태는 같지만 1그룹(godan)인 동사들 (える·いる로 끝나도 2그룹 아님)
+const GODAN_EXCEPTIONS = new Set([
+  '帰る', '知る', '走る', '入る', '切る', '要る',
+  '減る', '蹴る', '滑る', '焦る', '限る', '握る',
+  '喋る', '練る', '照る', '茂る', '散る', '威張る'
+]);
+
+function getVerbType(word) {
+  const k = word.kana;
+  if (!k) return 1;
+  if (k === 'する' || (k.endsWith('する') && k.length > 2)) return 3;
+  if (k === 'くる' || word.kanji === '来る') return 3;
+  if (word.kanji && GODAN_EXCEPTIONS.has(word.kanji)) return 1;
+  if (k.length >= 2 && k.endsWith('る')) {
+    const prev = k[k.length - 2];
+    if ('えけせてねへめれげぜでべぺ'.includes(prev)) return 2;
+    if ('いきしちにひみりぎじぢびぴ'.includes(prev)) return 2;
   }
-  return word.kana;
+  return 1;
+}
+
+function P(kana, kanji) { return { kana, kanji }; }
+
+function conjugateVerb(word) {
+  const type = getVerbType(word);
+  const k = word.kana;
+  const kanji = word.kanji || k;
+
+  if (type === 3) {
+    if (k === 'くる' || k.endsWith('くる')) {
+      // 来る 계열
+      const preK = k.slice(0, -2);
+      const preJ = (word.kanji || k).replace(/来る$|くる$/, '');
+      return [
+        ['정중',      P(preK + 'きます',  preJ + '来ます')],
+        ['정중 부정', P(preK + 'きません', preJ + '来ません')],
+        ['정중 과거', P(preK + 'きました', preJ + '来ました')],
+        ['て형',      P(preK + 'きて',    preJ + '来て')],
+        ['보통 부정', P(preK + 'こない',  preJ + '来ない')],
+        ['보통 과거', P(preK + 'きた',    preJ + '来た')],
+      ];
+    }
+    // ~する 계열
+    const sKana = k.slice(0, -2);
+    const sKanji = kanji.slice(0, -2);
+    return [
+      ['정중',      P(sKana + 'します',  sKanji + 'します')],
+      ['정중 부정', P(sKana + 'しません', sKanji + 'しません')],
+      ['정중 과거', P(sKana + 'しました', sKanji + 'しました')],
+      ['て형',      P(sKana + 'して',    sKanji + 'して')],
+      ['보통 부정', P(sKana + 'しない',  sKanji + 'しない')],
+      ['보통 과거', P(sKana + 'した',    sKanji + 'した')],
+    ];
+  }
+
+  if (type === 2) {
+    const sKana = k.slice(0, -1);
+    const sKanji = kanji.slice(0, -1);
+    return [
+      ['정중',      P(sKana + 'ます',  sKanji + 'ます')],
+      ['정중 부정', P(sKana + 'ません', sKanji + 'ません')],
+      ['정중 과거', P(sKana + 'ました', sKanji + 'ました')],
+      ['て형',      P(sKana + 'て',    sKanji + 'て')],
+      ['보통 부정', P(sKana + 'ない',  sKanji + 'ない')],
+      ['보통 과거', P(sKana + 'た',    sKanji + 'た')],
+    ];
+  }
+
+  // 1그룹 (godan)
+  const last = k.slice(-1);
+  const sKana = k.slice(0, -1);
+  const sKanji = kanji.slice(0, -1);
+  const masuMap = {'う':'い','つ':'ち','る':'り','く':'き','ぐ':'ぎ','す':'し','む':'み','ぶ':'び','ぬ':'に'};
+  const naiMap  = {'う':'わ','つ':'た','る':'ら','く':'か','ぐ':'が','す':'さ','む':'ま','ぶ':'ば','ぬ':'な'};
+
+  let teSuffix, taSuffix;
+  if ('うつる'.includes(last)) { teSuffix = 'って'; taSuffix = 'った'; }
+  else if (last === 'く')      { teSuffix = 'いて'; taSuffix = 'いた'; }
+  else if (last === 'ぐ')      { teSuffix = 'いで'; taSuffix = 'いだ'; }
+  else if (last === 'す')      { teSuffix = 'して'; taSuffix = 'した'; }
+  else if ('むぶぬ'.includes(last)) { teSuffix = 'んで'; taSuffix = 'んだ'; }
+  else { teSuffix = 'て'; taSuffix = 'た'; }
+
+  // 行く 예외 (いって/いった)
+  if (k === 'いく') { teSuffix = 'って'; taSuffix = 'った'; }
+
+  const masuK = masuMap[last] || '';
+  const naiK = naiMap[last] || '';
+
+  return [
+    ['정중',      P(sKana + masuK + 'ます',  sKanji + masuK + 'ます')],
+    ['정중 부정', P(sKana + masuK + 'ません', sKanji + masuK + 'ません')],
+    ['정중 과거', P(sKana + masuK + 'ました', sKanji + masuK + 'ました')],
+    ['て형',      P(sKana + teSuffix,        sKanji + teSuffix)],
+    ['보통 부정', P(sKana + naiK + 'ない',   sKanji + naiK + 'ない')],
+    ['보통 과거', P(sKana + taSuffix,        sKanji + taSuffix)],
+  ];
+}
+
+function conjugateAdjI(word) {
+  const k = word.kana;
+  const kanji = word.kanji || k;
+  // いい/良い 예외
+  if (k === 'いい' || kanji === '良い') {
+    const baseK = kanji === '良い' ? '良' : 'い';
+    return [
+      ['정중', P('いいです', kanji + 'です')],
+      ['부정', P('よくないです', baseK === '良' ? '良くないです' : 'よくないです')],
+      ['과거', P('よかったです', baseK === '良' ? '良かったです' : 'よかったです')],
+      ['て형', P('よくて',     baseK === '良' ? '良くて' : 'よくて')],
+    ];
+  }
+  const sKana = k.slice(0, -1);
+  const sKanji = kanji.slice(0, -1);
+  return [
+    ['정중', P(k + 'です',         kanji + 'です')],
+    ['부정', P(sKana + 'くないです', sKanji + 'くないです')],
+    ['과거', P(sKana + 'かったです', sKanji + 'かったです')],
+    ['て형', P(sKana + 'くて',      sKanji + 'くて')],
+  ];
+}
+
+function conjugateAdjNa(word) {
+  const k = word.kana;
+  const kanji = word.kanji || k;
+  return [
+    ['정중', P(k + 'です',       kanji + 'です')],
+    ['부정', P(k + 'じゃないです', kanji + 'じゃないです')],
+    ['과거', P(k + 'でした',     kanji + 'でした')],
+    ['て형', P(k + 'で',         kanji + 'で')],
+  ];
+}
+
+function getConjugations(word) {
+  if (word.pos === '동사') return conjugateVerb(word);
+  if (word.pos === 'い형용사') return conjugateAdjI(word);
+  if (word.pos && word.pos.indexOf('な형용사') === 0) return conjugateAdjNa(word);
+  return null;
+}
+
+function renderConjugationsBox(word) {
+  const conjs = getConjugations(word);
+  if (!conjs) return '';
+  return `
+    <div class="conjugations">
+      <div class="conj-title">활용형</div>
+      ${conjs.map(([label, form]) => `
+        <div class="conj-row">
+          <span class="conj-label">${label}</span>
+          <span class="conj-form">${renderRuby(form.kanji, form.kana)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 // ===================================================================
@@ -1103,6 +1333,7 @@ function showFeedbackUI() {
       <div class="feedback-title">${state.lastCorrect ? '✓ 정답이에요' : '✗ 정답은'}</div>
       <div class="feedback-word">${renderJp(word)}</div>
       <div class="feedback-meaning">${word.meaning} · ${word.pos}</div>
+      ${renderConjugationsBox(word)}
       <div class="feedback-actions">
         <button class="btn" id="next-q">${isLast ? '결과 보기' : '다음 →'}</button>
       </div>
@@ -1235,14 +1466,16 @@ function renderList() {
         ${filtered.length === 0 ? '<div style="text-align:center; color:#6b7280; padding:32px 0;">단어가 없어요</div>' :
           filtered.map(w => {
             const s = wordStatus(w);
+            const conj = getConjugations(w);
             return `
-              <div class="word-item">
+              <div class="word-item ${conj ? 'expandable' : ''}" data-id="${w.id}">
                 <div style="flex:1;">
-                  <div class="word-jp">${renderJp(w)}</div>
+                  <div class="word-jp">${renderJp(w)}${conj ? ' <span style="color:#9ca3af;font-size:12px;">▾</span>' : ''}</div>
                   <div class="word-meaning">${w.meaning} · ${w.pos} · ${w.level}</div>
                 </div>
                 <div class="word-status ${s}">${statusLabel[s]}</div>
               </div>
+              ${conj ? `<div class="word-detail" data-id="${w.id}" style="display:none">${renderConjugationsBox(w)}</div>` : ''}
             `;
           }).join('')
         }
@@ -1263,6 +1496,16 @@ function renderList() {
   };
   document.querySelectorAll('.filter-tab').forEach(b => {
     b.onclick = () => { state.listFilter = b.dataset.f; renderList(); };
+  });
+  document.querySelectorAll('.word-item.expandable').forEach(item => {
+    item.onclick = () => {
+      const id = item.dataset.id;
+      const detail = document.querySelector(`.word-detail[data-id="${id}"]`);
+      if (!detail) return;
+      const open = detail.style.display !== 'none';
+      detail.style.display = open ? 'none' : 'block';
+      item.classList.toggle('expanded', !open);
+    };
   });
   document.getElementById('reset').onclick = () => {
     if (confirm('모든 학습 기록을 지울까요? 되돌릴 수 없어요.')) {
