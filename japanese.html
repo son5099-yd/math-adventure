@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="일본어 단어">
+<meta name="theme-color" content="#1f2937">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23bc002d'/><text x='90' y='128' font-size='110' text-anchor='middle' fill='white' font-family='Hiragino Sans, sans-serif' font-weight='600'>あ</text></svg>">
+<title>일본어 단어 연습</title>
+<style>
+  * {
+    box-sizing: border-box; margin: 0; padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html, body {
+    min-height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Hiragino Sans', 'Noto Sans JP', 'Malgun Gothic', sans-serif;
+    background: #f5f6f8;
+    color: #1f2937;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+    padding:
+      max(20px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+  #app {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #bc002d;
+  }
+  .header-stats {
+    font-size: 13px;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 타이틀 화면 */
+  .title-card {
+    text-align: center;
+    padding: 40px 24px 32px;
+  }
+  .title-card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .title-card .subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .stat-box {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px 6px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  .stat-num.due { color: #dc2626; }
+  .stat-num.mastered { color: #059669; }
+
+  /* 버튼 */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.05s, background 0.15s;
+    font-family: inherit;
+    background: #1f2937;
+    color: white;
+  }
+  .btn:active { transform: scale(0.98); background: #111827; }
+  .btn.secondary {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+  .btn.secondary:active { background: #e5e7eb; }
+  @media (hover: hover) {
+    .btn:hover { background: #111827; }
+    .btn.secondary:hover { background: #e5e7eb; }
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .btn-row .btn { flex: 1; }
+
+  /* 진행 바 */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #1f2937;
+    transition: width 0.3s;
+  }
+  .progress-text {
+    font-size: 13px;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+    min-width: 40px;
+    text-align: right;
+  }
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    color: #6b7280;
+    font-size: 16px;
+  }
+
+  /* 퀴즈 카드 */
+  .quiz-prompt {
+    text-align: center;
+    padding: 16px 8px 28px;
+  }
+  .quiz-level {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 10px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+  .quiz-level.new { background: #fef3c7; color: #92400e; }
+  .quiz-level.review { background: #dbeafe; color: #1e40af; }
+  .quiz-meaning {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .quiz-pos {
+    font-size: 13px;
+    color: #9ca3af;
+  }
+
+  /* 선택지 */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .choice {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .choice:active {
+    border-color: #6b7280;
+    background: #f3f4f6;
+  }
+  @media (hover: hover) {
+    .choice:hover {
+      border-color: #9ca3af;
+      background: #fafafa;
+    }
+  }
+  .choice-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .choice-jp {
+    flex: 1;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #111827;
+  }
+  .choice-jp ruby rt {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 400;
+  }
+  .choice.correct {
+    border-color: #10b981;
+    background: #ecfdf5;
+  }
+  .choice.correct .choice-num {
+    background: #10b981;
+    color: white;
+  }
+  .choice.wrong {
+    border-color: #ef4444;
+    background: #fef2f2;
+  }
+  .choice.wrong .choice-num {
+    background: #ef4444;
+    color: white;
+  }
+  .choice.dim { opacity: 0.4; }
+  .choice:disabled { cursor: default; }
+
+  /* 정답 피드백 */
+  .feedback {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border-left: 4px solid #10b981;
+  }
+  .feedback.wrong { border-left-color: #ef4444; }
+  .feedback-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+  .feedback-word {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .feedback-word ruby rt {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 400;
+  }
+  .feedback-meaning {
+    font-size: 14px;
+    color: #4b5563;
+  }
+  .feedback-actions {
+    margin-top: 14px;
+  }
+
+  /* 세션 종료 */
+  .summary {
+    text-align: center;
+    padding: 32px 16px;
+  }
+  .summary-emoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+  .summary h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .summary p {
+    color: #6b7280;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .summary-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 28px;
+  }
+  .summary-stat .num {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-stat .label {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .summary-stat .num.correct { color: #059669; }
+  .summary-stat .num.wrong { color: #dc2626; }
+
+  /* 단어장 화면 */
+  .list-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .list-controls input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 16px; /* iOS 자동 확대 방지 */
+    font-family: inherit;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .list-controls input:focus { border-color: #1f2937; }
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .filter-tab {
+    background: #f3f4f6;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .filter-tab.active {
+    background: #1f2937;
+    color: white;
+  }
+  .word-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .word-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .word-jp {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .word-jp ruby rt {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 400;
+  }
+  .word-meaning {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  .word-status {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+  .word-status.new { background: #fef3c7; color: #92400e; }
+  .word-status.learning { background: #dbeafe; color: #1e40af; }
+  .word-status.review { background: #e0e7ff; color: #3730a3; }
+  .word-status.mastered { background: #d1fae5; color: #065f46; }
+
+  /* 모달 */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .modal h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .modal p {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  /* 활용형 박스 */
+  .conjugations {
+    margin-top: 14px;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .conj-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .conj-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border-top: 1px solid #f3f4f6;
+  }
+  .conj-row:first-of-type { border-top: none; }
+  .conj-label {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+  .conj-form {
+    font-size: 17px;
+    color: #111827;
+    font-weight: 500;
+  }
+  .conj-form ruby rt {
+    font-size: 9px;
+    color: #6b7280;
+    font-weight: 400;
+  }
+
+  /* 단어장 확장 */
+  .word-item.expandable { cursor: pointer; }
+  .word-item.expanded { background: #fafbfc; }
+  .word-detail {
+    padding: 8px 4px 12px 4px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafbfc;
+  }
+
+  /* 애니메이션 */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.25s; }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+  .pop { animation: pop 0.3s; }
+
+  /* iPad / 큰 화면 대응 */
+  @media (min-width: 700px) {
+    .quiz-meaning { font-size: 38px; }
+    .choice-jp { font-size: 24px; }
+  }
+  /* 좁은 폰 화면 대응 (iPhone SE 등 ~375px) */
+  @media (max-width: 380px) {
+    body { padding-left: 12px; padding-right: 12px; }
+    .card { padding: 18px 16px; }
+    .quiz-meaning { font-size: 28px; }
+    .choice-jp { font-size: 20px; }
+    .choice { padding: 14px 16px; }
+    .stat-num { font-size: 19px; }
+    .stat-label { font-size: 10px; }
+    .title-card h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ===================================================================
+// 단어 데이터 (JLPT N5 + N4)
+// ===================================================================
+const WORDS = [
+  // ===== N5: 사람/가족 =====
+  { id: 1, level:'N5', kanji:'人', kana:'ひと', meaning:'사람', pos:'명사' },
+  { id: 2, level:'N5', kanji:'私', kana:'わたし', meaning:'나, 저', pos:'대명사' },
+  { id: 3, level:'N5', kanji:'友達', kana:'ともだち', meaning:'친구', pos:'명사' },
+  { id: 4, level:'N5', kanji:'家族', kana:'かぞく', meaning:'가족', pos:'명사' },
+  { id: 5, level:'N5', kanji:'父', kana:'ちち', meaning:'아버지', pos:'명사' },
+  { id: 6, level:'N5', kanji:'母', kana:'はは', meaning:'어머니', pos:'명사' },
+  { id: 7, level:'N5', kanji:'兄', kana:'あに', meaning:'형, 오빠', pos:'명사' },
+  { id: 8, level:'N5', kanji:'姉', kana:'あね', meaning:'누나, 언니', pos:'명사' },
+  { id: 9, level:'N5', kanji:'弟', kana:'おとうと', meaning:'남동생', pos:'명사' },
+  { id:10, level:'N5', kanji:'妹', kana:'いもうと', meaning:'여동생', pos:'명사' },
+  { id:11, level:'N5', kanji:'子供', kana:'こども', meaning:'아이', pos:'명사' },
+  { id:12, level:'N5', kanji:'男', kana:'おとこ', meaning:'남자', pos:'명사' },
+  { id:13, level:'N5', kanji:'女', kana:'おんな', meaning:'여자', pos:'명사' },
+  { id:14, level:'N5', kanji:'先生', kana:'せんせい', meaning:'선생님', pos:'명사' },
+  { id:15, level:'N5', kanji:'学生', kana:'がくせい', meaning:'학생', pos:'명사' },
+
+  // ===== N5: 시간 =====
+  { id:20, level:'N5', kanji:'今', kana:'いま', meaning:'지금', pos:'명사' },
+  { id:21, level:'N5', kanji:'今日', kana:'きょう', meaning:'오늘', pos:'명사' },
+  { id:22, level:'N5', kanji:'明日', kana:'あした', meaning:'내일', pos:'명사' },
+  { id:23, level:'N5', kanji:'昨日', kana:'きのう', meaning:'어제', pos:'명사' },
+  { id:24, level:'N5', kanji:'毎日', kana:'まいにち', meaning:'매일', pos:'명사' },
+  { id:25, level:'N5', kanji:'朝', kana:'あさ', meaning:'아침', pos:'명사' },
+  { id:26, level:'N5', kanji:'昼', kana:'ひる', meaning:'낮, 점심', pos:'명사' },
+  { id:27, level:'N5', kanji:'夜', kana:'よる', meaning:'밤', pos:'명사' },
+  { id:28, level:'N5', kanji:'時間', kana:'じかん', meaning:'시간', pos:'명사' },
+  { id:29, level:'N5', kanji:'年', kana:'とし', meaning:'해, 나이', pos:'명사' },
+  { id:30, level:'N5', kanji:'月', kana:'つき', meaning:'달', pos:'명사' },
+  { id:31, level:'N5', kanji:'週', kana:'しゅう', meaning:'주', pos:'명사' },
+  { id:32, level:'N5', kanji:'今年', kana:'ことし', meaning:'올해', pos:'명사' },
+  { id:33, level:'N5', kanji:'来年', kana:'らいねん', meaning:'내년', pos:'명사' },
+  { id:34, level:'N5', kanji:'去年', kana:'きょねん', meaning:'작년', pos:'명사' },
+
+  // ===== N5: 장소 =====
+  { id:40, level:'N5', kanji:'学校', kana:'がっこう', meaning:'학교', pos:'명사' },
+  { id:41, level:'N5', kanji:'大学', kana:'だいがく', meaning:'대학교', pos:'명사' },
+  { id:42, level:'N5', kanji:'会社', kana:'かいしゃ', meaning:'회사', pos:'명사' },
+  { id:43, level:'N5', kanji:'家', kana:'いえ', meaning:'집', pos:'명사' },
+  { id:44, level:'N5', kanji:'部屋', kana:'へや', meaning:'방', pos:'명사' },
+  { id:45, level:'N5', kanji:'駅', kana:'えき', meaning:'역', pos:'명사' },
+  { id:46, level:'N5', kanji:'店', kana:'みせ', meaning:'가게', pos:'명사' },
+  { id:47, level:'N5', kanji:'銀行', kana:'ぎんこう', meaning:'은행', pos:'명사' },
+  { id:48, level:'N5', kanji:'病院', kana:'びょういん', meaning:'병원', pos:'명사' },
+  { id:49, level:'N5', kanji:'図書館', kana:'としょかん', meaning:'도서관', pos:'명사' },
+  { id:50, level:'N5', kanji:'公園', kana:'こうえん', meaning:'공원', pos:'명사' },
+  { id:51, level:'N5', kanji:'道', kana:'みち', meaning:'길', pos:'명사' },
+  { id:52, level:'N5', kanji:'国', kana:'くに', meaning:'나라', pos:'명사' },
+  { id:53, level:'N5', kanji:'町', kana:'まち', meaning:'동네, 거리', pos:'명사' },
+
+  // ===== N5: 사물 =====
+  { id:60, level:'N5', kanji:'本', kana:'ほん', meaning:'책', pos:'명사' },
+  { id:61, level:'N5', kanji:'新聞', kana:'しんぶん', meaning:'신문', pos:'명사' },
+  { id:62, level:'N5', kanji:'雑誌', kana:'ざっし', meaning:'잡지', pos:'명사' },
+  { id:63, level:'N5', kanji:'辞書', kana:'じしょ', meaning:'사전', pos:'명사' },
+  { id:64, level:'N5', kanji:'車', kana:'くるま', meaning:'차, 자동차', pos:'명사' },
+  { id:65, level:'N5', kanji:'電車', kana:'でんしゃ', meaning:'전철', pos:'명사' },
+  { id:66, level:'N5', kanji:'自転車', kana:'じてんしゃ', meaning:'자전거', pos:'명사' },
+  { id:67, level:'N5', kanji:'飛行機', kana:'ひこうき', meaning:'비행기', pos:'명사' },
+  { id:68, level:'N5', kanji:'電話', kana:'でんわ', meaning:'전화', pos:'명사' },
+  { id:69, level:'N5', kanji:'手紙', kana:'てがみ', meaning:'편지', pos:'명사' },
+  { id:70, level:'N5', kanji:'写真', kana:'しゃしん', meaning:'사진', pos:'명사' },
+  { id:71, level:'N5', kanji:'お金', kana:'おかね', meaning:'돈', pos:'명사' },
+  { id:72, level:'N5', kanji:'名前', kana:'なまえ', meaning:'이름', pos:'명사' },
+  { id:73, level:'N5', kanji:null, kana:'テレビ', meaning:'TV, 텔레비전', pos:'명사' },
+  { id:74, level:'N5', kanji:null, kana:'パソコン', meaning:'PC, 컴퓨터', pos:'명사' },
+
+  // ===== N5: 자연 =====
+  { id:80, level:'N5', kanji:'山', kana:'やま', meaning:'산', pos:'명사' },
+  { id:81, level:'N5', kanji:'川', kana:'かわ', meaning:'강', pos:'명사' },
+  { id:82, level:'N5', kanji:'海', kana:'うみ', meaning:'바다', pos:'명사' },
+  { id:83, level:'N5', kanji:'空', kana:'そら', meaning:'하늘', pos:'명사' },
+  { id:84, level:'N5', kanji:'雨', kana:'あめ', meaning:'비', pos:'명사' },
+  { id:85, level:'N5', kanji:'雪', kana:'ゆき', meaning:'눈(雪)', pos:'명사' },
+  { id:86, level:'N5', kanji:'風', kana:'かぜ', meaning:'바람', pos:'명사' },
+  { id:87, level:'N5', kanji:'花', kana:'はな', meaning:'꽃', pos:'명사' },
+  { id:88, level:'N5', kanji:'木', kana:'き', meaning:'나무', pos:'명사' },
+  { id:89, level:'N5', kanji:'犬', kana:'いぬ', meaning:'개', pos:'명사' },
+  { id:90, level:'N5', kanji:'猫', kana:'ねこ', meaning:'고양이', pos:'명사' },
+  { id:91, level:'N5', kanji:'鳥', kana:'とり', meaning:'새', pos:'명사' },
+  { id:92, level:'N5', kanji:'魚', kana:'さかな', meaning:'물고기, 생선', pos:'명사' },
+
+  // ===== N5: 음식 =====
+  { id:100, level:'N5', kanji:'水', kana:'みず', meaning:'물', pos:'명사' },
+  { id:101, level:'N5', kanji:'お茶', kana:'おちゃ', meaning:'차', pos:'명사' },
+  { id:102, level:'N5', kanji:null, kana:'コーヒー', meaning:'커피', pos:'명사' },
+  { id:103, level:'N5', kanji:'ご飯', kana:'ごはん', meaning:'밥', pos:'명사' },
+  { id:104, level:'N5', kanji:null, kana:'パン', meaning:'빵', pos:'명사' },
+  { id:105, level:'N5', kanji:'肉', kana:'にく', meaning:'고기', pos:'명사' },
+  { id:106, level:'N5', kanji:'野菜', kana:'やさい', meaning:'야채', pos:'명사' },
+  { id:107, level:'N5', kanji:'果物', kana:'くだもの', meaning:'과일', pos:'명사' },
+  { id:108, level:'N5', kanji:'卵', kana:'たまご', meaning:'달걀', pos:'명사' },
+  { id:109, level:'N5', kanji:'牛乳', kana:'ぎゅうにゅう', meaning:'우유', pos:'명사' },
+
+  // ===== N5: 동사 =====
+  { id:120, level:'N5', kanji:'食べる', kana:'たべる', meaning:'먹다', pos:'동사' },
+  { id:121, level:'N5', kanji:'飲む', kana:'のむ', meaning:'마시다', pos:'동사' },
+  { id:122, level:'N5', kanji:'行く', kana:'いく', meaning:'가다', pos:'동사' },
+  { id:123, level:'N5', kanji:'来る', kana:'くる', meaning:'오다', pos:'동사' },
+  { id:124, level:'N5', kanji:'帰る', kana:'かえる', meaning:'돌아가다', pos:'동사' },
+  { id:125, level:'N5', kanji:'見る', kana:'みる', meaning:'보다', pos:'동사' },
+  { id:126, level:'N5', kanji:'聞く', kana:'きく', meaning:'듣다, 묻다', pos:'동사' },
+  { id:127, level:'N5', kanji:'話す', kana:'はなす', meaning:'말하다', pos:'동사' },
+  { id:128, level:'N5', kanji:'読む', kana:'よむ', meaning:'읽다', pos:'동사' },
+  { id:129, level:'N5', kanji:'書く', kana:'かく', meaning:'쓰다', pos:'동사' },
+  { id:130, level:'N5', kanji:'買う', kana:'かう', meaning:'사다', pos:'동사' },
+  { id:131, level:'N5', kanji:'立つ', kana:'たつ', meaning:'서다', pos:'동사' },
+  { id:132, level:'N5', kanji:'座る', kana:'すわる', meaning:'앉다', pos:'동사' },
+  { id:133, level:'N5', kanji:'寝る', kana:'ねる', meaning:'자다', pos:'동사' },
+  { id:134, level:'N5', kanji:'起きる', kana:'おきる', meaning:'일어나다', pos:'동사' },
+  { id:135, level:'N5', kanji:'待つ', kana:'まつ', meaning:'기다리다', pos:'동사' },
+  { id:136, level:'N5', kanji:'働く', kana:'はたらく', meaning:'일하다', pos:'동사' },
+  { id:137, level:'N5', kanji:'遊ぶ', kana:'あそぶ', meaning:'놀다', pos:'동사' },
+  { id:138, level:'N5', kanji:'勉強する', kana:'べんきょうする', meaning:'공부하다', pos:'동사' },
+  { id:139, level:'N5', kanji:'作る', kana:'つくる', meaning:'만들다', pos:'동사' },
+  { id:140, level:'N5', kanji:'歩く', kana:'あるく', meaning:'걷다', pos:'동사' },
+  { id:141, level:'N5', kanji:'走る', kana:'はしる', meaning:'달리다', pos:'동사' },
+  { id:142, level:'N5', kanji:'飛ぶ', kana:'とぶ', meaning:'날다', pos:'동사' },
+  { id:143, level:'N5', kanji:'泳ぐ', kana:'およぐ', meaning:'헤엄치다', pos:'동사' },
+
+  // ===== N5: 형용사 =====
+  { id:160, level:'N5', kanji:'大きい', kana:'おおきい', meaning:'크다', pos:'い형용사' },
+  { id:161, level:'N5', kanji:'小さい', kana:'ちいさい', meaning:'작다', pos:'い형용사' },
+  { id:162, level:'N5', kanji:'高い', kana:'たかい', meaning:'비싸다, 높다', pos:'い형용사' },
+  { id:163, level:'N5', kanji:'安い', kana:'やすい', meaning:'싸다', pos:'い형용사' },
+  { id:164, level:'N5', kanji:'新しい', kana:'あたらしい', meaning:'새롭다', pos:'い형용사' },
+  { id:165, level:'N5', kanji:'古い', kana:'ふるい', meaning:'낡다, 오래되다', pos:'い형용사' },
+  { id:166, level:'N5', kanji:'暑い', kana:'あつい', meaning:'덥다', pos:'い형용사' },
+  { id:167, level:'N5', kanji:'寒い', kana:'さむい', meaning:'춥다', pos:'い형용사' },
+  { id:168, level:'N5', kanji:'良い', kana:'いい', meaning:'좋다', pos:'い형용사' },
+  { id:169, level:'N5', kanji:'悪い', kana:'わるい', meaning:'나쁘다', pos:'い형용사' },
+  { id:170, level:'N5', kanji:'多い', kana:'おおい', meaning:'많다', pos:'い형용사' },
+  { id:171, level:'N5', kanji:'少ない', kana:'すくない', meaning:'적다', pos:'い형용사' },
+  { id:172, level:'N5', kanji:'早い', kana:'はやい', meaning:'이르다, 빠르다', pos:'い형용사' },
+  { id:173, level:'N5', kanji:'遅い', kana:'おそい', meaning:'늦다, 느리다', pos:'い형용사' },
+  { id:174, level:'N5', kanji:'長い', kana:'ながい', meaning:'길다', pos:'い형용사' },
+  { id:175, level:'N5', kanji:'短い', kana:'みじかい', meaning:'짧다', pos:'い형용사' },
+  { id:176, level:'N5', kanji:'楽しい', kana:'たのしい', meaning:'즐겁다', pos:'い형용사' },
+  { id:177, level:'N5', kanji:'面白い', kana:'おもしろい', meaning:'재미있다', pos:'い형용사' },
+  { id:178, level:'N5', kanji:'強い', kana:'つよい', meaning:'강하다', pos:'い형용사' },
+  { id:179, level:'N5', kanji:'弱い', kana:'よわい', meaning:'약하다', pos:'い형용사' },
+  { id:180, level:'N5', kanji:'静か', kana:'しずか', meaning:'조용한', pos:'な형용사' },
+  { id:181, level:'N5', kanji:'元気', kana:'げんき', meaning:'건강한, 활기찬', pos:'な형용사' },
+  { id:182, level:'N5', kanji:'有名', kana:'ゆうめい', meaning:'유명한', pos:'な형용사' },
+  { id:183, level:'N5', kanji:'好き', kana:'すき', meaning:'좋아함', pos:'な형용사' },
+  { id:184, level:'N5', kanji:'嫌い', kana:'きらい', meaning:'싫어함', pos:'な형용사' },
+  { id:185, level:'N5', kanji:'暇', kana:'ひま', meaning:'한가함', pos:'な형용사' },
+
+  // ===== N4: 명사 =====
+  { id:200, level:'N4', kanji:'経験', kana:'けいけん', meaning:'경험', pos:'명사' },
+  { id:201, level:'N4', kanji:'説明', kana:'せつめい', meaning:'설명', pos:'명사' },
+  { id:202, level:'N4', kanji:'試験', kana:'しけん', meaning:'시험', pos:'명사' },
+  { id:203, level:'N4', kanji:'練習', kana:'れんしゅう', meaning:'연습', pos:'명사' },
+  { id:204, level:'N4', kanji:'質問', kana:'しつもん', meaning:'질문', pos:'명사' },
+  { id:205, level:'N4', kanji:'答え', kana:'こたえ', meaning:'대답, 답', pos:'명사' },
+  { id:206, level:'N4', kanji:'意味', kana:'いみ', meaning:'의미, 뜻', pos:'명사' },
+  { id:207, level:'N4', kanji:'約束', kana:'やくそく', meaning:'약속', pos:'명사' },
+  { id:208, level:'N4', kanji:'計画', kana:'けいかく', meaning:'계획', pos:'명사' },
+  { id:209, level:'N4', kanji:'予定', kana:'よてい', meaning:'예정', pos:'명사' },
+  { id:210, level:'N4', kanji:'趣味', kana:'しゅみ', meaning:'취미', pos:'명사' },
+  { id:211, level:'N4', kanji:'興味', kana:'きょうみ', meaning:'흥미', pos:'명사' },
+  { id:212, level:'N4', kanji:'用事', kana:'ようじ', meaning:'볼일, 용무', pos:'명사' },
+  { id:213, level:'N4', kanji:'都合', kana:'つごう', meaning:'사정, 형편', pos:'명사' },
+  { id:214, level:'N4', kanji:'場所', kana:'ばしょ', meaning:'장소', pos:'명사' },
+  { id:215, level:'N4', kanji:'場合', kana:'ばあい', meaning:'경우', pos:'명사' },
+  { id:216, level:'N4', kanji:'機会', kana:'きかい', meaning:'기회', pos:'명사' },
+  { id:217, level:'N4', kanji:'機械', kana:'きかい', meaning:'기계', pos:'명사' },
+  { id:218, level:'N4', kanji:'関係', kana:'かんけい', meaning:'관계', pos:'명사' },
+  { id:219, level:'N4', kanji:'連絡', kana:'れんらく', meaning:'연락', pos:'명사' },
+  { id:220, level:'N4', kanji:'案内', kana:'あんない', meaning:'안내', pos:'명사' },
+  { id:221, level:'N4', kanji:'紹介', kana:'しょうかい', meaning:'소개', pos:'명사' },
+  { id:222, level:'N4', kanji:'招待', kana:'しょうたい', meaning:'초대', pos:'명사' },
+  { id:223, level:'N4', kanji:'準備', kana:'じゅんび', meaning:'준비', pos:'명사' },
+  { id:224, level:'N4', kanji:'用意', kana:'ようい', meaning:'준비, 채비', pos:'명사' },
+  { id:225, level:'N4', kanji:'文化', kana:'ぶんか', meaning:'문화', pos:'명사' },
+  { id:226, level:'N4', kanji:'歴史', kana:'れきし', meaning:'역사', pos:'명사' },
+  { id:227, level:'N4', kanji:'社会', kana:'しゃかい', meaning:'사회', pos:'명사' },
+  { id:228, level:'N4', kanji:'世界', kana:'せかい', meaning:'세계', pos:'명사' },
+  { id:229, level:'N4', kanji:'経済', kana:'けいざい', meaning:'경제', pos:'명사' },
+  { id:230, level:'N4', kanji:'政治', kana:'せいじ', meaning:'정치', pos:'명사' },
+  { id:231, level:'N4', kanji:'自然', kana:'しぜん', meaning:'자연', pos:'명사' },
+  { id:232, level:'N4', kanji:'生活', kana:'せいかつ', meaning:'생활', pos:'명사' },
+  { id:233, level:'N4', kanji:'仕事', kana:'しごと', meaning:'일, 업무', pos:'명사' },
+  { id:234, level:'N4', kanji:'交通', kana:'こうつう', meaning:'교통', pos:'명사' },
+  { id:235, level:'N4', kanji:'空港', kana:'くうこう', meaning:'공항', pos:'명사' },
+  { id:236, level:'N4', kanji:'港', kana:'みなと', meaning:'항구', pos:'명사' },
+  { id:237, level:'N4', kanji:'地震', kana:'じしん', meaning:'지진', pos:'명사' },
+  { id:238, level:'N4', kanji:'台風', kana:'たいふう', meaning:'태풍', pos:'명사' },
+  { id:239, level:'N4', kanji:'火事', kana:'かじ', meaning:'화재', pos:'명사' },
+
+  // ===== N4: 동사 =====
+  { id:260, level:'N4', kanji:'集める', kana:'あつめる', meaning:'모으다', pos:'동사' },
+  { id:261, level:'N4', kanji:'並ぶ', kana:'ならぶ', meaning:'줄을 서다', pos:'동사' },
+  { id:262, level:'N4', kanji:'変わる', kana:'かわる', meaning:'바뀌다', pos:'동사' },
+  { id:263, level:'N4', kanji:'変える', kana:'かえる', meaning:'바꾸다', pos:'동사' },
+  { id:264, level:'N4', kanji:'続ける', kana:'つづける', meaning:'계속하다', pos:'동사' },
+  { id:265, level:'N4', kanji:'続く', kana:'つづく', meaning:'이어지다', pos:'동사' },
+  { id:266, level:'N4', kanji:'決める', kana:'きめる', meaning:'결정하다', pos:'동사' },
+  { id:267, level:'N4', kanji:'決まる', kana:'きまる', meaning:'정해지다', pos:'동사' },
+  { id:268, level:'N4', kanji:'違う', kana:'ちがう', meaning:'다르다, 틀리다', pos:'동사' },
+  { id:269, level:'N4', kanji:'似る', kana:'にる', meaning:'닮다', pos:'동사' },
+  { id:270, level:'N4', kanji:'動く', kana:'うごく', meaning:'움직이다', pos:'동사' },
+  { id:271, level:'N4', kanji:'急ぐ', kana:'いそぐ', meaning:'서두르다', pos:'동사' },
+  { id:272, level:'N4', kanji:'探す', kana:'さがす', meaning:'찾다(찾는 중)', pos:'동사' },
+  { id:273, level:'N4', kanji:'見つける', kana:'みつける', meaning:'발견하다', pos:'동사' },
+  { id:274, level:'N4', kanji:'忘れる', kana:'わすれる', meaning:'잊다', pos:'동사' },
+  { id:275, level:'N4', kanji:'覚える', kana:'おぼえる', meaning:'외우다, 기억하다', pos:'동사' },
+  { id:276, level:'N4', kanji:'思う', kana:'おもう', meaning:'생각하다', pos:'동사' },
+  { id:277, level:'N4', kanji:'考える', kana:'かんがえる', meaning:'고려하다, 생각하다', pos:'동사' },
+  { id:278, level:'N4', kanji:'知る', kana:'しる', meaning:'알다', pos:'동사' },
+  { id:279, level:'N4', kanji:'分かる', kana:'わかる', meaning:'알다, 이해하다', pos:'동사' },
+  { id:280, level:'N4', kanji:'教える', kana:'おしえる', meaning:'가르치다', pos:'동사' },
+  { id:281, level:'N4', kanji:'習う', kana:'ならう', meaning:'배우다', pos:'동사' },
+  { id:282, level:'N4', kanji:'始める', kana:'はじめる', meaning:'시작하다', pos:'동사' },
+  { id:283, level:'N4', kanji:'終わる', kana:'おわる', meaning:'끝나다', pos:'동사' },
+  { id:284, level:'N4', kanji:'戻る', kana:'もどる', meaning:'되돌아오다', pos:'동사' },
+  { id:285, level:'N4', kanji:'着く', kana:'つく', meaning:'도착하다', pos:'동사' },
+  { id:286, level:'N4', kanji:'渡る', kana:'わたる', meaning:'건너다', pos:'동사' },
+  { id:287, level:'N4', kanji:'通る', kana:'とおる', meaning:'지나가다', pos:'동사' },
+  { id:288, level:'N4', kanji:'込む', kana:'こむ', meaning:'붐비다', pos:'동사' },
+  { id:289, level:'N4', kanji:'空く', kana:'すく', meaning:'비다, 빈자리가 생기다', pos:'동사' },
+  { id:290, level:'N4', kanji:'開く', kana:'あく', meaning:'열리다', pos:'동사' },
+  { id:291, level:'N4', kanji:'閉まる', kana:'しまる', meaning:'닫히다', pos:'동사' },
+  { id:292, level:'N4', kanji:'開ける', kana:'あける', meaning:'열다', pos:'동사' },
+  { id:293, level:'N4', kanji:'閉める', kana:'しめる', meaning:'닫다', pos:'동사' },
+  { id:294, level:'N4', kanji:'呼ぶ', kana:'よぶ', meaning:'부르다', pos:'동사' },
+  { id:295, level:'N4', kanji:'手伝う', kana:'てつだう', meaning:'돕다', pos:'동사' },
+  { id:296, level:'N4', kanji:'頑張る', kana:'がんばる', meaning:'힘내다, 노력하다', pos:'동사' },
+  { id:297, level:'N4', kanji:'頼む', kana:'たのむ', meaning:'부탁하다', pos:'동사' },
+  { id:298, level:'N4', kanji:'貸す', kana:'かす', meaning:'빌려주다', pos:'동사' },
+  { id:299, level:'N4', kanji:'借りる', kana:'かりる', meaning:'빌리다', pos:'동사' },
+  { id:300, level:'N4', kanji:'返す', kana:'かえす', meaning:'돌려주다', pos:'동사' },
+  { id:301, level:'N4', kanji:'届ける', kana:'とどける', meaning:'배달하다, 전하다', pos:'동사' },
+  { id:302, level:'N4', kanji:'運ぶ', kana:'はこぶ', meaning:'옮기다, 운반하다', pos:'동사' },
+  { id:303, level:'N4', kanji:'落ちる', kana:'おちる', meaning:'떨어지다', pos:'동사' },
+  { id:304, level:'N4', kanji:'落とす', kana:'おとす', meaning:'떨어뜨리다', pos:'동사' },
+  { id:305, level:'N4', kanji:'壊れる', kana:'こわれる', meaning:'부서지다', pos:'동사' },
+  { id:306, level:'N4', kanji:'壊す', kana:'こわす', meaning:'부수다', pos:'동사' },
+  { id:307, level:'N4', kanji:'直す', kana:'なおす', meaning:'고치다', pos:'동사' },
+  { id:308, level:'N4', kanji:'治る', kana:'なおる', meaning:'(병이) 낫다', pos:'동사' },
+  { id:309, level:'N4', kanji:'死ぬ', kana:'しぬ', meaning:'죽다', pos:'동사' },
+  { id:310, level:'N4', kanji:'生まれる', kana:'うまれる', meaning:'태어나다', pos:'동사' },
+  { id:311, level:'N4', kanji:'育つ', kana:'そだつ', meaning:'자라다', pos:'동사' },
+  { id:312, level:'N4', kanji:'育てる', kana:'そだてる', meaning:'기르다', pos:'동사' },
+
+  // ===== N4: 형용사/부사 =====
+  { id:340, level:'N4', kanji:'必要', kana:'ひつよう', meaning:'필요한', pos:'な형용사' },
+  { id:341, level:'N4', kanji:'大事', kana:'だいじ', meaning:'중요한', pos:'な형용사' },
+  { id:342, level:'N4', kanji:'大切', kana:'たいせつ', meaning:'소중한', pos:'な형용사' },
+  { id:343, level:'N4', kanji:'安心', kana:'あんしん', meaning:'안심', pos:'な형용사/명사' },
+  { id:344, level:'N4', kanji:'心配', kana:'しんぱい', meaning:'걱정', pos:'な형용사/명사' },
+  { id:345, level:'N4', kanji:'注意', kana:'ちゅうい', meaning:'주의', pos:'명사' },
+  { id:346, level:'N4', kanji:'親切', kana:'しんせつ', meaning:'친절한', pos:'な형용사' },
+  { id:347, level:'N4', kanji:'簡単', kana:'かんたん', meaning:'간단한', pos:'な형용사' },
+  { id:348, level:'N4', kanji:'複雑', kana:'ふくざつ', meaning:'복잡한', pos:'な형용사' },
+  { id:349, level:'N4', kanji:'便利', kana:'べんり', meaning:'편리한', pos:'な형용사' },
+  { id:350, level:'N4', kanji:'不便', kana:'ふべん', meaning:'불편한', pos:'な형용사' },
+  { id:351, level:'N4', kanji:'自由', kana:'じゆう', meaning:'자유로운', pos:'な형용사' },
+  { id:352, level:'N4', kanji:'特別', kana:'とくべつ', meaning:'특별한', pos:'な형용사' },
+  { id:353, level:'N4', kanji:'普通', kana:'ふつう', meaning:'보통의', pos:'な형용사' },
+  { id:354, level:'N4', kanji:'丁寧', kana:'ていねい', meaning:'정중한, 꼼꼼한', pos:'な형용사' },
+  { id:355, level:'N4', kanji:'真面目', kana:'まじめ', meaning:'성실한', pos:'な형용사' },
+  { id:356, level:'N4', kanji:'残念', kana:'ざんねん', meaning:'유감스러운', pos:'な형용사' },
+  { id:357, level:'N4', kanji:'美しい', kana:'うつくしい', meaning:'아름답다', pos:'い형용사' },
+  { id:358, level:'N4', kanji:'寂しい', kana:'さびしい', meaning:'외롭다', pos:'い형용사' },
+  { id:359, level:'N4', kanji:'嬉しい', kana:'うれしい', meaning:'기쁘다', pos:'い형용사' },
+  { id:360, level:'N4', kanji:'悲しい', kana:'かなしい', meaning:'슬프다', pos:'い형용사' },
+  { id:361, level:'N4', kanji:'怖い', kana:'こわい', meaning:'무섭다', pos:'い형용사' },
+  { id:362, level:'N4', kanji:'恥ずかしい', kana:'はずかしい', meaning:'부끄럽다', pos:'い형용사' },
+  { id:363, level:'N4', kanji:'珍しい', kana:'めずらしい', meaning:'드물다, 신기하다', pos:'い형용사' },
+  { id:364, level:'N4', kanji:'確か', kana:'たしか', meaning:'확실히, 분명히', pos:'부사/형용동사' },
+  { id:365, level:'N4', kanji:'多分', kana:'たぶん', meaning:'아마', pos:'부사' },
+  { id:366, level:'N4', kanji:'急に', kana:'きゅうに', meaning:'갑자기', pos:'부사' },
+  { id:367, level:'N4', kanji:'必ず', kana:'かならず', meaning:'반드시', pos:'부사' },
+  { id:368, level:'N4', kanji:'一生懸命', kana:'いっしょうけんめい', meaning:'열심히', pos:'부사' },
+  { id:369, level:'N4', kanji:'久しぶり', kana:'ひさしぶり', meaning:'오랜만', pos:'명사' },
+  { id:370, level:'N4', kanji:null, kana:'もちろん', meaning:'물론', pos:'부사' },
+  { id:371, level:'N4', kanji:null, kana:'やっぱり', meaning:'역시', pos:'부사' },
+  { id:372, level:'N4', kanji:null, kana:'たまに', meaning:'가끔', pos:'부사' },
+  { id:373, level:'N4', kanji:null, kana:'いつも', meaning:'언제나, 항상', pos:'부사' },
+  { id:374, level:'N4', kanji:null, kana:'たくさん', meaning:'많이', pos:'부사' },
+  { id:375, level:'N4', kanji:null, kana:'ちょっと', meaning:'잠깐, 좀', pos:'부사' },
+];
+
+// ===================================================================
+// SRS (Spaced Repetition) 로직
+// ===================================================================
+// 박스 단계별 다음 복습까지의 간격 (밀리초)
+const MIN = 60 * 1000;
+const HOUR = 60 * MIN;
+const DAY = 24 * HOUR;
+const INTERVALS = [
+  10 * MIN,    // box 1: 10분
+  HOUR,        // box 2: 1시간
+  DAY,         // box 3: 1일
+  3 * DAY,     // box 4: 3일
+  7 * DAY,     // box 5: 1주
+  21 * DAY,    // box 6: 3주
+  60 * DAY,    // box 7: 마스터
+];
+const MASTERED_BOX = INTERVALS.length;
+
+// 한 세션 설정
+const SESSION_SIZE = 15;       // 한 세션에 풀 단어 수
+const MAX_NEW_PER_SESSION = 8; // 새 단어 최대
+
+const STORAGE_KEY = 'jp-learn-progress-v1';
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
+}
+
+function wordStatus(word) {
+  const p = state.progress[word.id];
+  if (!p) return 'new';
+  if (p.box >= MASTERED_BOX) return 'mastered';
+  if (p.nextReview <= Date.now()) return 'review';
+  return 'learning';
+}
+
+function updateWord(word, correct) {
+  const p = state.progress[word.id] || { box: 0, correctCount: 0, wrongCount: 0 };
+  if (correct) {
+    p.box = Math.min(p.box + 1, MASTERED_BOX);
+    p.correctCount++;
+  } else {
+    p.box = 1;
+    p.wrongCount++;
+  }
+  const intervalIdx = Math.max(0, Math.min(p.box - 1, INTERVALS.length - 1));
+  p.nextReview = Date.now() + INTERVALS[intervalIdx];
+  p.lastReview = Date.now();
+  state.progress[word.id] = p;
+  saveProgress();
+}
+
+// ===================================================================
+// 세션 빌드
+// ===================================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildSession() {
+  const now = Date.now();
+  const enabled = WORDS.filter(w => state.levels.includes(w.level));
+
+  // 복습 대상: 이미 학습 중이고 nextReview 지남
+  const due = enabled.filter(w => {
+    const p = state.progress[w.id];
+    return p && p.box < MASTERED_BOX && p.nextReview <= now;
+  }).sort((a, b) => state.progress[a.id].nextReview - state.progress[b.id].nextReview);
+
+  // 새 단어: 한 번도 풀지 않은 것
+  const fresh = enabled.filter(w => !state.progress[w.id]);
+
+  const session = [...due.slice(0, SESSION_SIZE)];
+  const room = SESSION_SIZE - session.length;
+  if (room > 0) {
+    session.push(...shuffle(fresh).slice(0, Math.min(room, MAX_NEW_PER_SESSION)));
+  }
+  // 부족하면 미래 복습 단어로 채움 (현재 box가 낮은 순)
+  if (session.length < SESSION_SIZE) {
+    const others = enabled.filter(w => {
+      const p = state.progress[w.id];
+      return p && p.box < MASTERED_BOX && !session.includes(w);
+    }).sort((a, b) => state.progress[a.id].box - state.progress[b.id].box);
+    session.push(...others.slice(0, SESSION_SIZE - session.length));
+  }
+  return shuffle(session);
+}
+
+function buildQuestion(word) {
+  // 같은 레벨에서 distractor 우선 선택, 부족하면 다른 레벨에서
+  let pool = WORDS.filter(w => w.id !== word.id && w.level === word.level);
+  if (pool.length < 3) {
+    pool = WORDS.filter(w => w.id !== word.id);
+  }
+  // 같은 품사 우선
+  const samePos = pool.filter(w => w.pos === word.pos);
+  const otherPos = pool.filter(w => w.pos !== word.pos);
+  const distractors = [];
+  const samePosShuffled = shuffle(samePos);
+  for (const w of samePosShuffled) {
+    if (distractors.length >= 3) break;
+    distractors.push(w);
+  }
+  if (distractors.length < 3) {
+    const otherShuffled = shuffle(otherPos);
+    for (const w of otherShuffled) {
+      if (distractors.length >= 3) break;
+      distractors.push(w);
+    }
+  }
+  const choices = shuffle([word, ...distractors]);
+  return { word, choices, correctIndex: choices.indexOf(word) };
+}
+
+// ===================================================================
+// 일본어 렌더링 (한자 + 후리가나)
+// ===================================================================
+function isKana(c) {
+  if (!c) return false;
+  const code = c.charCodeAt(0);
+  return (code >= 0x3040 && code <= 0x30FF);
+}
+
+// 한자 부분에만 ruby가 붙도록 분할 (예: 食べる → <ruby>食<rt>た</rt></ruby>べる)
+function renderRuby(kanjiForm, kanaForm) {
+  if (!kanjiForm) return kanaForm || '';
+  if (kanjiForm === kanaForm) return kanaForm;
+  let pi = 0;
+  while (pi < kanjiForm.length && pi < kanaForm.length
+         && kanjiForm[pi] === kanaForm[pi] && isKana(kanjiForm[pi])) pi++;
+  let si = 0;
+  while (kanjiForm.length - si - 1 >= pi && kanaForm.length - si - 1 >= pi
+         && kanjiForm[kanjiForm.length - 1 - si] === kanaForm[kanaForm.length - 1 - si]
+         && isKana(kanjiForm[kanjiForm.length - 1 - si])) si++;
+  const prefix = kanjiForm.slice(0, pi);
+  const midKanji = kanjiForm.slice(pi, kanjiForm.length - si);
+  const midKana = kanaForm.slice(pi, kanaForm.length - si);
+  const suffix = kanjiForm.slice(kanjiForm.length - si);
+  if (!midKanji) return kanaForm;
+  return `${prefix}<ruby>${midKanji}<rt>${midKana}</rt></ruby>${suffix}`;
+}
+
+function renderJp(word) {
+  return renderRuby(word.kanji, word.kana);
+}
+
+// ===================================================================
+// 활용형 (Conjugation)
+// ===================================================================
+// 형태는 같지만 1그룹(godan)인 동사들 (える·いる로 끝나도 2그룹 아님)
+const GODAN_EXCEPTIONS = new Set([
+  '帰る', '知る', '走る', '入る', '切る', '要る',
+  '減る', '蹴る', '滑る', '焦る', '限る', '握る',
+  '喋る', '練る', '照る', '茂る', '散る', '威張る'
+]);
+
+function getVerbType(word) {
+  const k = word.kana;
+  if (!k) return 1;
+  if (k === 'する' || (k.endsWith('する') && k.length > 2)) return 3;
+  if (k === 'くる' || word.kanji === '来る') return 3;
+  if (word.kanji && GODAN_EXCEPTIONS.has(word.kanji)) return 1;
+  if (k.length >= 2 && k.endsWith('る')) {
+    const prev = k[k.length - 2];
+    if ('えけせてねへめれげぜでべぺ'.includes(prev)) return 2;
+    if ('いきしちにひみりぎじぢびぴ'.includes(prev)) return 2;
+  }
+  return 1;
+}
+
+function P(kana, kanji) { return { kana, kanji }; }
+
+function conjugateVerb(word) {
+  const type = getVerbType(word);
+  const k = word.kana;
+  const kanji = word.kanji || k;
+
+  if (type === 3) {
+    if (k === 'くる' || k.endsWith('くる')) {
+      // 来る 계열
+      const preK = k.slice(0, -2);
+      const preJ = (word.kanji || k).replace(/来る$|くる$/, '');
+      return [
+        ['정중',      P(preK + 'きます',  preJ + '来ます')],
+        ['정중 부정', P(preK + 'きません', preJ + '来ません')],
+        ['정중 과거', P(preK + 'きました', preJ + '来ました')],
+        ['て형',      P(preK + 'きて',    preJ + '来て')],
+        ['보통 부정', P(preK + 'こない',  preJ + '来ない')],
+        ['보통 과거', P(preK + 'きた',    preJ + '来た')],
+      ];
+    }
+    // ~する 계열
+    const sKana = k.slice(0, -2);
+    const sKanji = kanji.slice(0, -2);
+    return [
+      ['정중',      P(sKana + 'します',  sKanji + 'します')],
+      ['정중 부정', P(sKana + 'しません', sKanji + 'しません')],
+      ['정중 과거', P(sKana + 'しました', sKanji + 'しました')],
+      ['て형',      P(sKana + 'して',    sKanji + 'して')],
+      ['보통 부정', P(sKana + 'しない',  sKanji + 'しない')],
+      ['보통 과거', P(sKana + 'した',    sKanji + 'した')],
+    ];
+  }
+
+  if (type === 2) {
+    const sKana = k.slice(0, -1);
+    const sKanji = kanji.slice(0, -1);
+    return [
+      ['정중',      P(sKana + 'ます',  sKanji + 'ます')],
+      ['정중 부정', P(sKana + 'ません', sKanji + 'ません')],
+      ['정중 과거', P(sKana + 'ました', sKanji + 'ました')],
+      ['て형',      P(sKana + 'て',    sKanji + 'て')],
+      ['보통 부정', P(sKana + 'ない',  sKanji + 'ない')],
+      ['보통 과거', P(sKana + 'た',    sKanji + 'た')],
+    ];
+  }
+
+  // 1그룹 (godan)
+  const last = k.slice(-1);
+  const sKana = k.slice(0, -1);
+  const sKanji = kanji.slice(0, -1);
+  const masuMap = {'う':'い','つ':'ち','る':'り','く':'き','ぐ':'ぎ','す':'し','む':'み','ぶ':'び','ぬ':'に'};
+  const naiMap  = {'う':'わ','つ':'た','る':'ら','く':'か','ぐ':'が','す':'さ','む':'ま','ぶ':'ば','ぬ':'な'};
+
+  let teSuffix, taSuffix;
+  if ('うつる'.includes(last)) { teSuffix = 'って'; taSuffix = 'った'; }
+  else if (last === 'く')      { teSuffix = 'いて'; taSuffix = 'いた'; }
+  else if (last === 'ぐ')      { teSuffix = 'いで'; taSuffix = 'いだ'; }
+  else if (last === 'す')      { teSuffix = 'して'; taSuffix = 'した'; }
+  else if ('むぶぬ'.includes(last)) { teSuffix = 'んで'; taSuffix = 'んだ'; }
+  else { teSuffix = 'て'; taSuffix = 'た'; }
+
+  // 行く 예외 (いって/いった)
+  if (k === 'いく') { teSuffix = 'って'; taSuffix = 'った'; }
+
+  const masuK = masuMap[last] || '';
+  const naiK = naiMap[last] || '';
+
+  return [
+    ['정중',      P(sKana + masuK + 'ます',  sKanji + masuK + 'ます')],
+    ['정중 부정', P(sKana + masuK + 'ません', sKanji + masuK + 'ません')],
+    ['정중 과거', P(sKana + masuK + 'ました', sKanji + masuK + 'ました')],
+    ['て형',      P(sKana + teSuffix,        sKanji + teSuffix)],
+    ['보통 부정', P(sKana + naiK + 'ない',   sKanji + naiK + 'ない')],
+    ['보통 과거', P(sKana + taSuffix,        sKanji + taSuffix)],
+  ];
+}
+
+function conjugateAdjI(word) {
+  const k = word.kana;
+  const kanji = word.kanji || k;
+  // いい/良い 예외
+  if (k === 'いい' || kanji === '良い') {
+    const baseK = kanji === '良い' ? '良' : 'い';
+    return [
+      ['정중', P('いいです', kanji + 'です')],
+      ['부정', P('よくないです', baseK === '良' ? '良くないです' : 'よくないです')],
+      ['과거', P('よかったです', baseK === '良' ? '良かったです' : 'よかったです')],
+      ['て형', P('よくて',     baseK === '良' ? '良くて' : 'よくて')],
+    ];
+  }
+  const sKana = k.slice(0, -1);
+  const sKanji = kanji.slice(0, -1);
+  return [
+    ['정중', P(k + 'です',         kanji + 'です')],
+    ['부정', P(sKana + 'くないです', sKanji + 'くないです')],
+    ['과거', P(sKana + 'かったです', sKanji + 'かったです')],
+    ['て형', P(sKana + 'くて',      sKanji + 'くて')],
+  ];
+}
+
+function conjugateAdjNa(word) {
+  const k = word.kana;
+  const kanji = word.kanji || k;
+  return [
+    ['정중', P(k + 'です',       kanji + 'です')],
+    ['부정', P(k + 'じゃないです', kanji + 'じゃないです')],
+    ['과거', P(k + 'でした',     kanji + 'でした')],
+    ['て형', P(k + 'で',         kanji + 'で')],
+  ];
+}
+
+function getConjugations(word) {
+  if (word.pos === '동사') return conjugateVerb(word);
+  if (word.pos === 'い형용사') return conjugateAdjI(word);
+  if (word.pos && word.pos.indexOf('な형용사') === 0) return conjugateAdjNa(word);
+  return null;
+}
+
+function renderConjugationsBox(word) {
+  const conjs = getConjugations(word);
+  if (!conjs) return '';
+  return `
+    <div class="conjugations">
+      <div class="conj-title">활용형</div>
+      ${conjs.map(([label, form]) => `
+        <div class="conj-row">
+          <span class="conj-label">${label}</span>
+          <span class="conj-form">${renderRuby(form.kanji, form.kana)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ===================================================================
+// 상태
+// ===================================================================
+const state = {
+  screen: 'title',          // title | quiz | summary | list
+  progress: loadProgress(),
+  levels: ['N5', 'N4'],     // 학습할 레벨
+  session: null,            // { words: [], index: 0, results: [] }
+  currentQ: null,           // 현재 문제
+  showFeedback: false,
+  lastCorrect: null,
+  listFilter: 'all',        // all | new | learning | review | mastered
+  listSearch: '',
+};
+
+// ===================================================================
+// 화면 렌더링
+// ===================================================================
+const app = document.getElementById('app');
+
+function computeStats() {
+  const enabled = WORDS.filter(w => state.levels.includes(w.level));
+  let learning = 0, mastered = 0, due = 0, fresh = 0;
+  const now = Date.now();
+  for (const w of enabled) {
+    const p = state.progress[w.id];
+    if (!p) { fresh++; continue; }
+    if (p.box >= MASTERED_BOX) { mastered++; continue; }
+    learning++;
+    if (p.nextReview <= now) due++;
+  }
+  return { total: enabled.length, learning, mastered, due, fresh };
+}
+
+function renderTitle() {
+  const s = computeStats();
+  const dueOrNew = s.due + Math.min(MAX_NEW_PER_SESSION, s.fresh);
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot"></span> 일본어 단어</div>
+      <div class="header-stats">${s.total}개 단어</div>
+    </div>
+    <div class="card title-card">
+      <h1>오늘도 한 걸음</h1>
+      <p class="subtitle">JLPT N5 · N4 단어 연습</p>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num">${s.fresh}</div>
+          <div class="stat-label">새 단어</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">${s.learning}</div>
+          <div class="stat-label">학습 중</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num due">${s.due}</div>
+          <div class="stat-label">복습 시간</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num mastered">${s.mastered}</div>
+          <div class="stat-label">마스터</div>
+        </div>
+      </div>
+      <button class="btn" id="btn-start">
+        ${dueOrNew > 0 ? `세션 시작 (${Math.min(SESSION_SIZE, dueOrNew)}문제)` : '세션 시작'}
+      </button>
+      <div class="btn-row">
+        <button class="btn secondary" id="btn-list">단어장 보기</button>
+        <button class="btn secondary" id="btn-settings">레벨 선택</button>
+      </div>
+    </div>
+    <div class="card" style="font-size:13px; color:#6b7280; line-height:1.6;">
+      <div style="font-weight:600; color:#374151; margin-bottom:8px;">📚 학습 방식</div>
+      4지선다로 한국어 뜻을 보고 일본어를 고릅니다.<br>
+      틀린 단어는 짧은 간격으로, 맞춘 단어는 점점 긴 간격으로 다시 나옵니다.<br>
+      6번 연속 맞추면 마스터로 분류됩니다.
+    </div>
+  `;
+  document.getElementById('btn-start').onclick = startSession;
+  document.getElementById('btn-list').onclick = () => { state.screen = 'list'; render(); };
+  document.getElementById('btn-settings').onclick = openLevelModal;
+}
+
+function openLevelModal() {
+  const has5 = state.levels.includes('N5');
+  const has4 = state.levels.includes('N4');
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>학습할 레벨</h3>
+      <p>퀴즈에 나올 단어 범위를 선택하세요.</p>
+      <label style="display:flex; align-items:center; gap:12px; padding:14px 4px; font-size:15px; border-top:1px solid #f3f4f6;">
+        <input type="checkbox" id="lv-n5" ${has5 ? 'checked' : ''} style="width:20px;height:20px;"> JLPT N5 (기초)
+      </label>
+      <label style="display:flex; align-items:center; gap:12px; padding:14px 4px; font-size:15px; border-top:1px solid #f3f4f6; border-bottom:1px solid #f3f4f6;">
+        <input type="checkbox" id="lv-n4" ${has4 ? 'checked' : ''} style="width:20px;height:20px;"> JLPT N4 (초급)
+      </label>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn secondary" id="lv-cancel">취소</button>
+        <button class="btn" id="lv-save">저장</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#lv-cancel').onclick = () => overlay.remove();
+  overlay.querySelector('#lv-save').onclick = () => {
+    const lv = [];
+    if (overlay.querySelector('#lv-n5').checked) lv.push('N5');
+    if (overlay.querySelector('#lv-n4').checked) lv.push('N4');
+    if (lv.length === 0) { alert('적어도 하나는 선택해주세요.'); return; }
+    state.levels = lv;
+    localStorage.setItem('jp-learn-levels', JSON.stringify(lv));
+    overlay.remove();
+    render();
+  };
+}
+
+function startSession() {
+  const session = buildSession();
+  if (session.length === 0) {
+    alert('학습할 단어가 없어요! 레벨을 선택하거나 잠시 후 다시 시도하세요.');
+    return;
+  }
+  state.session = { words: session, index: 0, results: [] };
+  state.currentQ = buildQuestion(session[0]);
+  state.showFeedback = false;
+  state.screen = 'quiz';
+  render();
+}
+
+function renderQuiz() {
+  const { session, currentQ, showFeedback, lastCorrect } = state;
+  const word = currentQ.word;
+  const total = session.words.length;
+  const current = session.index + 1;
+  const progress = (session.index / total) * 100;
+  const p = state.progress[word.id];
+  const tag = !p ? { label: 'NEW · 처음 보는 단어', cls: 'new' }
+             : (p.nextReview <= Date.now() && p.lastReview ? { label: `복습 · ${p.box}박스`, cls: 'review' }
+             : { label: `학습 중 · ${p.box}박스`, cls: '' });
+
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot"></span> 일본어 단어</div>
+      <button class="btn-icon" id="quit">✕ 종료</button>
+    </div>
+    <div class="card">
+      <div class="progress-row">
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div class="progress-text">${current} / ${total}</div>
+      </div>
+      <div class="quiz-prompt">
+        <span class="quiz-level ${tag.cls}">${tag.label}</span>
+        <div class="quiz-meaning">${word.meaning}</div>
+        <div class="quiz-pos">${word.pos} · ${word.level}</div>
+      </div>
+      <div class="choices" id="choices">
+        ${currentQ.choices.map((c, i) => `
+          <button class="choice" data-index="${i}">
+            <span class="choice-num">${i + 1}</span>
+            <span class="choice-jp">${renderJp(c)}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div id="feedback-area"></div>
+    </div>
+  `;
+  document.getElementById('quit').onclick = quitSession;
+  if (!showFeedback) {
+    document.querySelectorAll('.choice').forEach(btn => {
+      btn.onclick = () => handleAnswer(parseInt(btn.dataset.index));
+    });
+  } else {
+    showFeedbackUI();
+  }
+}
+
+function handleAnswer(choiceIdx) {
+  const correct = choiceIdx === state.currentQ.correctIndex;
+  state.lastCorrect = correct;
+  state.showFeedback = true;
+  state.session.results.push({ word: state.currentQ.word, correct });
+  updateWord(state.currentQ.word, correct);
+
+  // 모바일 햅틱 (Android Chrome 등)
+  if (navigator.vibrate) {
+    navigator.vibrate(correct ? 30 : [30, 60, 30]);
+  }
+
+  // 선택지 disable + 시각적 피드백
+  const choices = document.querySelectorAll('.choice');
+  choices.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === state.currentQ.correctIndex) btn.classList.add('correct');
+    if (i === choiceIdx && !correct) btn.classList.add('wrong');
+    if (i !== state.currentQ.correctIndex && i !== choiceIdx) btn.classList.add('dim');
+  });
+  if (correct) choices[choiceIdx].classList.add('pop');
+  else choices[choiceIdx].classList.add('shake');
+
+  showFeedbackUI();
+
+  // 피드백 영역(다음 버튼 포함)을 화면에 보이도록 부드럽게 스크롤
+  requestAnimationFrame(() => {
+    const fb = document.querySelector('.feedback');
+    if (fb && fb.scrollIntoView) {
+      fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+}
+
+function showFeedbackUI() {
+  const word = state.currentQ.word;
+  const area = document.getElementById('feedback-area');
+  const isLast = state.session.index >= state.session.words.length - 1;
+  area.innerHTML = `
+    <div class="feedback ${state.lastCorrect ? '' : 'wrong'}">
+      <div class="feedback-title">${state.lastCorrect ? '✓ 정답이에요' : '✗ 정답은'}</div>
+      <div class="feedback-word">${renderJp(word)}</div>
+      <div class="feedback-meaning">${word.meaning} · ${word.pos}</div>
+      ${renderConjugationsBox(word)}
+      <div class="feedback-actions">
+        <button class="btn" id="next-q">${isLast ? '결과 보기' : '다음 →'}</button>
+      </div>
+    </div>
+  `;
+  const btn = document.getElementById('next-q');
+  btn.onclick = nextQuestion;
+  btn.focus();
+  // 키보드 단축키: 엔터로 다음
+  document.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextQuestion(); }
+  };
+}
+
+function nextQuestion() {
+  document.onkeydown = null;
+  state.session.index++;
+  if (state.session.index >= state.session.words.length) {
+    state.screen = 'summary';
+    render();
+    return;
+  }
+  state.currentQ = buildQuestion(state.session.words[state.session.index]);
+  state.showFeedback = false;
+  render();
+}
+
+function quitSession() {
+  if (state.session && state.session.results.length > 0) {
+    if (!confirm('지금까지의 결과는 저장됩니다. 종료할까요?')) return;
+  }
+  document.onkeydown = null;
+  state.screen = 'title';
+  state.session = null;
+  render();
+}
+
+function renderSummary() {
+  const results = state.session.results;
+  const correct = results.filter(r => r.correct).length;
+  const wrong = results.length - correct;
+  const pct = Math.round(correct / results.length * 100);
+  const wrongWords = results.filter(r => !r.correct).map(r => r.word);
+  const emoji = pct === 100 ? '🎉' : pct >= 80 ? '👏' : pct >= 50 ? '👍' : '💪';
+
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot"></span> 일본어 단어</div>
+    </div>
+    <div class="card summary">
+      <div class="summary-emoji">${emoji}</div>
+      <h2>세션 완료!</h2>
+      <p>${results.length}문제 중 ${correct}개 맞췄어요 (${pct}%)</p>
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <div class="num correct">${correct}</div>
+          <div class="label">맞춘 문제</div>
+        </div>
+        <div class="summary-stat">
+          <div class="num wrong">${wrong}</div>
+          <div class="label">틀린 문제</div>
+        </div>
+      </div>
+      <button class="btn" id="again">다시 시작</button>
+      <div class="btn-row">
+        <button class="btn secondary" id="back-title">홈으로</button>
+      </div>
+    </div>
+    ${wrongWords.length ? `
+      <div class="card">
+        <div style="font-weight:600; margin-bottom:12px; font-size:14px;">📝 틀린 단어 복습</div>
+        ${wrongWords.map(w => `
+          <div class="word-item">
+            <div>
+              <div class="word-jp">${renderJp(w)}</div>
+              <div class="word-meaning">${w.meaning} · ${w.pos}</div>
+            </div>
+          </div>
+        `).join('')}
+        <div style="font-size:12px; color:#6b7280; margin-top:8px;">
+          틀린 단어는 10분 뒤 다시 등장합니다.
+        </div>
+      </div>
+    ` : ''}
+  `;
+  document.getElementById('again').onclick = startSession;
+  document.getElementById('back-title').onclick = () => { state.screen = 'title'; render(); };
+}
+
+function renderList() {
+  const enabled = WORDS.filter(w => state.levels.includes(w.level));
+  let filtered = enabled;
+  if (state.listFilter !== 'all') {
+    filtered = filtered.filter(w => wordStatus(w) === state.listFilter);
+  }
+  if (state.listSearch) {
+    const q = state.listSearch.toLowerCase();
+    filtered = filtered.filter(w =>
+      (w.kanji && w.kanji.includes(q)) ||
+      w.kana.includes(q) ||
+      w.meaning.toLowerCase().includes(q)
+    );
+  }
+
+  const statusLabel = { new:'NEW', learning:'학습', review:'복습', mastered:'마스터' };
+  const filterCounts = { all: enabled.length };
+  for (const w of enabled) {
+    const s = wordStatus(w);
+    filterCounts[s] = (filterCounts[s] || 0) + 1;
+  }
+
+  app.innerHTML = `
+    <div class="header">
+      <button class="btn-icon" id="back">← 홈</button>
+      <div class="logo" style="font-size:16px;">단어장</div>
+      <div class="header-stats">${filtered.length}개</div>
+    </div>
+    <div class="card">
+      <div class="list-controls">
+        <input id="search" type="text" placeholder="한국어, 일본어, 한자로 검색..." value="${state.listSearch.replace(/"/g, '&quot;')}">
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab ${state.listFilter === 'all' ? 'active' : ''}" data-f="all">전체 ${filterCounts.all || 0}</button>
+        <button class="filter-tab ${state.listFilter === 'new' ? 'active' : ''}" data-f="new">새 단어 ${filterCounts.new || 0}</button>
+        <button class="filter-tab ${state.listFilter === 'learning' ? 'active' : ''}" data-f="learning">학습 ${filterCounts.learning || 0}</button>
+        <button class="filter-tab ${state.listFilter === 'review' ? 'active' : ''}" data-f="review">복습 ${filterCounts.review || 0}</button>
+        <button class="filter-tab ${state.listFilter === 'mastered' ? 'active' : ''}" data-f="mastered">마스터 ${filterCounts.mastered || 0}</button>
+      </div>
+      <div class="word-list">
+        ${filtered.length === 0 ? '<div style="text-align:center; color:#6b7280; padding:32px 0;">단어가 없어요</div>' :
+          filtered.map(w => {
+            const s = wordStatus(w);
+            const conj = getConjugations(w);
+            return `
+              <div class="word-item ${conj ? 'expandable' : ''}" data-id="${w.id}">
+                <div style="flex:1;">
+                  <div class="word-jp">${renderJp(w)}${conj ? ' <span style="color:#9ca3af;font-size:12px;">▾</span>' : ''}</div>
+                  <div class="word-meaning">${w.meaning} · ${w.pos} · ${w.level}</div>
+                </div>
+                <div class="word-status ${s}">${statusLabel[s]}</div>
+              </div>
+              ${conj ? `<div class="word-detail" data-id="${w.id}" style="display:none">${renderConjugationsBox(w)}</div>` : ''}
+            `;
+          }).join('')
+        }
+      </div>
+    </div>
+    <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px;">
+      <div style="font-size:13px; color:#6b7280;">학습 기록 초기화</div>
+      <button class="btn secondary" style="width:auto; padding:8px 16px; font-size:13px;" id="reset">초기화</button>
+    </div>
+  `;
+  document.getElementById('back').onclick = () => { state.screen = 'title'; render(); };
+  document.getElementById('search').oninput = (e) => {
+    state.listSearch = e.target.value;
+    renderList(); // re-render only list view
+    // 입력 포커스 유지
+    const input = document.getElementById('search');
+    if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+  };
+  document.querySelectorAll('.filter-tab').forEach(b => {
+    b.onclick = () => { state.listFilter = b.dataset.f; renderList(); };
+  });
+  document.querySelectorAll('.word-item.expandable').forEach(item => {
+    item.onclick = () => {
+      const id = item.dataset.id;
+      const detail = document.querySelector(`.word-detail[data-id="${id}"]`);
+      if (!detail) return;
+      const open = detail.style.display !== 'none';
+      detail.style.display = open ? 'none' : 'block';
+      item.classList.toggle('expanded', !open);
+    };
+  });
+  document.getElementById('reset').onclick = () => {
+    if (confirm('모든 학습 기록을 지울까요? 되돌릴 수 없어요.')) {
+      state.progress = {};
+      saveProgress();
+      render();
+    }
+  };
+}
+
+function render() {
+  if (state.screen === 'title') renderTitle();
+  else if (state.screen === 'quiz') renderQuiz();
+  else if (state.screen === 'summary') renderSummary();
+  else if (state.screen === 'list') renderList();
+}
+
+// 저장된 레벨 설정 로드
+try {
+  const savedLevels = localStorage.getItem('jp-learn-levels');
+  if (savedLevels) {
+    const lv = JSON.parse(savedLevels);
+    if (Array.isArray(lv) && lv.length > 0) state.levels = lv;
+  }
+} catch {}
+
+render();
+</script>
+</body>
+</html>
