@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="일본어 단어">
 <meta name="theme-color" content="#1f2937">
-<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23bc002d'/><circle cx='90' cy='90' r='44' fill='white'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23bc002d'/><text x='90' y='128' font-size='110' text-anchor='middle' fill='white' font-family='Hiragino Sans, sans-serif' font-weight='600'>あ</text></svg>">
 <title>일본어 단어 연습</title>
 <style>
   * {
@@ -21,11 +21,17 @@
     background: #f5f6f8;
     color: #1f2937;
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
   }
   body {
     display: flex;
     justify-content: center;
     padding: 24px 16px;
+    padding:
+      max(20px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
   }
   #app {
     width: 100%;
@@ -123,13 +129,16 @@
     background: #1f2937;
     color: white;
   }
-  .btn:hover { background: #111827; }
-  .btn:active { transform: scale(0.98); }
+  .btn:active { transform: scale(0.98); background: #111827; }
   .btn.secondary {
     background: #f3f4f6;
     color: #1f2937;
   }
-  .btn.secondary:hover { background: #e5e7eb; }
+  .btn.secondary:active { background: #e5e7eb; }
+  @media (hover: hover) {
+    .btn:hover { background: #111827; }
+    .btn.secondary:hover { background: #e5e7eb; }
+  }
   .btn-row {
     display: flex;
     gap: 8px;
@@ -222,9 +231,15 @@
     transition: all 0.15s;
     font-family: inherit;
   }
-  .choice:hover {
-    border-color: #9ca3af;
-    background: #fafafa;
+  .choice:active {
+    border-color: #6b7280;
+    background: #f3f4f6;
+  }
+  @media (hover: hover) {
+    .choice:hover {
+      border-color: #9ca3af;
+      background: #fafafa;
+    }
   }
   .choice-num {
     width: 26px; height: 26px;
@@ -350,9 +365,10 @@
     padding: 10px 14px;
     border: 1px solid #e5e7eb;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 16px; /* iOS 자동 확대 방지 */
     font-family: inherit;
     outline: none;
+    -webkit-appearance: none;
   }
   .list-controls input:focus { border-color: #1f2937; }
   .filter-tabs {
@@ -513,6 +529,17 @@
   @media (min-width: 700px) {
     .quiz-meaning { font-size: 38px; }
     .choice-jp { font-size: 24px; }
+  }
+  /* 좁은 폰 화면 대응 (iPhone SE 등 ~375px) */
+  @media (max-width: 380px) {
+    body { padding-left: 12px; padding-right: 12px; }
+    .card { padding: 18px 16px; }
+    .quiz-meaning { font-size: 28px; }
+    .choice-jp { font-size: 20px; }
+    .choice { padding: 14px 16px; }
+    .stat-num { font-size: 19px; }
+    .stat-label { font-size: 10px; }
+    .title-card h1 { font-size: 24px; }
   }
 </style>
 </head>
@@ -1217,11 +1244,11 @@ function openLevelModal() {
     <div class="modal">
       <h3>학습할 레벨</h3>
       <p>퀴즈에 나올 단어 범위를 선택하세요.</p>
-      <label style="display:flex; align-items:center; gap:10px; padding:10px 0;">
-        <input type="checkbox" id="lv-n5" ${has5 ? 'checked' : ''}> JLPT N5 (기초)
+      <label style="display:flex; align-items:center; gap:12px; padding:14px 4px; font-size:15px; border-top:1px solid #f3f4f6;">
+        <input type="checkbox" id="lv-n5" ${has5 ? 'checked' : ''} style="width:20px;height:20px;"> JLPT N5 (기초)
       </label>
-      <label style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f3f4f6;">
-        <input type="checkbox" id="lv-n4" ${has4 ? 'checked' : ''}> JLPT N4 (초급)
+      <label style="display:flex; align-items:center; gap:12px; padding:14px 4px; font-size:15px; border-top:1px solid #f3f4f6; border-bottom:1px solid #f3f4f6;">
+        <input type="checkbox" id="lv-n4" ${has4 ? 'checked' : ''} style="width:20px;height:20px;"> JLPT N4 (초급)
       </label>
       <div class="btn-row" style="margin-top:16px;">
         <button class="btn secondary" id="lv-cancel">취소</button>
@@ -1310,6 +1337,11 @@ function handleAnswer(choiceIdx) {
   state.session.results.push({ word: state.currentQ.word, correct });
   updateWord(state.currentQ.word, correct);
 
+  // 모바일 햅틱 (Android Chrome 등)
+  if (navigator.vibrate) {
+    navigator.vibrate(correct ? 30 : [30, 60, 30]);
+  }
+
   // 선택지 disable + 시각적 피드백
   const choices = document.querySelectorAll('.choice');
   choices.forEach((btn, i) => {
@@ -1322,6 +1354,14 @@ function handleAnswer(choiceIdx) {
   else choices[choiceIdx].classList.add('shake');
 
   showFeedbackUI();
+
+  // 피드백 영역(다음 버튼 포함)을 화면에 보이도록 부드럽게 스크롤
+  requestAnimationFrame(() => {
+    const fb = document.querySelector('.feedback');
+    if (fb && fb.scrollIntoView) {
+      fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
 }
 
 function showFeedbackUI() {
