@@ -378,6 +378,25 @@
     border-left: 5px solid #ffd700;
   }
 
+  /* 음소거 버튼 */
+  #mute-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 500;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.1s;
+  }
+  #mute-btn:active { transform: scale(0.9); }
+
   /* iPad 세로 모드 안내 오버레이 */
   #rotate-overlay {
     position: fixed;
@@ -411,6 +430,7 @@
 </head>
 <body>
 <div id="app"></div>
+<button id="mute-btn" onclick="Sound.toggle()" title="소리 켜기/끄기">🔊</button>
 <div id="rotate-overlay">
   <div class="rotate-icon">📱</div>
   <h2>iPad를 가로로 돌려주세요</h2>
@@ -491,6 +511,102 @@ const WORLDS = [
     story: '책방 친구들이 낱말과 글자 문제로 고민 중이에요. 함께 풀어주면 친구가 될 수 있어요!'
   }
 ];
+
+// ========== 사운드 시스템 (Web Audio API) ==========
+const Sound = {
+  ctx: null,
+  master: null,
+  muted: localStorage.getItem('mathadv_muted') === '1',
+  bgmTimer: null,
+  bgmPlaying: false,
+  init() {
+    if (this.ctx) { this._resume(); return; }
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = this.muted ? 0 : 0.55;
+      this.master.connect(this.ctx.destination);
+      this._startBgm();
+    } catch (e) { /* audio unavailable */ }
+  },
+  _resume() {
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  setMuted(m) {
+    this.muted = m;
+    localStorage.setItem('mathadv_muted', m ? '1' : '0');
+    if (this.master) this.master.gain.value = m ? 0 : 0.55;
+    updateMuteButton();
+  },
+  toggle() {
+    this.init(); // 사용자가 누르는 순간 오디오 초기화
+    this.setMuted(!this.muted);
+  },
+  _seq(notes, dur, type, vol, gap) {
+    if (!this.ctx) return;
+    this._resume();
+    type = type || 'triangle';
+    vol = vol == null ? 0.25 : vol;
+    gap = gap == null ? 0.03 : gap;
+    let t = this.ctx.currentTime;
+    for (const freq of notes) {
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.connect(g);
+      g.connect(this.master);
+      osc.start(t);
+      osc.stop(t + dur);
+      t += dur + gap;
+    }
+  },
+  correct() { this._seq([523.25, 659.25, 783.99, 1046.5], 0.13, 'triangle', 0.28); },
+  wrong()   { this._seq([329.63, 246.94], 0.22, 'sine', 0.22); },
+  win()     { this._seq([523.25, 659.25, 783.99, 1046.5, 1318.51, 1046.5, 1318.51], 0.16, 'triangle', 0.3); },
+  lose()    { this._seq([440, 369.99, 293.66, 220], 0.25, 'sine', 0.22); },
+  _startBgm() {
+    if (this.bgmPlaying) return;
+    this.bgmPlaying = true;
+    const chords = [
+      [261.63, 329.63, 392.00],   // C major
+      [220.00, 277.18, 329.63],   // A minor
+      [174.61, 220.00, 261.63],   // F major
+      [196.00, 246.94, 293.66]    // G major
+    ];
+    let idx = 0;
+    const playChord = () => {
+      if (!this.bgmPlaying || !this.ctx) return;
+      const chord = chords[idx % chords.length];
+      const t = this.ctx.currentTime;
+      const dur = 4;
+      for (const freq of chord) {
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.035, t + 0.6);
+        g.gain.linearRampToValueAtTime(0.035, t + dur - 1);
+        g.gain.linearRampToValueAtTime(0, t + dur);
+        osc.connect(g);
+        g.connect(this.master);
+        osc.start(t);
+        osc.stop(t + dur);
+      }
+      idx++;
+    };
+    playChord();
+    this.bgmTimer = setInterval(playChord, 4000);
+  }
+};
+
+function updateMuteButton() {
+  const btn = document.getElementById('mute-btn');
+  if (btn) btn.textContent = Sound.muted ? '🔇' : '🔊';
+}
 
 // 상태
 const state = {
@@ -881,6 +997,7 @@ function startGame(mode) {
   state.stars = 0;
   state.crystals = 0;
   state.hp = state.maxHp;
+  Sound.init(); // 첫 사용자 제스처에서 오디오 활성화
   renderMap();
 }
 
@@ -1014,6 +1131,7 @@ function answer(i) {
   const correct = i === q.a;
 
   if (correct) {
+    Sound.correct();
     buttons[i].classList.add('correct');
     floatText(document.getElementById('enemy'), '+1 💝', '#ff8ec7');
     floatText(document.getElementById('hero'), '🎉', '#ffd700');
@@ -1025,6 +1143,7 @@ function answer(i) {
       nextBattle();
     }, 1100);
   } else {
+    Sound.wrong();
     buttons[i].classList.add('wrong');
     buttons[q.a].classList.add('correct');
     document.getElementById('hero').classList.add('think');
@@ -1089,6 +1208,7 @@ function worldClear() {
   }
 
   const allCleared = WORLDS.every(w => state.cleared[w.id]);
+  Sound.win();
 
   render(`
     <div class="screen result-screen">
@@ -1109,6 +1229,7 @@ function worldClear() {
 }
 
 function gameOver() {
+  Sound.lose();
   render(`
     <div class="screen result-screen" style="background:linear-gradient(135deg,#a0e7e5 0%,#b4f8c8 100%)">
       <h2>잠깐 쉬어가요 😊</h2>
@@ -1131,6 +1252,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // 시작!
+updateMuteButton();
 renderTitle();
 </script>
 </body>
