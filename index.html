@@ -368,12 +368,83 @@
     margin-top: 6px;
     font-weight: bold;
   }
+  /* ===== 세계 인트로 화면 ===== */
+  .world-intro {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    text-align: center;
+    color: white;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .world-intro-icon { font-size: 120px; margin-bottom: 20px; animation: bounce 2s infinite; }
+  .world-intro-name { font-size: 48px; margin-bottom: 16px; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); }
+  .world-intro-story { font-size: 22px; line-height: 1.6; max-width: 600px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+  /* ===== 작은 높이(폰 가로 모드 등) 통합 축소 ===== */
   @media (max-height: 500px) {
+    .screen { padding: 14px; }
+
+    /* 보상(도장) 화면 */
     .reward-card { padding: 12px 26px 10px; }
     .reward-card .sticker-emoji { font-size: 96px; }
     .reward-card .sticker-name { font-size: 20px; }
     .reward-card .sticker-msg { font-size: 14px; }
     .reward-sparkle { font-size: 22px; }
+
+    /* 지도 화면 — 4열, 스크롤 가능, 카드 축소 */
+    .map-header { margin-bottom: 6px; }
+    .map-title { font-size: 22px; }
+    .player-stats { font-size: 14px; padding: 4px 12px; gap: 10px; }
+    .map-grid {
+      gap: 8px;
+      overflow-y: auto;
+      align-content: flex-start;
+      min-height: 0;
+      padding-bottom: 4px;
+    }
+    .world-card { width: calc((100% - 24px) / 4); padding: 8px 6px; border-width: 3px; }
+    .world-icon { font-size: 36px; margin-bottom: 2px; }
+    .world-name { font-size: 14px; margin-bottom: 2px; }
+    .world-topic { font-size: 11px; }
+    .world-stars { font-size: 13px; margin-top: 2px; }
+    .lock-overlay { width: 28px; height: 28px; font-size: 16px; top: 4px; right: 4px; }
+
+    /* 전투 화면 */
+    .battle-top { margin-bottom: 4px; }
+    .battle-info { font-size: 14px; }
+    .hp-bar { font-size: 15px; padding: 4px 10px; }
+    .battle-arena .hero-emoji,
+    .battle-arena .enemy-emoji { font-size: 60px !important; }
+    .hero-name, .enemy-name { font-size: 12px; padding: 2px 8px; margin-top: 4px; }
+    .vs { font-size: 28px; }
+    .question-box { padding: 10px 12px; margin-top: 6px; }
+    .question-text { font-size: 20px; margin-bottom: 6px; min-height: 0; }
+    .question-visual { font-size: 22px; margin-bottom: 4px; }
+    .answer-grid { gap: 8px; }
+    .answer-btn { padding: 8px 10px; font-size: 16px; border-width: 2px; }
+
+    /* 결과/엔딩 화면 */
+    .result-screen h2 { font-size: 26px; margin-bottom: 6px; text-shadow: 2px 2px 0 white; }
+    .result-screen .big-icon { font-size: 70px; margin: 4px 0; }
+    .result-screen p { font-size: 14px; margin-bottom: 4px; }
+    .reward-list { font-size: 18px; margin: 6px 0; }
+
+    /* 세계 인트로 */
+    .world-intro-icon { font-size: 64px; margin-bottom: 8px; }
+    .world-intro-name { font-size: 26px; margin-bottom: 6px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    .world-intro-story { font-size: 14px; line-height: 1.4; }
+    .world-intro .btn { padding: 10px 22px; font-size: 16px; }
+    .world-intro .btn.green { margin-top: 12px !important; }
+    .world-intro .btn.small { margin-top: 8px !important; padding: 7px 16px; font-size: 13px; }
+
+    /* 풀이 카드 */
+    .explain-card { padding: 14px 16px; }
+    .explain-header { font-size: 18px; margin-bottom: 6px; }
+    .explain-question { font-size: 15px; margin-bottom: 4px; }
   }
 
   .floating-text {
@@ -1305,10 +1376,10 @@ function enterWorld(worldId) {
 function showWorldIntro(world) {
   render(`
     <div class="screen battle-screen ${world.bg}">
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:white">
-        <div style="font-size:120px;margin-bottom:20px;animation:bounce 2s infinite">${world.icon}</div>
-        <h2 style="font-size:48px;margin-bottom:16px;text-shadow:3px 3px 6px rgba(0,0,0,0.5)">${world.name}</h2>
-        <p style="font-size:22px;line-height:1.6;max-width:600px;text-shadow:2px 2px 4px rgba(0,0,0,0.5)">${world.story}</p>
+      <div class="world-intro">
+        <div class="world-intro-icon">${world.icon}</div>
+        <h2 class="world-intro-name">${world.name}</h2>
+        <p class="world-intro-story">${world.story}</p>
         <button class="btn green" style="margin-top:30px" onclick="nextBattle()">친구 만나러 가기! 🌟</button>
         <button class="btn small" style="margin-top:12px;background:rgba(255,255,255,0.3);box-shadow:none" onclick="renderMap()">지도로 돌아가기</button>
       </div>
