@@ -417,16 +417,18 @@
     .lock-overlay { width: 28px; height: 28px; font-size: 16px; top: 4px; right: 4px; }
 
     /* 전투 화면 */
+    .battle-screen { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .battle-arena { flex: 0 1 auto; min-height: 0; }
     .battle-top { margin-bottom: 4px; }
     .battle-info { font-size: 14px; }
     .hp-bar { font-size: 15px; padding: 4px 10px; }
     .battle-arena .hero-emoji,
-    .battle-arena .enemy-emoji { font-size: 60px !important; }
+    .battle-arena .enemy-emoji { font-size: 56px !important; }
     .hero-name, .enemy-name { font-size: 12px; padding: 2px 8px; margin-top: 4px; }
-    .vs { font-size: 28px; }
-    .question-box { padding: 10px 12px; margin-top: 6px; }
-    .question-text { font-size: 20px; margin-bottom: 6px; min-height: 0; }
-    .question-visual { font-size: 22px; margin-bottom: 4px; }
+    .vs { font-size: 24px; }
+    .question-box { padding: 10px 12px; margin-top: 6px; flex-shrink: 0; }
+    .question-text { font-size: 18px; margin-bottom: 6px; min-height: 0; }
+    .question-visual { font-size: 20px; margin-bottom: 4px; }
     .answer-grid { gap: 8px; }
     .answer-btn { padding: 8px 10px; font-size: 16px; border-width: 2px; }
 
@@ -581,9 +583,65 @@
     0%, 100% { transform: rotate(0deg); }
     50% { transform: rotate(-90deg); }
   }
-  /* 터치 기기(iPad/iPhone)에서 세로 모드일 때만 오버레이 표시 */
-  @media (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  /* iPad 크기 이상에서만 가로 안내 (폰은 세로 모드도 그대로 플레이 가능) */
+  @media (orientation: portrait) and (hover: none) and (pointer: coarse) and (min-width: 700px) {
     #rotate-overlay { display: flex; }
+  }
+
+  /* ===== 세로 모드 폰 (좁은 화면) — 보기 짤림 방지 ===== */
+  @media (max-width: 700px) and (orientation: portrait) {
+    .screen { padding: 16px; }
+
+    /* 타이틀 */
+    .title-screen h1 { font-size: 38px; }
+    .title-screen .hero-preview { font-size: 80px; }
+    .title-screen p { font-size: 16px; line-height: 1.4; }
+
+    /* 지도 */
+    .map-header { margin-bottom: 8px; }
+    .map-title { font-size: 24px; }
+    .player-stats { font-size: 15px; padding: 5px 12px; gap: 10px; }
+    .map-grid { gap: 10px; }
+    .world-card { width: calc((100% - 20px) / 3); padding: 10px 6px; }
+    .world-icon { font-size: 44px; margin-bottom: 4px; }
+    .world-name { font-size: 15px; margin-bottom: 2px; }
+    .world-topic { font-size: 11px; }
+    .world-stars { font-size: 15px; margin-top: 4px; }
+    .lock-overlay { width: 32px; height: 32px; font-size: 18px; top: 6px; right: 6px; }
+
+    /* 전투 — 핵심 수정: 아레나는 자연 크기, 전체 스크롤 허용 */
+    .battle-screen { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .battle-arena { flex: 0 1 auto; min-height: 0; padding: 4px 0; }
+    .battle-top { margin-bottom: 6px; }
+    .battle-info { font-size: 15px; }
+    .hp-bar { font-size: 16px; padding: 4px 12px; }
+    .battle-arena .hero-emoji,
+    .battle-arena .enemy-emoji { font-size: 72px !important; }
+    .hero-name, .enemy-name { font-size: 13px; padding: 2px 8px; margin-top: 4px; }
+    .vs { font-size: 26px; }
+    .question-box { padding: 12px; margin-top: 8px; flex-shrink: 0; }
+    .question-text { font-size: 22px; margin-bottom: 8px; min-height: 0; line-height: 1.3; }
+    .question-visual { font-size: 24px; margin-bottom: 6px; }
+    .answer-grid { gap: 8px; }
+    .answer-btn { padding: 12px 8px; font-size: 18px; border-width: 2px; }
+
+    /* 결과/도장 */
+    .result-screen h2 { font-size: 32px; }
+    .result-screen .big-icon { font-size: 100px; }
+    .result-screen p { font-size: 18px; }
+    .reward-card .sticker-emoji { font-size: 120px; }
+    .reward-card .sticker-name { font-size: 22px; }
+    .reward-card .sticker-msg { font-size: 15px; }
+
+    /* 세계 인트로 */
+    .world-intro-icon { font-size: 80px; margin-bottom: 12px; }
+    .world-intro-name { font-size: 32px; margin-bottom: 10px; }
+    .world-intro-story { font-size: 16px; line-height: 1.5; }
+
+    /* 풀이 카드 */
+    .explain-card { padding: 18px 20px; }
+    .explain-header { font-size: 20px; }
+    .explain-question { font-size: 17px; }
   }
 </style>
 </head>
