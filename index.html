@@ -306,6 +306,76 @@
   .result-screen p { font-size: 22px; margin-bottom: 12px; }
   .reward-list { font-size: 26px; margin: 16px 0; }
 
+  /* ===== 오늘의 도장(보상) ===== */
+  .reward-wrap { position: relative; display: inline-block; margin: 12px 0 8px; }
+  .reward-card {
+    background: white;
+    padding: 20px 36px 14px;
+    border-radius: 14px;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.25);
+    transform: rotate(-2deg);
+    position: relative;
+    z-index: 1;
+  }
+  .reward-card .sticker-emoji {
+    font-size: 160px;
+    line-height: 1;
+    display: block;
+    animation: wiggle 2.4s ease-in-out infinite;
+  }
+  .reward-card .sticker-name {
+    font-size: 26px;
+    font-weight: bold;
+    color: #5b2a86;
+    margin-top: 4px;
+  }
+  .reward-card .sticker-msg {
+    font-size: 17px;
+    color: #777;
+    margin-top: 2px;
+  }
+  .reward-card::after {
+    content: '오늘의 도장';
+    position: absolute;
+    top: -12px;
+    right: -14px;
+    background: #ff5e7e;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    transform: rotate(8deg);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .reward-sparkle {
+    position: absolute;
+    font-size: 30px;
+    pointer-events: none;
+    animation: sparkle 2s ease-in-out infinite;
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.35; transform: scale(0.7); }
+    50%      { opacity: 1;    transform: scale(1.2); }
+  }
+  .collection-bar {
+    font-size: 18px;
+    color: #5b2a86;
+    background: rgba(255,255,255,0.85);
+    padding: 8px 22px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-top: 6px;
+    font-weight: bold;
+  }
+  @media (max-height: 500px) {
+    .reward-card { padding: 12px 26px 10px; }
+    .reward-card .sticker-emoji { font-size: 96px; }
+    .reward-card .sticker-name { font-size: 20px; }
+    .reward-card .sticker-msg { font-size: 14px; }
+    .reward-sparkle { font-size: 22px; }
+  }
+
   .floating-text {
     position: absolute;
     font-size: 32px;
@@ -533,6 +603,49 @@ const WORLDS = [
     story: '영어 마을 친구들이 새 영어 단어와 표현을 배우고 싶대요. 함께 풀어주면 친해질 수 있어요!'
   }
 ];
+
+// 8개 세계를 하루에 모두 클리어하면 받는 귀여운 동물 도장
+const REWARDS = [
+  { id: 'cat',      emoji: '🐱', name: '새끼 고양이',  msg: '야옹~ 정말 잘했어요!' },
+  { id: 'dog',      emoji: '🐶', name: '아기 강아지',  msg: '왈왈! 너무 멋져요!' },
+  { id: 'rabbit',   emoji: '🐰', name: '토끼',         msg: '깡총깡총! 대단해요!' },
+  { id: 'panda',    emoji: '🐼', name: '아기 판다',    msg: '대나무처럼 쑥쑥!' },
+  { id: 'hedgehog', emoji: '🦔', name: '고슴도치',     msg: '뾰족뾰족 사랑스러워요!' },
+  { id: 'hamster',  emoji: '🐹', name: '햄스터',       msg: '쪼르르 빠르네요!' },
+  { id: 'koala',    emoji: '🐨', name: '아기 코알라',  msg: '꾸벅꾸벅 응원해요!' },
+  { id: 'otter',    emoji: '🦦', name: '수달',         msg: '퐁당! 신나요!' },
+  { id: 'penguin',  emoji: '🐧', name: '아기 펭귄',    msg: '뒤뚱뒤뚱 축하해요!' },
+  { id: 'sloth',    emoji: '🦥', name: '나무늘보',     msg: '느긋느긋 멋져요~' },
+  { id: 'turtle',   emoji: '🐢', name: '거북이',       msg: '천천히 멋지게 해냈어요!' },
+  { id: 'kangaroo', emoji: '🦘', name: '아기 캥거루',  msg: '폴짝! 챔피언이에요!' },
+  { id: 'bear',     emoji: '🐻', name: '아기 곰',      msg: '꼭 안아드릴게요!' },
+  { id: 'tiger',    emoji: '🐯', name: '아기 호랑이',  msg: '어흥! 정말 용감해요!' },
+  { id: 'chick',    emoji: '🐥', name: '병아리',       msg: '삐악삐악 사랑해요!' },
+  { id: 'unicorn',  emoji: '🦄', name: '유니콘',       msg: '반짝반짝 빛나요!' },
+  { id: 'dragon',   emoji: '🐲', name: '아기 용',      msg: '진정한 친구가 되었어요!' },
+  { id: 'whale',    emoji: '🐳', name: '아기 고래',    msg: '바다처럼 넓은 마음!' },
+  { id: 'butterfly',emoji: '🦋', name: '나비',         msg: '훨훨 자유롭게!' },
+  { id: 'ladybug',  emoji: '🐞', name: '무당벌레',     msg: '행운을 가져다 줄게요!' },
+];
+
+function getCollection() {
+  try { return JSON.parse(localStorage.getItem('mathadv_collection') || '[]'); }
+  catch { return []; }
+}
+function getTodayReward() {
+  const id = localStorage.getItem(`mathadv_reward_${dateSeed()}`);
+  return id ? REWARDS.find(r => r.id === id) : null;
+}
+function grantDailyReward() {
+  const collection = getCollection();
+  const uncollected = REWARDS.filter(r => !collection.includes(r.id));
+  const pool = uncollected.length > 0 ? uncollected : REWARDS;
+  const reward = pool[Math.floor(Math.random() * pool.length)];
+  localStorage.setItem(`mathadv_reward_${dateSeed()}`, reward.id);
+  const next = Array.from(new Set([...collection, reward.id]));
+  localStorage.setItem('mathadv_collection', JSON.stringify(next));
+  return reward;
+}
 
 // ========== 사운드 시스템 (Web Audio API) ==========
 const Sound = {
@@ -1342,6 +1455,12 @@ function worldClear() {
   const allCleared = WORLDS.every(w => state.cleared[w.id]);
   Sound.win();
 
+  // 오늘의 도전 모드에서 8개 세계를 모두 클리어하고 아직 도장을 안 받았으면 보상 화면
+  if (allCleared && state.mode === 'daily' && !getTodayReward()) {
+    const reward = grantDailyReward();
+    return showDailyReward(reward, stars);
+  }
+
   render(`
     <div class="screen result-screen">
       <h2>🎉 친구가 되었어요! 🎉</h2>
@@ -1356,6 +1475,31 @@ function worldClear() {
         `<p>다음 친구들을 만나러 가볼까요?</p>`
       }
       <button class="btn green" style="margin-top:24px" onclick="renderMap()">지도로 돌아가기</button>
+    </div>
+  `);
+}
+
+function showDailyReward(reward, stars) {
+  const collected = getCollection().length;
+  const total = REWARDS.length;
+  render(`
+    <div class="screen result-screen">
+      <h2>🎊 오늘의 도전 완료! 🎊</h2>
+      <p style="font-size:20px;margin-bottom:2px">8개 세계의 친구들을 모두 도와줬어요!</p>
+      <div style="font-size:24px;margin:4px 0 0">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+      <div class="reward-wrap">
+        <div class="reward-sparkle" style="top:-12px;left:-32px">✨</div>
+        <div class="reward-sparkle" style="top:24px;right:-32px;animation-delay:.5s">⭐</div>
+        <div class="reward-sparkle" style="bottom:36px;left:-28px;animation-delay:1s">💖</div>
+        <div class="reward-sparkle" style="bottom:0;right:-22px;animation-delay:1.5s">🌟</div>
+        <div class="reward-card">
+          <span class="sticker-emoji">${reward.emoji}</span>
+          <div class="sticker-name">${reward.name}</div>
+          <div class="sticker-msg">${reward.msg}</div>
+        </div>
+      </div>
+      <div class="collection-bar">📒 모은 도장 ${collected} / ${total}</div>
+      <button class="btn green" style="margin-top:14px" onclick="renderMap()">지도로 돌아가기</button>
     </div>
   `);
 }
