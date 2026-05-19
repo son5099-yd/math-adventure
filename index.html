@@ -64,8 +64,8 @@
     margin-bottom: 12px;
     animation: bounce 2s infinite;
   }
-  /* 좁은 폰 가로 모드(URL바 포함 ~400px 높이) — 잘리지 않게 크기 축소 */
-  @media (max-height: 500px) {
+  /* 폰 가로 모드 — 잘리지 않게 크기 축소 */
+  @media (max-height: 600px) {
     .title-screen { padding-top: 16px; padding-bottom: 16px; }
     .title-screen h1 { font-size: 34px; margin-bottom: 6px; }
     .title-screen .hero-preview { font-size: 60px; margin: 2px 0; }
@@ -131,7 +131,10 @@
     justify-content: center;
     gap: 16px;
     flex: 1;
-    align-content: center;
+    align-content: safe center;
+    overflow-y: auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
   }
   .world-card {
     width: calc((100% - 32px) / 3);
@@ -385,7 +388,7 @@
   .world-intro-story { font-size: 22px; line-height: 1.6; max-width: 600px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 
   /* ===== 작은 높이(폰 가로 모드 등) 통합 축소 ===== */
-  @media (max-height: 500px) {
+  @media (max-height: 600px) {
     .screen { padding: 14px; }
 
     /* 보상(도장) 화면 */
