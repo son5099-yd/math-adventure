@@ -1140,11 +1140,13 @@ function resetGame() {
 }
 
 function renderMap() {
+  // 수학 5개 세계만 순차 잠금. 과학·국어·영어는 항상 열림.
+  const MATH_SEQUENCE = ['forest', 'castle', 'cave', 'village', 'island'];
   const worldsHtml = WORLDS.map((w, i) => {
     const stars = state.cleared[w.id] || 0;
-    const prevCleared = i === 0 || state.cleared[WORLDS[i-1].id];
     const isCleared = stars > 0;
-    const locked = !prevCleared;
+    const mathIdx = MATH_SEQUENCE.indexOf(w.id);
+    const locked = mathIdx > 0 && !state.cleared[MATH_SEQUENCE[mathIdx - 1]];
     return `
       <div class="world-card ${locked ? 'locked' : ''} ${isCleared ? 'cleared' : ''}"
            onclick="${locked ? '' : `enterWorld('${w.id}')`}">
