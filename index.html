@@ -163,6 +163,7 @@
   .battle-screen.island { background: linear-gradient(180deg, #00b4db 0%, #0083b0 100%); }
   .battle-screen.lab { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); }
   .battle-screen.library { background: linear-gradient(180deg, #f6d365 0%, #fda085 100%); }
+  .battle-screen.english { background: linear-gradient(180deg, #a18cd1 0%, #fbc2eb 100%); }
 
   .battle-top {
     display: flex; justify-content: space-between;
@@ -509,6 +510,13 @@ const WORLDS = [
     enemies:     ['🐸',         '🦜',         '🦌',       '🐺',       '🦅',         '🦁'],
     enemyNames:  ['개구리 시인','앵무새 친구','사슴 박사','늑대 작가','독수리 학자','사자 교장님'],
     story: '책방 친구들이 낱말과 글자 문제로 고민 중이에요. 함께 풀어주면 친구가 될 수 있어요!'
+  },
+  {
+    id: 'english', name: '영어 마을', icon: '🌎', topic: '영어 낱말과 표현',
+    bg: 'english',
+    enemies:     ['🐯',         '🐘',         '🐪',       '🦍',         '🦛',       '🐊'],
+    enemyNames:  ['호랑이 학생','코끼리 친구','낙타 친구','고릴라 친구','하마 친구','악어 영어박사'],
+    story: '영어 마을 친구들이 새 영어 단어와 표현을 배우고 싶대요. 함께 풀어주면 친해질 수 있어요!'
   }
 ];
 
@@ -692,6 +700,7 @@ function genQuestion(worldId, difficulty) {
     case 'island': return genFraction(difficulty);
     case 'lab': return genScience();
     case 'library': return genKorean();
+    case 'english': return genEnglish();
   }
 }
 
@@ -810,6 +819,83 @@ function genKorean() {
     // 띄어쓰기
     { q: '올바르게 띄어 쓴 것은?', visual: '✍️', opts: ['학교에간다', '학교에 간다', '학 교에 간 다', '학교에간 다'], a: 1, explain: '낱말과 낱말 사이는 띄어 써요. "학교에"와 "간다"는 따로 띄어 써야 해요.' },
     { q: '올바르게 띄어 쓴 것은?', visual: '✍️', opts: ['나는밥을먹는다', '나는 밥을 먹는다', '나는밥을 먹는다', '나 는 밥 을 먹 는 다'], a: 1, explain: '"나는", "밥을", "먹는다" 세 부분으로 띄어 써요. 한 낱말 안은 붙여 쓰고요.' },
+  ];
+  return questions[Math.floor(R() * questions.length)];
+}
+
+function genEnglish() {
+  const questions = [
+    // 동의어 (Synonyms)
+    { q: '"huge"와 비슷한 뜻은?', visual: 'huge ≈ ?', opts: ['tiny', 'enormous', 'short', 'narrow'], a: 1, explain: '"huge"와 "enormous"는 둘 다 "엄청 큰"이라는 뜻이에요. big보다 더 큰 느낌이에요.' },
+    { q: '"smart"와 비슷한 뜻은?', visual: 'smart ≈ ?', opts: ['silly', 'clever', 'lazy', 'shy'], a: 1, explain: '"smart"와 "clever"는 둘 다 "똑똑한, 영리한"이라는 뜻이에요.' },
+    { q: '"happy"와 비슷한 뜻은?', visual: 'happy ≈ ?', opts: ['angry', 'bored', 'joyful', 'tired'], a: 2, explain: '"happy"와 "joyful"은 둘 다 "행복한, 기쁜"이라는 뜻이에요.' },
+    { q: '"beautiful"과 비슷한 뜻은?', visual: 'beautiful ≈ ?', opts: ['ugly', 'pretty', 'noisy', 'wet'], a: 1, explain: '"beautiful"과 "pretty"는 둘 다 "예쁜, 아름다운"이라는 뜻이에요.' },
+    { q: '"begin"과 비슷한 뜻은?', visual: 'begin ≈ ?', opts: ['finish', 'stop', 'start', 'close'], a: 2, explain: '"begin"과 "start"는 둘 다 "시작하다"라는 뜻이에요.' },
+    { q: '"quick"과 비슷한 뜻은?', visual: 'quick ≈ ?', opts: ['slow', 'fast', 'late', 'small'], a: 1, explain: '"quick"과 "fast"는 둘 다 "빠른"이라는 뜻이에요.' },
+    { q: '"scared"와 비슷한 뜻은?', visual: 'scared ≈ ?', opts: ['brave', 'afraid', 'kind', 'proud'], a: 1, explain: '"scared"와 "afraid"는 둘 다 "무서워하는, 두려워하는"이라는 뜻이에요.' },
+    { q: '"choose"와 비슷한 뜻은?', visual: 'choose ≈ ?', opts: ['lose', 'pick', 'find', 'drop'], a: 1, explain: '"choose"와 "pick"은 둘 다 "고르다, 선택하다"라는 뜻이에요.' },
+
+    // 반의어 (Antonyms)
+    { q: '"hot"의 반대말은?', visual: 'hot ↔ ?', opts: ['warm', 'cool', 'cold', 'wet'], a: 2, explain: '"hot(뜨거운)"의 반대말은 "cold(차가운)"이에요. cool은 시원한 정도예요.' },
+    { q: '"happy"의 반대말은?', visual: 'happy ↔ ?', opts: ['angry', 'sad', 'busy', 'tired'], a: 1, explain: '"happy(행복한)"의 반대말은 "sad(슬픈)"이에요.' },
+    { q: '"easy"의 반대말은?', visual: 'easy ↔ ?', opts: ['simple', 'difficult', 'fast', 'short'], a: 1, explain: '"easy(쉬운)"의 반대말은 "difficult(어려운)"이에요. hard도 같은 뜻이에요.' },
+    { q: '"early"의 반대말은?', visual: 'early ↔ ?', opts: ['fast', 'soon', 'late', 'now'], a: 2, explain: '"early(이른)"의 반대말은 "late(늦은)"이에요.' },
+    { q: '"strong"의 반대말은?', visual: 'strong ↔ ?', opts: ['big', 'weak', 'tall', 'fast'], a: 1, explain: '"strong(강한)"의 반대말은 "weak(약한)"이에요.' },
+    { q: '"rich"의 반대말은?', visual: 'rich ↔ ?', opts: ['poor', 'kind', 'old', 'thin'], a: 0, explain: '"rich(부유한)"의 반대말은 "poor(가난한)"이에요.' },
+    { q: '"always"의 반대말은?', visual: 'always ↔ ?', opts: ['often', 'sometimes', 'never', 'usually'], a: 2, explain: '"always(항상)"의 반대말은 "never(절대 ~하지 않다)"예요.' },
+    { q: '"remember"의 반대말은?', visual: 'remember ↔ ?', opts: ['forget', 'learn', 'know', 'study'], a: 0, explain: '"remember(기억하다)"의 반대말은 "forget(잊다)"이에요.' },
+    { q: '"buy"의 반대말은?', visual: 'buy ↔ ?', opts: ['get', 'sell', 'keep', 'pay'], a: 1, explain: '"buy(사다)"의 반대말은 "sell(팔다)"이에요.' },
+
+    // 영어 → 한국어 뜻 (English → Korean)
+    { q: '"delicious"의 뜻은?', visual: '🍰', opts: ['무서운', '맛있는', '슬픈', '커다란'], a: 1, explain: '"delicious"는 "아주 맛있는"이라는 뜻이에요. tasty도 비슷해요.' },
+    { q: '"enormous"의 뜻은?', visual: '🐘', opts: ['아주 작은', '엄청나게 큰', '아주 빠른', '아주 차가운'], a: 1, explain: '"enormous"는 "엄청나게 큰"이라는 뜻이에요. very big과 비슷해요.' },
+    { q: '"ancient"의 뜻은?', visual: '🏛️', opts: ['새로운', '아주 오래된', '깨끗한', '비싼'], a: 1, explain: '"ancient"는 "고대의, 아주 오래된"이라는 뜻이에요. 피라미드는 ancient예요.' },
+    { q: '"brave"의 뜻은?', visual: '🦁', opts: ['용감한', '게으른', '슬픈', '조용한'], a: 0, explain: '"brave"는 "용감한"이라는 뜻이에요. courage(용기) 있는 사람을 brave라고 해요.' },
+    { q: '"polite"의 뜻은?', visual: '🙇', opts: ['무례한', '예의 바른', '시끄러운', '게으른'], a: 1, explain: '"polite"는 "예의 바른, 공손한"이라는 뜻이에요. 반대말은 rude(무례한)예요.' },
+    { q: '"honest"의 뜻은?', visual: '🤝', opts: ['거짓말하는', '정직한', '게으른', '쓸쓸한'], a: 1, explain: '"honest"는 "정직한, 솔직한"이라는 뜻이에요.' },
+    { q: '"curious"의 뜻은?', visual: '🤔', opts: ['졸린', '호기심 많은', '슬픈', '바쁜'], a: 1, explain: '"curious"는 "호기심이 많은"이라는 뜻이에요. 궁금한 게 많을 때 써요.' },
+    { q: '"gentle"의 뜻은?', visual: '🤲', opts: ['거친', '부드러운/온순한', '빠른', '단단한'], a: 1, explain: '"gentle"은 "부드러운, 다정한, 온순한"이라는 뜻이에요.' },
+    { q: '"famous"의 뜻은?', visual: '🌟', opts: ['유명한', '슬픈', '바쁜', '깨끗한'], a: 0, explain: '"famous"는 "유명한"이라는 뜻이에요. well-known과 비슷해요.' },
+    { q: '"adventure"의 뜻은?', visual: '🗺️', opts: ['숙제', '모험', '식사', '시험'], a: 1, explain: '"adventure"는 "모험"이라는 뜻이에요. 이 게임 이름도 Math Adventure예요!' },
+    { q: '"mystery"의 뜻은?', visual: '🔮', opts: ['미술', '비밀·수수께끼', '음악', '음식'], a: 1, explain: '"mystery"는 "신비, 수수께끼"라는 뜻이에요. 풀리지 않은 사건을 mystery라고 해요.' },
+    { q: '"giant"의 뜻은?', visual: '🦣', opts: ['거인·아주 큰', '아기', '난쟁이', '연필'], a: 0, explain: '"giant"는 "거인, 아주 큰"이라는 뜻이에요. a giant tree = 아주 큰 나무.' },
+
+    // 한국어 → 영어 (Korean → English)
+    { q: '"맛있는"을 영어로 하면?', visual: '🍕', opts: ['ugly', 'delicious', 'boring', 'thirsty'], a: 1, explain: '"맛있는"은 "delicious"예요. "It\'s delicious!" 처럼 써요.' },
+    { q: '"흥미진진한, 신나는"을 영어로 하면?', visual: '🎢', opts: ['boring', 'exciting', 'angry', 'lazy'], a: 1, explain: '"신나는, 흥미진진한"은 "exciting"이에요. 반대말 boring은 "지루한"이에요.' },
+    { q: '"친절한"을 영어로 하면?', visual: '🤗', opts: ['kind', 'mean', 'sleepy', 'busy'], a: 0, explain: '"친절한"은 "kind"예요. nice도 비슷하게 쓸 수 있어요.' },
+    { q: '"조용한"을 영어로 하면?', visual: '🤫', opts: ['noisy', 'quiet', 'angry', 'tired'], a: 1, explain: '"조용한"은 "quiet"이에요. 반대말은 noisy(시끄러운)예요.' },
+    { q: '"위험한"을 영어로 하면?', visual: '⚠️', opts: ['safe', 'easy', 'dangerous', 'pretty'], a: 2, explain: '"위험한"은 "dangerous"예요. 반대말은 safe(안전한)예요.' },
+    { q: '"무거운"을 영어로 하면?', visual: '🪨', opts: ['light', 'heavy', 'soft', 'thin'], a: 1, explain: '"무거운"은 "heavy"예요. 반대말 light는 "가벼운"이라는 뜻이에요.' },
+
+    // 동사 정의 (Verbs)
+    { q: '"to find something new"의 뜻을 가진 단어는?', visual: '🔍', opts: ['discover', 'forget', 'lose', 'sleep'], a: 0, explain: '"discover"는 새로운 것을 "발견하다"라는 뜻이에요. 콜럼버스는 신대륙을 discovered 했어요.' },
+    { q: '"to watch carefully"의 뜻을 가진 단어는?', visual: '👀', opts: ['observe', 'forget', 'sleep', 'shout'], a: 0, explain: '"observe"는 "주의 깊게 관찰하다"라는 뜻이에요. 과학자들이 별을 observe해요.' },
+    { q: '"to make a choice"의 뜻을 가진 단어는?', visual: '🤔', opts: ['forget', 'decide', 'lose', 'fall'], a: 1, explain: '"decide"는 "결정하다"라는 뜻이에요. "I decided to study English." 처럼 써요.' },
+    { q: '"to keep something safe"의 뜻을 가진 단어는?', visual: '🛡️', opts: ['break', 'lose', 'protect', 'drop'], a: 2, explain: '"protect"는 "보호하다"라는 뜻이에요. 부모님은 우리를 protect해요.' },
+    { q: '"to say sorry"의 뜻을 가진 단어는?', visual: '🙏', opts: ['shout', 'apologize', 'laugh', 'win'], a: 1, explain: '"apologize"는 "사과하다"라는 뜻이에요. 잘못했을 때 apologize해요.' },
+
+    // 문장 완성 (Sentence completion)
+    { q: '"She ___ to school every day." 빈칸은?', visual: '🏫', opts: ['go', 'goes', 'going', 'gone'], a: 1, explain: 'She/He/It 같은 3인칭 단수에는 동사에 -s를 붙여요. 그래서 "goes"가 맞아요.' },
+    { q: '"Yesterday, I ___ a movie." 빈칸은?', visual: '🎬', opts: ['watch', 'watches', 'watched', 'watching'], a: 2, explain: '"Yesterday(어제)"는 과거를 나타내요. 과거형은 "watched"예요.' },
+    { q: '"There ___ many books on the desk." 빈칸은?', visual: '📚', opts: ['is', 'are', 'am', 'be'], a: 1, explain: '"books"는 복수예요. 복수에는 "are"를 써요. "There are many books."' },
+    { q: '"He ___ playing soccer now." 빈칸은?', visual: '⚽', opts: ['is', 'are', 'am', 'be'], a: 0, explain: '"He"는 3인칭 단수라 "is"를 써요. 지금 진행 중인 일은 "is + -ing" 형태로 표현해요.' },
+    { q: '"I have ___ apple." 빈칸은?', visual: '🍎', opts: ['a', 'an', 'the', 'some'], a: 1, explain: '"apple"은 모음(a, e, i, o, u) 소리로 시작해서 앞에 "an"을 써요.' },
+    { q: '"My sister is ___ than me." 빈칸은?', visual: '👯', opts: ['tall', 'taller', 'tallest', 'tallly'], a: 1, explain: '둘을 비교할 때는 "형용사 + er + than"을 써요. taller than = ~보다 더 큰.' },
+    { q: '"This cake is ___ delicious!" 빈칸은?', visual: '🍰', opts: ['so', 'much', 'many', 'very much'], a: 0, explain: '형용사 앞에서 "정말 ~한"을 강조할 때는 "so" 또는 "very"를 써요. "so delicious"가 자연스러워요.' },
+
+    // 품사 (Parts of speech)
+    { q: '다음 중 명사(noun)는?', visual: '📝', opts: ['run', 'quickly', 'dog', 'beautiful'], a: 2, explain: '명사는 사물·사람·동물의 이름이에요. "dog(개)"가 명사예요. run은 동사예요.' },
+    { q: '다음 중 동사(verb)는?', visual: '🏃', opts: ['table', 'jump', 'blue', 'happy'], a: 1, explain: '동사는 동작을 나타내요. "jump(뛰다)"가 동사예요.' },
+    { q: '다음 중 형용사(adjective)는?', visual: '🎨', opts: ['book', 'eat', 'blue', 'quickly'], a: 2, explain: '형용사는 모양·상태·색을 나타내요. "blue(파란)"가 형용사예요.' },
+    { q: '다음 중 부사(adverb)는?', visual: '🏃💨', opts: ['quickly', 'apple', 'happy', 'desk'], a: 0, explain: '부사는 동사·형용사를 꾸며줘요. "quickly(빠르게)"는 부사예요. 보통 -ly로 끝나요.' },
+
+    // 표현·관용구 (Expressions)
+    { q: '"Piece of cake!"의 뜻은?', visual: '🍰', opts: ['배가 고파요', '아주 쉬워요', '맛있어요', '케이크 주세요'], a: 1, explain: '"Piece of cake"는 "식은 죽 먹기, 아주 쉬워요"라는 표현이에요. 케이크 한 조각 먹는 것처럼 쉽다는 뜻이죠.' },
+    { q: '"Break a leg!"의 뜻은?', visual: '🎭', opts: ['다리를 다쳐요', '행운을 빌어요', '도망쳐요', '집에 가요'], a: 1, explain: '"Break a leg!"는 무대에 오르는 사람에게 "잘해요, 행운을 빌어요"라고 응원할 때 쓰는 표현이에요.' },
+    { q: '"How are you?"의 뜻은?', visual: '👋', opts: ['몇 살이에요?', '어떻게 지내요?', '어디 가요?', '뭐 먹어요?'], a: 1, explain: '"How are you?"는 "어떻게 지내요?"라고 안부를 묻는 표현이에요.' },
+    { q: '"Thank you"에 어울리는 대답은?', visual: '😊', opts: ['Sorry', 'Goodbye', "You're welcome", 'Yes'], a: 2, explain: '누가 "Thank you(고마워요)"라고 하면 "You\'re welcome(천만에요)"이라고 대답해요.' },
+    { q: '"It\'s raining cats and dogs!"의 뜻은?', visual: '🌧️', opts: ['고양이와 강아지가 떨어져요', '비가 아주 많이 와요', '동물이 비를 좋아해요', '비가 멈췄어요'], a: 1, explain: '"raining cats and dogs"는 "비가 억수같이 쏟아진다"라는 재미있는 영어 표현이에요.' },
   ];
   return questions[Math.floor(R() * questions.length)];
 }
@@ -1009,7 +1095,7 @@ function renderTitle() {
     <div class="screen title-screen">
       <h1>수학 친구들의 모험</h1>
       <div class="hero-preview">${HERO}</div>
-      <p>7개의 세계를 모험하며<br>수학·과학·국어 문제로 고민하는 친구들을 도와줘요!</p>
+      <p>8개의 세계를 모험하며<br>수학·과학·국어·영어 문제로 고민하는 친구들을 도와줘요!</p>
       <div style="background:white;border-radius:20px;padding:8px 20px;margin-bottom:18px;font-size:18px;color:#5b2a86;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
         📅 오늘은 ${dateLabel()}이에요!
       </div>
