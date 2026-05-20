@@ -669,6 +669,32 @@
   }
   #mute-btn:active { transform: scale(0.9); }
 
+  /* 지금 흐르는 곡 정보 배지 (모든 화면에 작게 표시) */
+  #bgm-info {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(0,0,0,0.55);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 13px;
+    z-index: 500;
+    pointer-events: none;
+    max-width: 70vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.3s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    line-height: 1.3;
+    backdrop-filter: blur(4px);
+  }
+  #bgm-info.hidden-bgm { opacity: 0; }
+  @media (max-width: 500px) {
+    #bgm-info { font-size: 11px; padding: 4px 10px; bottom: 8px; left: 8px; max-width: 60vw; }
+  }
+
   /* iPad 세로 모드 안내 오버레이 */
   #rotate-overlay {
     position: fixed;
@@ -767,6 +793,7 @@
 <body>
 <div id="app"></div>
 <button id="mute-btn" onclick="Sound.toggle()" title="소리 켜기/끄기">🔊</button>
+<div id="bgm-info" class="hidden-bgm"></div>
 <div id="rotate-overlay">
   <div class="rotate-icon">📱</div>
   <h2>iPad를 가로로 돌려주세요</h2>
@@ -1034,6 +1061,7 @@ const Sound = {
     localStorage.setItem('mathadv_muted', m ? '1' : '0');
     if (this.master) this.master.gain.value = m ? 0 : 0.55;
     updateMuteButton();
+    updateBgmInfo();
   },
   toggle() {
     this.init(); // 사용자가 누르는 순간 오디오 초기화
@@ -1067,68 +1095,260 @@ const Sound = {
   _startBgm() {
     if (this.bgmPlaying) return;
     this.bgmPlaying = true;
-    // 베토벤 - 환희의 송가 (Ode to Joy), 1824년작, 퍼블릭 도메인
-    const C4=261.63, D4=293.66, E4=329.63, F4=349.23, G4=392.00;
-    const C3=130.81, G3=196.00;
-    const melody = [
-      [E4,1],[E4,1],[F4,1],[G4,1], [G4,1],[F4,1],[E4,1],[D4,1],
-      [C4,1],[C4,1],[D4,1],[E4,1], [E4,1.5],[D4,0.5],[D4,2],
-      [E4,1],[E4,1],[F4,1],[G4,1], [G4,1],[F4,1],[E4,1],[D4,1],
-      [C4,1],[C4,1],[D4,1],[E4,1], [D4,1.5],[C4,0.5],[C4,2],
-    ];
-    const bass = [
-      [C3,4],[G3,4],[C3,4],[G3,4],
-      [C3,4],[G3,4],[C3,4],[C3,4],
-    ];
-    const beatDur = 0.45;
-    const totalDur = 32 * beatDur;
+    // 오늘의 곡 선택 (날짜 시드 기반)
+    const song = BGM_LIBRARY[dateSeed() % BGM_LIBRARY.length];
+    this.currentSong = song;
+    updateBgmInfo();
+    const beatDur = song.beat;
+    const totalBeats = song.melody.reduce((s, n) => s + n[1], 0);
+    const totalDur = totalBeats * beatDur;
     let nextStart = this.ctx.currentTime + 0.1;
+    const playPart = (notes, type, vol, startT, attack, release) => {
+      let t = startT;
+      for (const [name, beats] of notes) {
+        const dur = beats * beatDur;
+        const freq = NOTE[name] || 0;
+        if (freq > 0) {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.value = freq;
+          g.gain.setValueAtTime(0, t);
+          g.gain.linearRampToValueAtTime(vol, t + attack);
+          g.gain.setValueAtTime(vol, t + dur - release);
+          g.gain.linearRampToValueAtTime(0, t + dur - 0.01);
+          osc.connect(g);
+          g.connect(this.master);
+          osc.start(t);
+          osc.stop(t + dur);
+        }
+        t += dur;
+      }
+    };
     const scheduleLoop = () => {
       if (!this.bgmPlaying || !this.ctx) return;
       const startT = nextStart;
-      // 멜로디 (삼각파, 밝고 또렷한 소리)
-      let t = startT;
-      for (const [freq, beats] of melody) {
-        const dur = beats * beatDur;
-        const osc = this.ctx.createOscillator();
-        const g = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.11, t + 0.025);
-        g.gain.setValueAtTime(0.11, t + dur - 0.08);
-        g.gain.linearRampToValueAtTime(0, t + dur - 0.01);
-        osc.connect(g);
-        g.connect(this.master);
-        osc.start(t);
-        osc.stop(t + dur);
-        t += dur;
-      }
-      // 베이스 (사인파, 부드러운 반주)
-      let bt = startT;
-      for (const [freq, beats] of bass) {
-        const dur = beats * beatDur;
-        const osc = this.ctx.createOscillator();
-        const g = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        g.gain.setValueAtTime(0, bt);
-        g.gain.linearRampToValueAtTime(0.05, bt + 0.15);
-        g.gain.setValueAtTime(0.05, bt + dur - 0.3);
-        g.gain.linearRampToValueAtTime(0, bt + dur - 0.02);
-        osc.connect(g);
-        g.connect(this.master);
-        osc.start(bt);
-        osc.stop(bt + dur);
-        bt += dur;
-      }
+      playPart(song.melody, 'triangle', 0.11, startT, 0.025, 0.08);
+      if (song.bass) playPart(song.bass, 'sine', 0.05, startT, 0.15, 0.3);
       nextStart = startT + totalDur;
-      // 현재 루프 종료 0.4초 전에 다음 루프 예약 (이음새 없게)
       this.bgmTimer = setTimeout(scheduleLoop, (totalDur - 0.4) * 1000);
     };
     scheduleLoop();
   }
 };
+
+// ========== BGM 라이브러리 (모두 퍼블릭 도메인 클래식) ==========
+const NOTE = {
+  R: 0,
+  G2:98.00, Gs2:103.83, A2:110.00, As2:116.54, B2:123.47,
+  C3:130.81, Cs3:138.59, D3:146.83, Ds3:155.56, E3:164.81, F3:174.61,
+  Fs3:184.99, G3:196.00, Gs3:207.65, A3:220.00, As3:233.08, B3:246.94,
+  C4:261.63, Cs4:277.18, D4:293.66, Ds4:311.13, E4:329.63, F4:349.23,
+  Fs4:369.99, G4:392.00, Gs4:415.30, A4:440.00, As4:466.16, B4:493.88,
+  C5:523.25, Cs5:554.37, D5:587.33, Ds5:622.25, E5:659.25, F5:698.46,
+  Fs5:739.99, G5:783.99, Gs5:830.61, A5:880.00, As5:932.33, B5:987.77,
+  C6:1046.50,
+  // flats (aliases for readability)
+  Bb3:233.08, Bb4:466.16, Eb4:311.13, Ab4:415.30, Db4:277.18,
+  Bb5:932.33, Eb5:622.25, Ab5:830.61,
+};
+
+const BGM_LIBRARY = [
+  {
+    id: 'ode_to_joy',
+    composer: '베토벤',
+    title: '환희의 송가',
+    titleEn: 'Ode to Joy',
+    year: 1824,
+    beat: 0.45,
+    melody: [
+      ['E4',1],['E4',1],['F4',1],['G4',1], ['G4',1],['F4',1],['E4',1],['D4',1],
+      ['C4',1],['C4',1],['D4',1],['E4',1], ['E4',1.5],['D4',0.5],['D4',2],
+      ['E4',1],['E4',1],['F4',1],['G4',1], ['G4',1],['F4',1],['E4',1],['D4',1],
+      ['C4',1],['C4',1],['D4',1],['E4',1], ['D4',1.5],['C4',0.5],['C4',2],
+      ['D4',1],['D4',1],['E4',1],['C4',1], ['D4',1],['E4',0.5],['F4',0.5],['E4',1],['C4',1],
+      ['D4',1],['E4',0.5],['F4',0.5],['E4',1],['D4',1],['C4',1],['D4',1],['G3',2],
+      ['E4',1],['E4',1],['F4',1],['G4',1], ['G4',1],['F4',1],['E4',1],['D4',1],
+      ['C4',1],['C4',1],['D4',1],['E4',1], ['D4',1.5],['C4',0.5],['C4',2],
+    ],
+    bass: [
+      ['C3',4],['G3',4],['C3',4],['G3',4],
+      ['C3',4],['G3',4],['C3',4],['C3',4],
+      ['G3',4],['C3',4],['G3',4],['C3',4],
+      ['C3',4],['G3',4],['C3',4],['C3',4],
+    ],
+  },
+  {
+    id: 'twinkle',
+    composer: '모차르트',
+    title: '작은 별 변주곡',
+    titleEn: 'Twinkle, Twinkle, Little Star',
+    year: 1781,
+    beat: 0.42,
+    melody: [
+      ['C4',1],['C4',1],['G4',1],['G4',1], ['A4',1],['A4',1],['G4',2],
+      ['F4',1],['F4',1],['E4',1],['E4',1], ['D4',1],['D4',1],['C4',2],
+      ['G4',1],['G4',1],['F4',1],['F4',1], ['E4',1],['E4',1],['D4',2],
+      ['G4',1],['G4',1],['F4',1],['F4',1], ['E4',1],['E4',1],['D4',2],
+      ['C4',1],['C4',1],['G4',1],['G4',1], ['A4',1],['A4',1],['G4',2],
+      ['F4',1],['F4',1],['E4',1],['E4',1], ['D4',1],['D4',1],['C4',2],
+      // 변주: 한 옥타브 위
+      ['C5',1],['C5',1],['G5',1],['G5',1], ['A5',1],['A5',1],['G5',2],
+      ['F5',1],['F5',1],['E5',1],['E5',1], ['D5',1],['D5',1],['C5',2],
+    ],
+    bass: [
+      ['C3',4],['F3',4],['C3',4],['G3',4],
+      ['C3',4],['G3',4],['C3',4],['C3',4],
+      ['C3',4],['F3',4],['C3',4],['G3',4],
+      ['C3',4],['F3',4],['C3',4],['C3',4],
+    ],
+  },
+  {
+    id: 'eine_kleine',
+    composer: '모차르트',
+    title: '아이네 클라이네 나흐트무지크',
+    titleEn: 'Eine kleine Nachtmusik',
+    year: 1787,
+    beat: 0.38,
+    melody: [
+      ['G4',1],['G4',0.5],['D5',0.5],['G4',1],['D5',1],
+      ['G4',1],['G4',0.5],['D5',0.5],['G4',1],['D5',1],
+      ['G4',0.5],['B4',0.5],['D5',0.5],['G5',0.5],['D5',2],
+      ['D5',1],['Fs4',1],['A4',1],['D5',1],
+      ['B4',2],['A4',2],
+      ['G4',1],['G4',0.5],['D5',0.5],['G4',1],['D5',1],
+      ['G4',0.5],['B4',0.5],['D5',0.5],['G5',0.5],['D5',2],
+      ['G5',1],['Fs5',1],['E5',1],['D5',1],
+    ],
+    bass: [
+      ['G3',4],['G3',4],['G3',4],['D3',4],
+      ['D3',4],['G3',4],['G3',4],['G3',4],
+    ],
+  },
+  {
+    id: 'bach_minuet',
+    composer: '바흐',
+    title: '미뉴엣 G장조',
+    titleEn: 'Minuet in G Major',
+    year: 1725,
+    beat: 0.4,
+    melody: [
+      ['D5',2],['G4',1],['A4',1], ['B4',1],['C5',1],['D5',1],['G4',1],
+      ['E5',1],['D5',1],['C5',1],['B4',1], ['A4',2],['B4',1],['C5',1],
+      ['B4',1],['A4',1],['G4',1],['Fs4',1], ['G4',1],['A4',1],['B4',1],['G4',1],
+      ['B4',2],['A4',6],
+      ['D5',2],['G4',1],['A4',1], ['B4',1],['C5',1],['D5',1],['G4',1],
+      ['E5',1],['D5',1],['C5',1],['B4',1], ['A4',2],['B4',1],['C5',1],
+      ['B4',1],['A4',1],['G4',1],['Fs4',1], ['G4',4],
+    ],
+    bass: [
+      ['G3',4],['D3',4],['G3',4],['D3',4],
+      ['G3',4],['D3',4],['G3',4],['D3',4],
+      ['G3',4],['D3',4],['G3',4],['D3',4],
+      ['G3',4],['G3',4],
+    ],
+  },
+  {
+    id: 'brahms_lullaby',
+    composer: '브람스',
+    title: '자장가',
+    titleEn: 'Wiegenlied (Lullaby)',
+    year: 1868,
+    beat: 0.55,
+    melody: [
+      ['G4',1.5],['G4',0.5],['B4',2], ['G4',1.5],['G4',0.5],['B4',2],
+      ['G4',1],['G5',1],['E5',2], ['D5',1],['B4',1],['A4',2],
+      ['A4',1.5],['A4',0.5],['D5',2], ['Fs4',1.5],['Fs4',0.5],['C5',2],
+      ['B4',1],['G4',1],['A4',1],['B4',1], ['G4',4],
+    ],
+    bass: [
+      ['G3',4],['G3',4],
+      ['C4',4],['D4',4],
+      ['D4',4],['D4',4],
+      ['G3',4],['G3',4],
+    ],
+  },
+  {
+    id: 'fur_elise',
+    composer: '베토벤',
+    title: '엘리제를 위하여',
+    titleEn: 'Für Elise',
+    year: 1810,
+    beat: 0.32,
+    melody: [
+      ['E5',1],['Ds5',1],['E5',1],['Ds5',1],['E5',1],['B4',1],['D5',1],['C5',1],
+      ['A4',2],['R',1],['C4',1],['E4',1],['A4',1],
+      ['B4',2],['R',1],['E4',1],['Gs4',1],['B4',1],
+      ['C5',2],['R',1],['E4',1],['E5',1],['Ds5',1],
+      ['E5',1],['Ds5',1],['E5',1],['B4',1],['D5',1],['C5',1],
+      ['A4',2],['R',1],['C4',1],['E4',1],['A4',1],
+      ['B4',2],['R',1],['D4',1],['C5',1],['B4',1],
+      ['A4',4],
+    ],
+    bass: [
+      ['A2',4],['A2',4],
+      ['A2',4],['E3',4],
+      ['A2',4],['A2',4],
+      ['E3',4],['A2',4],
+      ['E3',4],['A2',4],
+      ['A2',4],['A2',4],
+    ],
+  },
+  {
+    id: 'pachelbel_canon',
+    composer: '파헬벨',
+    title: '캐논 D장조',
+    titleEn: 'Canon in D',
+    year: 1680,
+    beat: 0.5,
+    melody: [
+      ['Fs5',2],['E5',2], ['D5',2],['Cs5',2],
+      ['B4',2],['A4',2], ['B4',2],['Cs5',2],
+      ['D5',2],['Cs5',2], ['B4',2],['A4',2],
+      ['G4',2],['Fs4',2], ['G4',2],['E4',2],
+      ['Fs5',1],['E5',1],['D5',1],['Cs5',1], ['B4',1],['A4',1],['B4',1],['Cs5',1],
+      ['D5',1],['Cs5',1],['B4',1],['A4',1], ['G4',1],['Fs4',1],['G4',1],['E4',1],
+    ],
+    bass: [
+      ['D3',4],['A3',4],['B2',4],['Fs3',4],
+      ['G2',4],['D3',4],['G2',4],['A2',4],
+      ['D3',4],['A3',4],['B2',4],['Fs3',4],
+    ],
+  },
+  {
+    id: 'vivaldi_spring',
+    composer: '비발디',
+    title: '사계 〈봄〉 1악장',
+    titleEn: 'The Four Seasons - Spring, Mvt. 1',
+    year: 1725,
+    beat: 0.32,
+    melody: [
+      ['E5',1],['E5',1],['E5',1],['Ds5',0.5],['E5',0.5], ['Fs5',1],['Fs5',1],['Fs5',2],
+      ['E5',1],['E5',1],['E5',1],['Ds5',0.5],['E5',0.5], ['Fs5',1],['Fs5',1],['Fs5',2],
+      ['B4',1],['B4',1],['Cs5',1],['Cs5',1], ['D5',1],['D5',1],['B4',2],
+      ['E5',1],['E5',1],['E5',1],['Ds5',0.5],['E5',0.5], ['Fs5',1],['Fs5',1],['Fs5',2],
+      ['E5',1],['D5',1],['Cs5',1],['B4',1], ['A4',1],['B4',1],['E5',2],
+    ],
+    bass: [
+      ['E3',4],['E3',4],['E3',4],['E3',4],
+      ['B2',4],['B2',4],
+      ['E3',4],['E3',4],
+      ['E3',4],['E3',4],
+    ],
+  },
+];
+
+function updateBgmInfo() {
+  const el = document.getElementById('bgm-info');
+  if (!el) return;
+  const song = Sound.currentSong;
+  if (!song || Sound.muted) {
+    el.classList.add('hidden-bgm');
+    return;
+  }
+  el.classList.remove('hidden-bgm');
+  el.textContent = `🎵 ${song.composer} 〈${song.title}〉 · ${song.year}`;
+}
 
 function updateMuteButton() {
   const btn = document.getElementById('mute-btn');
@@ -2052,6 +2272,7 @@ document.addEventListener('keydown', (e) => {
 
 // 시작!
 updateMuteButton();
+updateBgmInfo();
 renderTitle();
 </script>
 </body>
