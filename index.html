@@ -1705,10 +1705,18 @@ function genFraction(diff) {
     // 2. 피자 먹은 양
     () => {
       const correct = `${numer}/${denom}`;
-      const opts = shuffleArr([correct,
+      const candidates = [
         `${numer}/${denom + 1}`,
         `${numer + 1}/${denom}`,
-        `${denom - numer}/${denom}`]);
+        `${denom - numer}/${denom}`,
+        `${denom}/${numer}`,
+        `${numer}/${denom + 2}`,
+      ];
+      const wrongs = [];
+      for (const c of candidates) {
+        if (c !== correct && !wrongs.includes(c) && wrongs.length < 3) wrongs.push(c);
+      }
+      const opts = shuffleArr([correct, ...wrongs]);
       return {
         q: `🍕 피자 ${denom}조각 중 ${numer}조각을 먹었어요. 먹은 양은?`,
         visual: svgBar(numer, denom, '#e8a44c'),
@@ -1752,10 +1760,18 @@ function genFraction(diff) {
     () => {
       const left = denom - numer;
       const correct = `${left}/${denom}`;
-      const opts = shuffleArr([correct,
+      const candidates = [
         `${numer}/${denom}`,
         `${left}/${numer}`,
-        `${numer}/${left}`]);
+        `${numer}/${left || 1}`,
+        `${left}/${denom + 1}`,
+        `${denom}/${left || 1}`,
+      ];
+      const wrongs = [];
+      for (const c of candidates) {
+        if (c !== correct && !wrongs.includes(c) && wrongs.length < 3) wrongs.push(c);
+      }
+      const opts = shuffleArr([correct, ...wrongs]);
       return {
         q: `🍫 초콜릿 ${denom}조각 중 ${numer}조각을 먹었어요. 남은 양(흰 부분)은?`,
         visual: svgBar(numer, denom, '#8b4513'),
