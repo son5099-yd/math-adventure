@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="국어 모험">
+<meta name="theme-color" content="#1e293b">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%231e293b'/><text x='90' y='128' font-size='110' text-anchor='middle' fill='white' font-family='Apple SD Gothic Neo, Noto Sans KR, sans-serif' font-weight='700'>국</text></svg>">
+<title>국어 모험 · 문해력과 논술</title>
+<style>
+  * {
+    box-sizing: border-box; margin: 0; padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html, body {
+    min-height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    background: #f5f6f8;
+    color: #1f2937;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+    word-break: keep-all;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding:
+      max(20px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+  #app {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #1e293b 0%, #4338ca 100%);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 22px;
+  }
+  .header-stats {
+    font-size: 13px;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 타이틀 화면 */
+  .title-card {
+    text-align: center;
+    padding: 36px 24px 28px;
+  }
+  .title-card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .title-card .subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .stat-box {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 14px 6px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  .stat-num.acc { color: #4338ca; }
+  .stat-num.streak { color: #d97706; }
+
+  /* 카테고리 */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 4px 4px 4px;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+  }
+  .cat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cat-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.05s, background 0.15s;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+  }
+  .cat-item:active { transform: scale(0.99); background: #f9fafb; }
+  @media (hover: hover) {
+    .cat-item:hover { border-color: #1e293b; }
+  }
+  .cat-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .cat-icon.vocab    { background: #ede9fe; color: #5b21b6; }
+  .cat-icon.idiom    { background: #fef3c7; color: #92400e; }
+  .cat-icon.spelling { background: #dbeafe; color: #1e40af; }
+  .cat-icon.reading  { background: #d1fae5; color: #065f46; }
+  .cat-icon.logic    { background: #fee2e2; color: #991b1b; }
+  .cat-body { flex: 1; min-width: 0; }
+  .cat-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+  .cat-desc {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .cat-meta {
+    font-size: 11px;
+    color: #9ca3af;
+    flex-shrink: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .cat-meta strong {
+    display: block;
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 700;
+  }
+
+  /* 버튼 */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.05s, background 0.15s;
+    font-family: inherit;
+    background: #1e293b;
+    color: white;
+  }
+  .btn:active { transform: scale(0.98); background: #0f172a; }
+  .btn.secondary {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+  .btn.secondary:active { background: #e5e7eb; }
+  @media (hover: hover) {
+    .btn:hover { background: #0f172a; }
+    .btn.secondary:hover { background: #e5e7eb; }
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .btn-row .btn { flex: 1; }
+
+  /* 진행 바 */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4338ca 0%, #1e293b 100%);
+    transition: width 0.3s;
+  }
+  .progress-text {
+    font-size: 13px;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+    min-width: 44px;
+    text-align: right;
+  }
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    color: #6b7280;
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+  /* 퀴즈 카드 */
+  .quiz-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4338ca;
+    background: #ede9fe;
+    padding: 4px 10px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
+  }
+  .quiz-tag.idiom    { background: #fef3c7; color: #92400e; }
+  .quiz-tag.spelling { background: #dbeafe; color: #1e40af; }
+  .quiz-tag.reading  { background: #d1fae5; color: #065f46; }
+  .quiz-tag.logic    { background: #fee2e2; color: #991b1b; }
+
+  .passage {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #1f2937;
+    border-left: 3px solid #4338ca;
+  }
+  .passage .passage-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .quiz-q {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .quiz-sub {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 18px;
+  }
+  .quiz-word {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .quiz-word .hanja {
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 500;
+    margin-left: 4px;
+  }
+
+  /* 선택지 */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .choice {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px 18px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: all 0.15s;
+    font-family: inherit;
+    width: 100%;
+  }
+  .choice:active {
+    border-color: #6b7280;
+    background: #f3f4f6;
+  }
+  @media (hover: hover) {
+    .choice:hover {
+      border-color: #9ca3af;
+      background: #fafafa;
+    }
+  }
+  .choice-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .choice-text {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #111827;
+  }
+  .choice.correct {
+    border-color: #10b981;
+    background: #ecfdf5;
+  }
+  .choice.correct .choice-num {
+    background: #10b981;
+    color: white;
+  }
+  .choice.wrong {
+    border-color: #ef4444;
+    background: #fef2f2;
+  }
+  .choice.wrong .choice-num {
+    background: #ef4444;
+    color: white;
+  }
+  .choice.dim { opacity: 0.45; }
+  .choice:disabled { cursor: default; }
+
+  /* 피드백 */
+  .feedback {
+    margin-top: 16px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border-left: 4px solid #10b981;
+  }
+  .feedback.wrong { border-left-color: #ef4444; }
+  .feedback-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .feedback-title.ok { color: #059669; }
+  .feedback-title.no { color: #dc2626; }
+  .feedback-answer {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .feedback-explain {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.7;
+  }
+  .feedback-explain b {
+    color: #1e293b;
+    font-weight: 600;
+  }
+  .feedback-actions {
+    margin-top: 16px;
+  }
+
+  /* 세션 종료 */
+  .summary {
+    text-align: center;
+    padding: 32px 16px 24px;
+  }
+  .summary-emoji {
+    font-size: 56px;
+    margin-bottom: 12px;
+  }
+  .summary h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .summary p {
+    color: #6b7280;
+    margin-bottom: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .summary-stats {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-bottom: 28px;
+  }
+  .summary-stat .num {
+    font-size: 30px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-stat .label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  .summary-stat .num.correct { color: #059669; }
+  .summary-stat .num.wrong { color: #dc2626; }
+  .summary-stat .num.rate { color: #4338ca; }
+
+  .review-list {
+    margin-top: 8px;
+    text-align: left;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 16px;
+  }
+  .review-list-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .review-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 13px;
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-mark {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 18px;
+  }
+  .review-mark.ok { color: #059669; }
+  .review-mark.no { color: #dc2626; }
+  .review-q {
+    flex: 1;
+    color: #374151;
+    line-height: 1.5;
+  }
+  .review-q .review-correct {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  /* 애니메이션 */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.25s; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+  .pop { animation: pop 0.3s; }
+
+  /* 큰 화면 */
+  @media (min-width: 700px) {
+    .quiz-q { font-size: 20px; }
+    .quiz-word { font-size: 30px; }
+    .choice-text { font-size: 16px; }
+    .passage { font-size: 16px; }
+  }
+  /* 작은 화면 */
+  @media (max-width: 380px) {
+    body { padding-left: 12px; padding-right: 12px; }
+    .card { padding: 18px 16px; }
+    .quiz-q { font-size: 16px; }
+    .quiz-word { font-size: 22px; }
+    .choice-text { font-size: 14px; }
+    .choice { padding: 12px 14px; }
+    .stat-num { font-size: 19px; }
+    .stat-label { font-size: 10px; }
+    .title-card h1 { font-size: 24px; }
+    .cat-name { font-size: 15px; }
+    .passage { font-size: 14px; padding: 14px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ===================================================================
+// 문제 데이터 (중학교 2학년 수준 · 문해력 + 논술)
+// ===================================================================
+
+// ---------- 1. 어휘 (한자어 · 고유어 의미) ----------
+const VOCAB = [
+  { id:'v1', word:'도래', hanja:'到來', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['어떤 시기가 닥쳐옴', '다른 곳으로 떠남', '여러 번 반복함', '천천히 사라짐'], answer:0,
+    explain:'<b>도래(到來)</b>는 어떤 시기·기회·새로운 시대 등이 <b>닥쳐옴</b>을 뜻해요. "AI 시대의 도래"처럼 써요.' },
+  { id:'v2', word:'함의', hanja:'含意', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['속에 품고 있는 뜻', '두 사람의 합의', '말의 표면적인 뜻', '잘못 전해진 의미'], answer:0,
+    explain:'<b>함의(含意)</b>는 말이나 글이 겉으로 드러내지 않고 <b>속에 품고 있는 뜻</b>이에요. 한자 \'含(머금을 함)\'을 기억해 두세요.' },
+  { id:'v3', word:'부각', hanja:'浮刻', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['드러나게 두드러짐', '아래로 가라앉음', '조금씩 줄어듦', '여러 갈래로 나뉨'], answer:0,
+    explain:'<b>부각(浮刻)</b>은 어떤 사물이 특징적으로 <b>두드러지게 드러남</b>이에요. "문제점이 부각되다"처럼 쓰여요.' },
+  { id:'v4', word:'만연', hanja:'蔓延', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['널리 퍼져 번짐', '잠시 멈춰 있음', '깊이 숨어 있음', '한곳에 모임'], answer:0,
+    explain:'<b>만연(蔓延)</b>은 식물의 덩굴처럼 좋지 않은 것이 <b>널리 퍼져 번짐</b>을 뜻해요. "이기주의가 만연하다"처럼 부정적 맥락에 자주 써요.' },
+  { id:'v5', word:'도태', hanja:'淘汰', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['경쟁에서 밀려나 사라짐', '한층 더 성장함', '여럿이 어우러짐', '오래 견디며 살아남음'], answer:0,
+    explain:'<b>도태(淘汰)</b>는 경쟁이나 환경에 맞지 않는 것이 <b>밀려나 없어짐</b>이에요. \'자연 도태\'가 대표적인 예예요.' },
+  { id:'v6', word:'회자', hanja:'膾炙', q:'"그 사건은 지금도 사람들 사이에 <b>회자</b>되고 있다."에서 \'회자\'의 뜻은?',
+    choices:['널리 사람들 입에 오르내림', '잊혀져 사라짐', '비난을 받음', '비밀로 감춰짐'], answer:0,
+    explain:'<b>회자(膾炙)</b>는 본래 \'회와 구운 고기\'로 누구나 좋아하는 음식을 뜻해요. 여기서 <b>사람들의 입에 자주 오르내림</b>이라는 뜻이 됐어요.' },
+  { id:'v7', word:'일축', hanja:'一蹴', q:'"의혹을 한 마디로 <b>일축</b>했다."에서 \'일축\'의 뜻은?',
+    choices:['단번에 물리쳐 거절함', '조금씩 받아들임', '오래 고민함', '다른 사람에게 떠넘김'], answer:0,
+    explain:'<b>일축(一蹴)</b>은 \'한 번에 차버림\'으로, 상대 주장이나 요구를 <b>단번에 물리침</b>이에요.' },
+  { id:'v8', word:'봉착', hanja:'逢着', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['어떤 일·문제에 맞닥뜨림', '계획을 성공시킴', '서로 멀어짐', '천천히 다가감'], answer:0,
+    explain:'<b>봉착(逢着)</b>은 어떤 처지나 문제 등에 <b>맞닥뜨림</b>이에요. "위기에 봉착했다"처럼 써요.' },
+  { id:'v9', word:'답습', hanja:'踏襲', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['예로부터 해 오던 대로 그대로 따름', '새롭게 만들어 냄', '엄격하게 비판함', '여러 방법을 비교함'], answer:0,
+    explain:'<b>답습(踏襲)</b>은 옛것을 그대로 <b>밟아 따라감</b>이에요. 보통 "구태를 답습하다"처럼 부정적으로 써요.' },
+  { id:'v10', word:'모색', hanja:'摸索', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['방법이나 길을 더듬어 찾음', '이미 정해진 길을 따라감', '잘못을 인정함', '서둘러 결정함'], answer:0,
+    explain:'<b>모색(摸索)</b>은 어둠 속에서 <b>더듬어 찾듯</b> 방법을 찾는 일이에요. "해결책을 모색하다"처럼 써요.' },
+  { id:'v11', word:'자조', hanja:'自嘲', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['자기를 스스로 비웃음', '남을 비웃음', '자기 자신을 도움', '스스로 칭찬함'], answer:0,
+    explain:'<b>자조(自嘲)</b>는 자기 자신을 비웃거나 조소함이에요. "자조 섞인 웃음"처럼 써요. \'자조하다(自助)\'와 한자가 달라요.' },
+  { id:'v12', word:'모호', hanja:'模糊', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['말이나 태도가 분명하지 않음', '아주 또렷하고 분명함', '매우 간결하고 짧음', '겉으로만 화려함'], answer:0,
+    explain:'<b>모호(模糊)</b>는 흐릿하여 <b>분명하지 않음</b>이에요. "태도가 모호하다"처럼 써요.' },
+  { id:'v13', word:'통찰', hanja:'洞察', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['예리하게 꿰뚫어 봄', '겉만 슬쩍 살핌', '오래 망설임', '여기저기 둘러봄'], answer:0,
+    explain:'<b>통찰(洞察)</b>은 사물의 본질을 꿰뚫어 보는 일이에요. \'동굴(洞)을 살펴봄(察)\' → 깊숙이 들여다본다는 느낌이 핵심.' },
+  { id:'v14', word:'미온적', hanja:'微溫的', q:'"정부의 대응이 <b>미온적</b>이라는 비판이 나온다."에서 \'미온적\'의 뜻은?',
+    choices:['태도가 적극적이지 않음', '대단히 신속함', '아주 엄격함', '지나치게 감정적임'], answer:0,
+    explain:'<b>미온적(微溫的)</b>은 글자 그대로 \'미지근한\'이라는 뜻이에요. 적극성이 부족한 태도를 가리켜요.' },
+  { id:'v15', word:'발현', hanja:'發現', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['속에 있던 것이 겉으로 나타남', '아직 드러나지 않음', '서서히 사라짐', '강제로 빼앗김'], answer:0,
+    explain:'<b>발현(發現)</b>은 속에 있거나 숨겨졌던 것이 <b>밖으로 드러남</b>이에요. "재능의 발현"처럼 써요.' },
+  { id:'v16', word:'와전', hanja:'訛傳', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['사실과 다르게 전해짐', '많은 사람에게 알려짐', '오랫동안 기억됨', '여러 번 반복됨'], answer:0,
+    explain:'<b>와전(訛傳)</b>은 말이나 소문 등이 <b>잘못 전해짐</b>이에요. "소문이 와전되다"처럼 써요.' },
+  { id:'v17', word:'경솔', hanja:'輕率', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['말이나 행동이 가볍고 조심성 없음', '말이 무겁고 신중함', '몸이 가볍고 빠름', '솔직하고 정직함'], answer:0,
+    explain:'<b>경솔(輕率)</b>은 <b>가볍고(輕) 거침(率)</b> 없음 — 깊이 생각하지 않고 함부로 행동하는 태도예요.' },
+  { id:'v18', word:'진위', hanja:'眞僞', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['참과 거짓', '높음과 낮음', '많음과 적음', '시작과 끝'], answer:0,
+    explain:'<b>진위(眞僞)</b>는 진실(眞)과 거짓(僞)이에요. "진위를 가리다"처럼 써요.' },
+  { id:'v19', word:'발탁', hanja:'拔擢', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['여럿 가운데 골라 뽑아 씀', '자리에서 물러나게 함', '잠시 자리를 비움', '여러 사람이 함께 일함'], answer:0,
+    explain:'<b>발탁(拔擢)</b>은 여럿 가운데 골라 뽑아 씀이에요. "신인 발탁"처럼 써요.' },
+  { id:'v20', word:'자가당착', hanja:'自家撞着', q:'다음 사자성어의 뜻으로 알맞은 것은?',
+    choices:['자기 말이나 행동이 서로 모순됨', '스스로 새로운 길을 찾음', '집안의 일을 잘 정리함', '뜻이 같은 사람끼리 모임'], answer:0,
+    explain:'<b>자가당착(自家撞着)</b>은 한 사람의 말이나 행동에서 <b>앞뒤가 어긋남</b>이에요. \'스스로 부딪침\'이 직역이에요.' },
+  { id:'v21', word:'사양', hanja:'辭讓', q:'다음 한자어의 뜻으로 알맞은 것은?',
+    choices:['겸손하여 받지 않거나 응하지 않음', '강하게 요구함', '쉽게 받아들임', '몰래 가져감'], answer:0,
+    explain:'<b>사양(辭讓)</b>은 권하는 것을 겸손하게 사양함이에요. "사양 말고 드세요"처럼 써요.' },
+  { id:'v22', word:'명불허전', hanja:'名不虛傳', q:'다음 사자성어의 뜻으로 알맞은 것은?',
+    choices:['명성이 헛되이 전해진 것이 아님', '이름을 함부로 전하면 안 됨', '소문은 대개 거짓임', '이름값을 못함'], answer:0,
+    explain:'<b>명불허전(名不虛傳)</b>은 \'명성은 헛되이 퍼지지 않는다\' — 알려진 만큼 실제로 그럴 만한 가치가 있다는 뜻이에요.' },
+  { id:'v23', word:'일맥상통', hanja:'一脈相通', q:'다음 사자성어의 뜻으로 알맞은 것은?',
+    choices:['생각·사물 등이 서로 통하는 데가 있음', '한 사람의 의견만 따름', '여러 의견이 충돌함', '한 가지 방법만 고집함'], answer:0,
+    explain:'<b>일맥상통(一脈相通)</b>은 \'한 줄기로 서로 통함\' — 사물·견해 등이 본질적으로 닮아 있다는 뜻이에요.' },
+  { id:'v24', word:'설상가상', hanja:'雪上加霜', q:'다음 사자성어의 뜻으로 알맞은 것은?',
+    choices:['어려운 일이 겹쳐서 일어남', '운 좋은 일이 연달아 일어남', '눈이 내리면 봄이 옴', '추위가 풀리고 따뜻해짐'], answer:0,
+    explain:'<b>설상가상(雪上加霜)</b>은 \'눈 위에 서리까지 덮임\' — 안 좋은 일이 잇따라 일어남이에요.' },
+  { id:'v25', word:'우유부단', hanja:'優柔不斷', q:'다음 사자성어의 뜻으로 알맞은 것은?',
+    choices:['망설이기만 하고 결단을 내리지 못함', '결정이 매우 빠르고 단호함', '온화하고 부드러운 성품', '강하게 밀어붙임'], answer:0,
+    explain:'<b>우유부단(優柔不斷)</b>은 \'부드럽고 약하여 끊지 못함\' — 결단력이 부족한 태도예요.' },
+];
+
+// ---------- 2. 속담 · 관용구 ----------
+const IDIOM = [
+  { id:'i1', q:'"빈 수레가 요란하다"의 뜻으로 알맞은 것은?',
+    choices:['실속 없는 사람이 더 말이 많다', '비어 있을수록 가벼워서 빠르다', '작은 일이 큰일이 된다', '준비된 사람일수록 침착하다'], answer:0,
+    explain:'안에 든 것이 없는 빈 수레가 더 시끄럽게 덜컹거리듯, <b>실속이 없는 사람일수록 말과 행동이 시끄럽다</b>는 뜻이에요.' },
+  { id:'i2', q:'"등잔 밑이 어둡다"의 뜻으로 알맞은 것은?',
+    choices:['가까이 있는 일을 도리어 잘 모름', '밤이 되면 사물이 잘 안 보임', '오래된 물건은 쓸모가 없다', '먼 곳일수록 사정을 잘 안다'], answer:0,
+    explain:'등잔 바로 아래는 등잔의 받침에 가려 어둡듯이, <b>가까이 있는 일이나 사람을 도리어 잘 알지 못함</b>을 비유해요.' },
+  { id:'i3', q:'"사공이 많으면 배가 산으로 간다"의 뜻으로 알맞은 것은?',
+    choices:['주관하는 사람이 많으면 일이 잘못된다', '여럿이 모이면 일이 빨라진다', '경험이 많을수록 길을 잘 찾는다', '실력자가 많을수록 좋은 결과가 난다'], answer:0,
+    explain:'배를 모는 사공이 너무 많으면 의견이 갈려 결국 엉뚱한 곳(산)으로 간다는 뜻으로, <b>지휘하는 사람이 많아 일이 잘못됨</b>을 비유해요.' },
+  { id:'i4', q:'"호랑이도 제 말 하면 온다"의 뜻으로 알맞은 것은?',
+    choices:['이야기하던 사람이 마침 나타남', '무서운 사람일수록 자주 보인다', '소문은 결국 진실이 된다', '말이 씨가 되어 일이 일어난다'], answer:0,
+    explain:'어떤 사람의 이야기를 하던 차에 그 사람이 마침 나타나는 경우를 비유해요.' },
+  { id:'i5', q:'"우물 안 개구리"의 뜻으로 알맞은 것은?',
+    choices:['세상 넓은 줄 모르는 좁은 식견', '깊은 곳에 숨어 사는 사람', '한곳에서 오래 산 사람', '겁이 많아 나서지 못하는 사람'], answer:0,
+    explain:'우물 안에서는 동그란 하늘밖에 보지 못하듯이 <b>견문이 좁아 더 넓은 세계를 모르는 사람</b>을 비유해요.' },
+  { id:'i6', q:'"공든 탑이 무너지랴"의 뜻으로 알맞은 것은?',
+    choices:['정성과 노력을 들인 일은 헛되지 않다', '높이 쌓을수록 위태롭다', '한 번 잘못된 일은 되돌릴 수 없다', '욕심을 부리면 모든 것을 잃는다'], answer:0,
+    explain:'정성껏 쌓은 탑은 쉽게 무너지지 않듯, <b>공을 들인 일은 반드시 좋은 결과를 낸다</b>는 격려의 속담이에요.' },
+  { id:'i7', q:'"낫 놓고 ㄱ자도 모른다"의 뜻으로 알맞은 것은?',
+    choices:['아주 무식하여 글자도 알아보지 못함', '농사일을 잘 모르는 사람', '낫이 위험한 물건이라는 뜻', '글자보다 일이 중요하다'], answer:0,
+    explain:'낫 모양이 한글 \'ㄱ\'과 비슷한데도 글자를 알아보지 못한다는 의미로, <b>매우 무식함</b>을 비유해요.' },
+  { id:'i8', q:'"백지장도 맞들면 낫다"의 뜻으로 알맞은 것은?',
+    choices:['쉬운 일도 협력하면 더 쉬워진다', '가벼운 물건은 혼자 들어야 한다', '종이는 잘 찢어진다', '도움 없이 일하는 게 빠르다'], answer:0,
+    explain:'아주 가벼운 백지 한 장도 함께 들면 더 가벼워지듯이 <b>아무리 쉬운 일도 협력하면 낫다</b>는 뜻이에요.' },
+  { id:'i9', q:'"윗물이 맑아야 아랫물이 맑다"의 뜻으로 알맞은 것은?',
+    choices:['윗사람이 잘해야 아랫사람도 잘한다', '강의 위쪽이 더 깨끗하다', '먼저 시작한 사람이 유리하다', '서열을 지켜야 한다'], answer:0,
+    explain:'상류가 맑아야 하류도 맑은 것처럼 <b>윗사람이 모범을 보여야 아랫사람도 따라 잘한다</b>는 뜻이에요.' },
+  { id:'i10', q:'"가는 말이 고와야 오는 말이 곱다"의 뜻으로 알맞은 것은?',
+    choices:['내가 잘해야 남도 나에게 잘한다', '말은 빨리 해야 한다', '먼저 시작하는 사람이 손해 본다', '말보다 행동이 중요하다'], answer:0,
+    explain:'상대를 대하는 내 태도가 좋아야 상대도 나에게 좋게 대한다는 뜻으로, 상호 존중을 강조하는 속담이에요.' },
+  { id:'i11', q:'다음 중 "발이 넓다"의 올바른 뜻은?',
+    choices:['아는 사람이 많고 사교 범위가 넓다', '많이 걸어 다닌다', '발 크기가 크다', '신발을 자주 산다'], answer:0,
+    explain:'관용구 <b>"발이 넓다"</b>는 <b>아는 사람이 많아 인간관계가 넓다</b>는 뜻이에요. 신체 부위가 들어간 관용구는 글자 그대로의 뜻이 아닌 점을 기억해요.' },
+  { id:'i12', q:'다음 중 "귀가 얇다"의 올바른 뜻은?',
+    choices:['남의 말을 너무 쉽게 믿는다', '귀가 작고 가볍다', '잘 듣지 못한다', '소리에 민감하다'], answer:0,
+    explain:'<b>"귀가 얇다"</b>는 다른 사람의 말에 쉽게 흔들리는 것 — 즉 <b>남의 말을 잘 믿는 성향</b>을 가리키는 관용구예요.' },
+  { id:'i13', q:'다음 중 "입이 무겁다"의 올바른 뜻은?',
+    choices:['비밀을 잘 지킨다', '말이 더디다', '맛있는 것만 좋아한다', '말이 거칠다'], answer:0,
+    explain:'<b>"입이 무겁다"</b>는 함부로 말하지 않고 <b>비밀을 잘 지키는</b> 사람을 가리켜요. 반대로 \'입이 가볍다\'는 비밀을 못 지키는 사람이에요.' },
+  { id:'i14', q:'다음 중 "손이 크다"의 올바른 뜻은?',
+    choices:['씀씀이가 후하다', '키가 크다', '힘이 세다', '욕심이 많다'], answer:0,
+    explain:'<b>"손이 크다"</b>는 한 번에 많이 내주거나 차리는 등 <b>씀씀이가 후한</b> 모습을 가리키는 관용구예요.' },
+  { id:'i15', q:'다음 중 "눈이 높다"의 올바른 뜻은?',
+    choices:['수준 이상의 좋은 것만 찾는다', '키가 커서 멀리 본다', '시력이 좋다', '잠이 없다'], answer:0,
+    explain:'<b>"눈이 높다"</b>는 평범한 것에 만족하지 못하고 <b>높은 수준만 찾음</b>이에요.' },
+  { id:'i16', q:'다음 중 "마음을 졸이다"의 올바른 뜻은?',
+    choices:['걱정되어 안절부절못하다', '결심을 굳히다', '느긋해지다', '생각을 정리하다'], answer:0,
+    explain:'<b>"마음을 졸이다"</b>는 어떤 일의 결과가 어떻게 될지 몰라 <b>속을 태우며 걱정함</b>이에요.' },
+  { id:'i17', q:'"백문이 불여일견(百聞이 不如一見)"의 뜻으로 알맞은 것은?',
+    choices:['백 번 듣는 것보다 한 번 보는 것이 낫다', '한 번 본 것은 잊기 쉽다', '많이 들을수록 좋다', '듣는 것과 보는 것은 같다'], answer:0,
+    explain:'직접 한 번 보는 것이 여러 번 듣는 것보다 낫다는 뜻으로, <b>직접 경험의 중요성</b>을 강조하는 표현이에요.' },
+  { id:'i18', q:'"호미로 막을 것을 가래로 막는다"의 뜻으로 알맞은 것은?',
+    choices:['작을 때 처리하지 않아 일이 커진다', '큰 도구가 더 좋다', '여럿이 함께 일해야 한다', '농사 도구가 발전했다'], answer:0,
+    explain:'작은 호미로 충분했을 일을 미루다가 결국 큰 가래로도 막기 어려운 큰일이 됨 — <b>작은 일을 미루지 말라</b>는 교훈이에요.' },
+  { id:'i19', q:'"소 잃고 외양간 고친다"의 뜻으로 알맞은 것은?',
+    choices:['일이 잘못된 뒤에야 손을 씀', '미리 준비를 잘함', '한 번 잘못하면 영영 못 고침', '실수에서 배워야 한다'], answer:0,
+    explain:'소가 도망간 뒤에야 외양간을 고치듯, <b>이미 일이 잘못된 뒤에 뒤늦게 대비함</b>을 비웃는 속담이에요.' },
+  { id:'i20', q:'"천 리 길도 한 걸음부터"의 뜻으로 알맞은 것은?',
+    choices:['아무리 큰일도 작은 시작에서 비롯됨', '먼 곳에 가려면 빠른 길을 찾아야 함', '여행은 여럿이 가야 즐겁다', '길은 결국 다 통한다'], answer:0,
+    explain:'어떤 큰 목표든 <b>첫걸음부터 차근차근 시작해야 한다</b>는 격려의 속담이에요.' },
+];
+
+// ---------- 3. 맞춤법 · 어법 ----------
+const SPELL = [
+  { id:'s1', q:'다음 중 맞춤법이 바른 것은?',
+    choices:['이걸 어떻해?', '이걸 어떡해?', '이걸 어떻게?', '이걸 어떡게?'], answer:1,
+    explain:'<b>어떡해</b>는 \'어떻게 해\'가 줄어든 말로, 보통 <b>서술어</b> 자리에 와요. "이걸 어떡해?(=어떻게 해?)" / 반면 \'어떻게\'는 <b>방법을 묻는 부사</b>로 "이걸 어떻게 풀까?"처럼 써요.' },
+  { id:'s2', q:'다음 중 문장이 어법에 맞는 것은?',
+    choices:['이건 내가 할께.', '이건 내가 할게.', '이건 내가 할께요.', '이건 내가 했끼요.'], answer:1,
+    explain:'화자의 의지·약속을 나타내는 어미는 <b>-ㄹ게</b>가 표준이에요. (예: 갈게, 먹을게, 할게) \'-ㄹ께\'는 잘못된 표기예요.' },
+  { id:'s3', q:'"방학이 _____ 남았어?" 빈칸에 들어갈 알맞은 말은?',
+    choices:['몇일', '며칠', '몇 일', '며 칠'], answer:1,
+    explain:'표준어는 <b>며칠</b>이에요. \'몇 일\'로 쓰는 것은 잘못. 항상 \'며칠\'로 붙여서 적어요.' },
+  { id:'s4', q:'다음 중 바른 표현은?',
+    choices:['그건 안되.', '그건 안돼.', '그건 않되.', '그건 않돼.'], answer:1,
+    explain:'\'안\'은 부정 부사로 띄어 써도 되고 동사 앞에 붙여도 돼요. <b>되→돼</b>는 \'되어\'의 준말이에요. "안 돼"로 띄어 쓰는 것도 맞아요. \'않-\'은 \'-지 않다\' 형태로만 써요.' },
+  { id:'s5', q:'다음 중 바른 표현은?',
+    choices:['길을 가르쳐 주세요.', '길을 가리켜 주세요.', '둘 다 맞는다.', '둘 다 틀린다.'], answer:0,
+    explain:'<b>가르치다</b>는 \'지식·기능을 알게 함\'(teach), <b>가리키다</b>는 \'손이나 막대로 어떤 것을 보임\'(point)이에요. 길을 알려주는 건 \'가르쳐\'가 맞아요.' },
+  { id:'s6', q:'"답이 _____" 빈칸에 가장 알맞은 말은?',
+    choices:['틀려.', '달라.', '둘 다 맞다.', '둘 다 같은 말이다.'], answer:1,
+    explain:'<b>틀리다</b>는 \'정답이 아니다(wrong)\', <b>다르다</b>는 \'같지 않다(different)\'예요. 답이 \'서로 같지 않다\'면 <b>다르다</b>가 맞아요. "내 생각과 네 생각이 틀려"는 잘못된 표현.' },
+  { id:'s7', q:'다음 중 바른 표현은?',
+    choices:['우표를 부치다.', '우표를 붙이다.', '편지를 붙이다.', '편지를 보치다.'], answer:1,
+    explain:'<b>붙이다</b>는 \'떨어지지 않게 하다\'(우표·스티커 등을 종이에). <b>부치다</b>는 \'편지·물건을 보내다\'. 따라서 "우표를 <b>붙이다</b>", "편지를 <b>부치다</b>"가 맞아요.' },
+  { id:'s8', q:'다음 중 맞춤법이 바른 것은?',
+    choices:['왠지 기분이 좋아.', '웬지 기분이 좋아.', '왼지 기분이 좋아.', '웬일이 기분이 좋아.'], answer:0,
+    explain:'<b>왠지</b>는 \'왜인지\'가 줄어든 말로 \'무슨 까닭인지 모르게\'예요. \'웬\'은 \'어찌 된, 어떤\'이라는 뜻(예: \'웬일이야?\')으로 다른 말이에요.' },
+  { id:'s9', q:'다음 중 바른 표현은?',
+    choices:['생일 축하해. 건강하게 낫아라.', '생일 축하해. 건강하게 낳아라.', '감기 빨리 낳아.', '감기 빨리 나아.'], answer:3,
+    explain:'<b>낫다</b>(병이 회복되다)의 활용은 \'낫는다/나아라\'예요. <b>낳다</b>는 \'아이를 낳다\'(출산), <b>낮다</b>는 \'높지 않다\'예요. 의미가 모두 다르니 주의.' },
+  { id:'s10', q:'다음 중 맞춤법이 바른 것은?',
+    choices:['깨끗히 청소했다.', '깨끗이 청소했다.', '둘 다 맞다.', '맑끗이 청소했다.'], answer:1,
+    explain:'부사 \'-이/-히\'는 헷갈리지만, <b>깨끗이</b>가 맞아요. (반면 \'꼼꼼히, 솔직히, 분명히\'는 \'-히\'로 적어요.)' },
+  { id:'s11', q:'다음 중 바른 표현은?',
+    choices:['친구로서 충고할게.', '친구로써 충고할게.', '친구로 충고할게.', '친구로써서 충고할게.'], answer:0,
+    explain:'<b>로서</b>는 \'자격·신분\'을 나타내고, <b>로써</b>는 \'수단·도구\'를 나타내요. "친구라는 자격으로"이므로 <b>로서</b>가 맞아요. ("말로써 설득하다"는 \'로써\'.)' },
+  { id:'s12', q:'"어제 본 영화 어땠어? 재미있_____?" 빈칸에 알맞은 말은?',
+    choices:['든', '던', '둘 다 맞다.', '둘 다 틀리다.'], answer:1,
+    explain:'<b>-던</b>은 <b>과거의 경험·회상</b>에 써요(예: 먹던 것). <b>-든(지)</b>는 <b>선택</b>에 써요(예: 먹든 말든). 과거에 본 영화를 회상하므로 <b>-던</b>이 맞아요.' },
+  { id:'s13', q:'다음 중 띄어쓰기가 바른 문장은?',
+    choices:['책 한권만 빌려줘.', '책 한 권만 빌려줘.', '책한 권만 빌려줘.', '책한권만 빌려줘.'], answer:1,
+    explain:'단위 명사는 앞말과 <b>띄어 써요</b>. "한 권, 두 명, 세 마리"처럼. 다만 숫자와 단위를 함께 쓸 때(예: 1권)는 붙여 써요.' },
+  { id:'s14', q:'다음 중 바른 표현은?',
+    choices:['바램이 이루어졌다.', '바람이 이루어졌다.', '바램을 갖다.', '바램이 컸다.'], answer:1,
+    explain:'\'바라다\'에서 만든 명사는 <b>바람</b>이에요. \'바램\'은 잘못된 표기. ("나의 바람이 이루어지길.")' },
+  { id:'s15', q:'다음 중 맞춤법이 바른 것은?',
+    choices:['오랫만에 만났네.', '오랫만에 만났내.', '오랜만에 만났네.', '오랜만에 만났내.'], answer:2,
+    explain:'\'오랫동안\'은 맞지만 \'오랜만\'은 <b>오랜+만</b>이라 사이시옷이 없어요. <b>오랜만</b>이 맞아요. 종결어미는 \'-네\'예요(\'-내\' 아님).' },
+  { id:'s16', q:'다음 중 띄어쓰기가 바른 것은?',
+    choices:['먹을수 있어.', '먹을 수 있어.', '먹을수있어.', '먹을 수있어.'], answer:1,
+    explain:'<b>의존명사 \'수\'는 앞말과 띄어 써요</b>. \'-(으)ㄹ 수 있다/없다\' 형태로 자주 써요.' },
+  { id:'s17', q:'다음 중 바른 표현은?',
+    choices:['이따 만나자.', '있다 만나자.', '잇다 만나자.', '있따 만나자.'], answer:0,
+    explain:'<b>이따(가)</b>는 \'조금 뒤에\'라는 뜻의 부사예요. \'있다\'(존재하다)와 헷갈리지 않게 주의해요.' },
+  { id:'s18', q:'다음 중 맞춤법이 바른 것은?',
+    choices:['역활을 맡았다.', '역할을 맡았다.', '역활을 맞았다.', '역할을 맞았다.'], answer:1,
+    explain:'한자어는 <b>役割(역할)</b>로, \'역활\'은 잘못된 표기. \'맡다\'(담당하다)와 \'맞다\'(옳다/때리다)도 구별해요.' },
+  { id:'s19', q:'다음 중 바른 문장은?',
+    choices:['숙제를 다 했음으로 놀아도 된다.', '숙제를 다 했으므로 놀아도 된다.', '둘 다 맞다.', '둘 다 틀리다.'], answer:1,
+    explain:'이유·근거는 <b>-(으)므로</b>예요. <b>-(으)ㅁ으로(써)</b>는 \'수단·방법\'을 나타내요(예: "노력함으로써 성공했다").' },
+  { id:'s20', q:'다음 중 맞춤법이 바른 것은?',
+    choices:['일찌기 알았더라면…', '일찍이 알았더라면…', '일찍히 알았더라면…', '일직이 알았더라면…'], answer:1,
+    explain:'표준어는 <b>일찍이</b>예요. \'일찌기\'는 옛 표기로 지금은 잘못된 것으로 봐요.' },
+];
+
+// ---------- 4. 독해 (지문 + 문제) ----------
+const READ = [
+  { id:'r1',
+    passage:'요즘 사람들은 짧은 영상에 익숙해진 나머지 긴 글을 읽는 일을 점점 어려워한다. 한 페이지를 끝까지 읽기도 전에 다른 화면을 켠다. 그러나 깊이 있는 사고는 오래 머무는 시선에서 나온다. 빠르게 흘러가는 정보 속에서도 잠시 멈춰 곱씹는 습관이 우리에게 필요하다.',
+    q:'이 글의 글쓴이가 가장 말하고 싶은 것은?',
+    choices:[
+      '짧은 영상은 모두 나쁘므로 보지 말아야 한다.',
+      '정보를 빠르게 받아들이는 능력이 무엇보다 중요하다.',
+      '깊이 있는 사고를 위해 천천히 읽고 생각하는 습관이 필요하다.',
+      '책은 영상보다 항상 우수한 매체이다.',
+    ], answer:2,
+    explain:'글쓴이는 짧은 영상 자체를 부정하지 않고, <b>"잠시 멈춰 곱씹는 습관"</b>의 필요성을 강조하고 있어요. 그 핵심을 그대로 담은 3번이 정답이에요. 1·2·4번은 글에서 말한 것보다 더 강하거나 다른 주장이에요.' },
+  { id:'r2',
+    passage:'고래는 어류가 아니라 포유류이다. 물속에 살지만 아가미가 아닌 폐로 숨을 쉬며, 새끼를 낳아 젖을 먹여 키운다. 어류처럼 생긴 모습 때문에 오해받기도 하지만, 호흡 방식과 번식 방법은 사람과 더 가깝다.',
+    q:'이 글의 중심 내용으로 가장 알맞은 것은?',
+    choices:[
+      '고래는 사람과 똑같이 살아간다.',
+      '고래는 생김새는 물고기 같지만 분류상 포유류이다.',
+      '고래는 매우 큰 동물이라 어류로 분류된다.',
+      '아가미가 없는 동물은 모두 포유류이다.',
+    ], answer:1,
+    explain:'글 전체가 <b>"고래가 왜 포유류인가"</b>를 설명하고 있어요. 2번이 글의 중심 생각을 가장 잘 요약한 문장이에요. 4번은 글에서 말하지 않은 무리한 일반화예요.' },
+  { id:'r3',
+    passage:'규칙은 우리를 불편하게 하기 위해 있는 것이 아니다. 신호등을 지키는 일은 답답해 보여도, 모두가 함께 살아가기 위한 약속이다. 만약 한 사람이라도 약속을 어기면, 그 피해는 그 사람만이 아닌 모두에게 돌아온다.',
+    q:'글쓴이의 주장으로 가장 알맞은 것은?',
+    choices:[
+      '규칙은 사람을 불편하게 만든다.',
+      '신호등 외에는 지키지 않아도 된다.',
+      '규칙은 모두를 위한 약속이므로 지켜야 한다.',
+      '한 사람의 잘못은 그 사람에게만 영향을 준다.',
+    ], answer:2,
+    explain:'\'불편\'은 글쓴이가 반박하려는 통념이고, 진짜 주장은 <b>"규칙 = 함께 살기 위한 약속"</b>이에요. 4번은 글의 마지막 문장과 정반대예요.' },
+  { id:'r4',
+    passage:'책을 많이 읽는다고 해서 반드시 글을 잘 쓰는 것은 아니다. 읽기만 하면 머릿속에 좋은 표현이 쌓이지만, 그것을 자기 문장으로 옮기려면 직접 써 보는 연습이 필요하다. 읽기와 쓰기는 함께 가야 비로소 실력이 된다.',
+    q:'이 글에서 끌어낼 수 있는 결론은?',
+    choices:[
+      '독서량이 글쓰기의 모든 것을 결정한다.',
+      '읽기와 쓰기를 함께 연습해야 글쓰기 실력이 는다.',
+      '글쓰기 연습만 해도 충분하다.',
+      '책을 많이 읽으면 어차피 글을 잘 쓰게 된다.',
+    ], answer:1,
+    explain:'마지막 문장이 핵심이에요: <b>"읽기와 쓰기는 함께 가야"</b>. 1번과 4번은 글쓴이가 반박하는 입장, 3번은 글에서 말한 적 없어요.' },
+  { id:'r5',
+    passage:'스마트폰은 우리에게 큰 편리함을 주었다. 멀리 있는 친구와도 손쉽게 연락할 수 있고, 모르는 것이 있으면 바로 찾아볼 수도 있다. 하지만 이로 인해 우리는 잠시도 가만히 있지 못하게 되었다. 잠깐의 침묵조차 견디기 어려워 자꾸 화면을 들여다본다.',
+    q:'이 글의 글쓴이의 태도로 가장 적절한 것은?',
+    choices:[
+      '스마트폰을 강하게 비판하며 사용을 막아야 한다.',
+      '스마트폰의 편리함과 부작용을 함께 짚고 있다.',
+      '스마트폰은 단점이 거의 없다고 본다.',
+      '스마트폰 사용에는 아무런 의견이 없다.',
+    ], answer:1,
+    explain:'앞부분은 \'편리함\', 뒷부분은 \'잠시도 가만히 있지 못함\' — <b>양쪽을 다 짚는 균형 잡힌 태도</b>예요. 1번은 너무 강하고, 3·4번은 글을 잘못 읽은 거예요.' },
+  { id:'r6',
+    passage:'무더운 여름, 매미가 시끄럽게 운다. 누군가는 소음이라고 불평하지만, 매미는 단 며칠의 짧은 삶을 위해 7년이 넘는 시간을 땅속에서 견뎠다. 그 짧은 노래에는 긴 기다림이 담겨 있다.',
+    q:'이 글의 분위기·어조를 가장 잘 나타낸 것은?',
+    choices:[
+      '비판적이고 단호하다',
+      '차분히 사색하며 따뜻한 시선을 담고 있다',
+      '비웃듯이 비꼬는 어조이다',
+      '감정 없이 사실만 전달한다',
+    ], answer:1,
+    explain:'매미의 울음을 \'소음\'이 아니라 \'긴 기다림이 담긴 노래\'로 바라보는 시선 — <b>대상에 대한 따뜻하고 차분한 시선</b>이 느껴져요.' },
+  { id:'r7',
+    passage:'한 번도 실패하지 않은 사람이 있다면, 그는 한 번도 새로운 일에 도전하지 않은 사람일 것이다. 실패는 결국 도전의 흔적이며, 흔적이 없다는 것은 시도가 없었다는 뜻이다. 실패가 부끄러운 것이 아니라, 도전이 없는 삶이 더 안타까운 것이다.',
+    q:'글쓴이가 실패에 대해 가지는 관점은?',
+    choices:[
+      '실패는 가능한 한 피해야 할 수치스러운 일이다.',
+      '실패는 도전했다는 증거이므로 부끄럽지 않다.',
+      '실패한 사람과는 어울리지 말아야 한다.',
+      '실패하지 않는 사람이 가장 위대하다.',
+    ], answer:1,
+    explain:'글쓴이는 실패를 <b>"도전의 흔적"</b>으로 보고 있어요. 오히려 안타깝게 여기는 건 \'도전이 없는 삶\'이에요. 1·3·4번은 글쓴이의 관점과 정반대예요.' },
+  { id:'r8',
+    passage:'동물원의 동물은 안전하다. 굶을 염려도, 사냥당할 걱정도 없다. 그러나 좁은 우리 안에서 평생을 보내는 동물의 눈빛에는 어딘가 텅 빈 기색이 있다. 안전과 자유 사이에서 우리는 어느 쪽을 더 소중히 여겨야 할까?',
+    q:'이 글의 글쓴이가 던지는 핵심 질문은?',
+    choices:[
+      '동물원을 더 크게 지어야 하는가?',
+      '안전을 위해 자유를 포기하는 것은 옳은가?',
+      '야생의 동물은 모두 위험한가?',
+      '동물원을 더 많이 지어야 하는가?',
+    ], answer:1,
+    explain:'마지막 문장이 글의 핵심 질문이에요: <b>"안전과 자유 사이에서 어느 쪽이 더 소중한가"</b>. 그 의미를 일반화한 2번이 정답이에요.' },
+];
+
+// ---------- 5. 논리 · 논술 ----------
+const LOGIC = [
+  { id:'l1', q:'다음 문장에서 <b>주장(결론)</b>에 해당하는 것은?<br><br>"많은 청소년이 새벽까지 스마트폰을 본다. 수면 시간이 줄면 다음 날 집중력이 떨어진다. 따라서 청소년의 스마트폰 사용 시간을 줄여야 한다."',
+    choices:[
+      '많은 청소년이 새벽까지 스마트폰을 본다.',
+      '수면 시간이 줄면 집중력이 떨어진다.',
+      '청소년의 스마트폰 사용 시간을 줄여야 한다.',
+      '청소년은 집중력이 부족하다.',
+    ], answer:2,
+    explain:'\'따라서\' 뒤에 오는 문장이 보통 <b>결론(주장)</b>이에요. 앞의 두 문장은 그 주장을 뒷받침하는 <b>근거</b>예요. 주장과 근거를 구분하는 건 논술의 기본이에요.' },
+  { id:'l2', q:'다음 글에서 <b>논리적 비약(근거 부족)</b>이 있는 곳은?<br><br>"① 우리 반 영수가 게임을 좋아한다. ② 영수는 어제 수학 시험에서 낮은 점수를 받았다. ③ 따라서 게임은 학생들의 성적을 떨어뜨린다."',
+    choices:['①번 문장', '②번 문장', '③번 결론', '비약이 없다'], answer:2,
+    explain:'한 사람의 사례만으로 \'<b>모든 학생</b>\'에게 일반화하는 건 <b>성급한 일반화의 오류</b>예요. 영수의 점수가 낮은 이유가 게임 때문인지, 다른 이유 때문인지도 확인되지 않았어요.' },
+  { id:'l3', q:'다음 중 <b>사실</b>이 아닌 <b>의견</b>에 해당하는 문장은?',
+    choices:[
+      '대한민국의 수도는 서울이다.',
+      '물은 100도에서 끓는다.',
+      '겨울보다 가을이 더 아름다운 계절이다.',
+      '하루는 24시간이다.',
+    ], answer:2,
+    explain:'\'아름답다\'는 사람마다 다르게 느끼는 <b>주관적 판단</b>이므로 의견이에요. 1·2·4번은 확인 가능한 객관적 사실이에요. 논술에서는 사실과 의견을 구분하는 것이 매우 중요해요.' },
+  { id:'l4', q:'"독서가 중요하다"라는 주장의 <b>근거</b>로 가장 적절한 것은?',
+    choices:[
+      '많은 사람이 책을 좋아하기 때문이다.',
+      '책은 종이로 만들어져 있다.',
+      '독서는 어휘력을 키우고 다양한 관점을 접하게 해 주기 때문이다.',
+      '도서관은 어디에나 있다.',
+    ], answer:2,
+    explain:'좋은 근거는 <b>주장을 뒷받침할 만큼 구체적·논리적</b>이어야 해요. 3번은 독서가 \'왜\' 중요한지 설명해요. 1번은 동어반복에 가깝고, 2·4번은 주장과 관련이 약해요.' },
+  { id:'l5', q:'다음 글의 흐름에 가장 자연스럽게 이어질 문장은?<br><br>"운동은 우리 몸의 건강에 큰 도움을 준다. 규칙적으로 몸을 움직이면 체력이 좋아지고 면역력도 강해진다. _____ 그래서 우리는 매일 조금씩이라도 몸을 움직이는 습관을 들여야 한다.',
+    choices:[
+      '하지만 운동은 시간이 많이 든다.',
+      '또한 운동은 스트레스를 줄여 정신 건강에도 좋다.',
+      '운동선수들은 매우 강하다.',
+      '겨울에는 운동하기가 어렵다.',
+    ], answer:1,
+    explain:'앞 문장이 \'몸의 건강\'을 말했고 뒤 문장이 결론으로 \'매일 운동하자\'예요. 빈칸에는 <b>덧붙이는 근거</b>가 와야 해요. \'또한 ~ 정신 건강에도 좋다\'가 자연스럽게 이어져요. 1·4번은 반대 방향이라 흐름이 깨져요.' },
+  { id:'l6', q:'다음 주장에 대한 가장 강한 <b>반론(반대 의견)</b>은?<br><br>"학교에서 휴대전화 사용을 전면 금지해야 한다. 수업에 방해가 되기 때문이다."',
+    choices:[
+      '나는 휴대전화가 좋아서 그건 싫다.',
+      '휴대전화는 비싸기 때문이다.',
+      '응급 상황 연락이나 학습 자료 검색 등 휴대전화가 필요한 경우도 있으므로, 일률적 금지보다 사용 범위를 정하는 편이 낫다.',
+      '학교는 원래 즐거운 곳이어야 한다.',
+    ], answer:2,
+    explain:'좋은 반론은 <b>감정이 아니라 근거</b>가 있어요. 3번은 \'금지하면 잃는 것\'을 구체적으로 말하고 <b>대안</b>까지 제시해요. 1번은 감정적, 2·4번은 주장과 관련이 약해요.' },
+  { id:'l7', q:'다음 글의 <b>중심 생각(주제)</b>을 한 문장으로 가장 잘 요약한 것은?<br><br>"좋은 글은 화려한 표현이 아니라 분명한 뜻에서 나온다. 어려운 단어가 많아도 무슨 말인지 모르면 좋은 글이 아니다. 글의 가치는 결국 \'잘 통하느냐\'에 달려 있다."',
+    choices:[
+      '글에는 화려한 표현이 많을수록 좋다.',
+      '글은 무엇보다 의미가 잘 전달되어야 좋은 글이다.',
+      '어려운 단어를 많이 쓰는 사람이 글을 잘 쓴다.',
+      '글은 짧을수록 좋다.',
+    ], answer:1,
+    explain:'세 문장 모두 <b>"뜻이 잘 통하는 글이 좋은 글"</b>이라는 점을 말하고 있어요. 1번과 3번은 글이 반박하는 입장이에요.' },
+  { id:'l8', q:'다음 글의 <b>논리적 구조</b>로 가장 알맞은 것은?<br><br>"바다거북의 수가 줄고 있다. 그 까닭은 첫째, 바다에 버려진 비닐을 해파리로 오해해 먹기 때문이다. 둘째, 해변이 개발되어 알을 낳을 곳이 줄어들기 때문이다."',
+    choices:[
+      '시간 순서에 따른 서술',
+      '문제 제시 + 두 가지 원인 설명',
+      '두 의견의 비교',
+      '주장과 반론',
+    ], answer:1,
+    explain:'첫 문장이 <b>문제 제시</b>(바다거북 감소), 그다음이 <b>원인 두 가지</b>(비닐, 해변 개발)예요. 이런 글은 보통 뒤에 \'그래서 우리는 ~해야 한다\'는 결론이 이어져요.' },
+  { id:'l9', q:'다음 두 문장을 자연스럽게 잇는 접속어로 가장 알맞은 것은?<br><br>"열심히 공부했다. _____ 시험을 잘 봤다."',
+    choices:['그러나', '그래서', '예를 들어', '한편'], answer:1,
+    explain:'앞이 \'원인\', 뒤가 \'결과\'예요. 인과를 잇는 접속어는 <b>\'그래서\'</b>예요. \'그러나\'는 역접, \'예를 들어\'는 예시, \'한편\'은 화제 전환이라 어색해요.' },
+  { id:'l10', q:'다음 글에서 글쓴이가 사용한 <b>설득의 방법</b>으로 가장 알맞은 것은?<br><br>"환경을 지키는 일은 어렵지 않다. 가까운 거리는 걸어 다니고, 일회용 컵 대신 텀블러를 쓰며, 재활용을 꼼꼼히 하면 된다. 이런 작은 실천이 모여 큰 변화를 만든다."',
+    choices:[
+      '구체적인 사례·실천 방법을 들어 설득한다.',
+      '권위 있는 사람의 말을 인용한다.',
+      '독자를 비난하며 압박한다.',
+      '통계 자료를 제시한다.',
+    ], answer:0,
+    explain:'\'걸어 다니기, 텀블러, 재활용\'처럼 <b>독자가 바로 할 수 있는 구체적 실천</b>을 제시해 설득하고 있어요. 이런 방법을 \'<b>예시·구체화</b>\'라고 해요.' },
+  { id:'l11', q:'다음 중 글쓰기에서 흔히 일어나는 <b>오류</b>가 아닌 것은?',
+    choices:[
+      '주장만 있고 근거가 없음',
+      '근거가 주장과 관련이 없음',
+      '주장에 알맞은 근거가 두세 가지 제시됨',
+      '하나의 사례로 전체를 단정함',
+    ], answer:2,
+    explain:'1·2·4번은 모두 글쓰기에서 자주 나타나는 약점이에요. 3번은 오히려 <b>좋은 글의 특징</b>이에요. 주장에는 그것을 뒷받침할 적절한 근거가 두세 가지 정도 따라오는 것이 이상적이에요.' },
+  { id:'l12', q:'다음 문장에서 <b>호응이 어색한</b> 곳은?<br><br>"나는 결코 그 사실을 알고 있었다."',
+    choices:[
+      '\'나는\'을 \'우리는\'으로 바꾼다.',
+      '\'결코\'를 \'분명히\'로 바꾸거나, 서술어를 \'~알지 못했다\'로 고친다.',
+      '\'사실을\'을 \'사실은\'으로 바꾼다.',
+      '문장에 문제가 없다.',
+    ], answer:1,
+    explain:'<b>\'결코\'는 부정 표현과 호응</b>해요(\'결코 ~ 아니다/없다/못하다\'). 그래서 긍정 서술어와 함께 쓰면 어색해요. \'결코 알지 못했다\' 또는 \'분명히 알고 있었다\'로 고쳐야 자연스러워요.' },
+  { id:'l13', q:'다음 글의 가장 적절한 <b>제목</b>은?<br><br>"실수는 누구나 한다. 중요한 것은 같은 실수를 두 번 하지 않는 것이다. 실수에서 배우는 사람은 자란다."',
+    choices:[
+      '실수는 절대 해서는 안 되는 일',
+      '실수보다 중요한 것 — 다시 배우는 자세',
+      '완벽한 사람의 비결',
+      '실수의 종류',
+    ], answer:1,
+    explain:'글의 핵심은 \'실수를 하지 말라\'가 아니라 <b>\'실수에서 배우자\'</b>예요. 이 핵심을 살린 2번이 가장 적절한 제목이에요.' },
+  { id:'l14', q:'다음 중 <b>객관적</b>으로 쓰인 문장은?',
+    choices:[
+      '그 가수는 정말 멋있다.',
+      '이 책은 누구에게나 추천할 만큼 훌륭하다.',
+      '이 책은 2024년에 한국에서 출간되었다.',
+      '겨울은 가장 매력적인 계절이다.',
+    ], answer:2,
+    explain:'1·2·4번은 글쓴이의 <b>주관적 평가</b>가 들어 있어요. 3번은 사실을 그대로 적은 객관적인 문장이에요. 논술에서는 두 가지를 의도적으로 구분해 써야 해요.' },
+  { id:'l15', q:'논술문을 쓸 때 <b>가장 권장되는 글 구조</b>는?',
+    choices:[
+      '결론만 반복해서 쓴다.',
+      '서론(문제 제시) - 본론(주장과 근거) - 결론(주장 정리)',
+      '재미있는 이야기만 길게 쓴다.',
+      '주장 없이 사실만 나열한다.',
+    ], answer:1,
+    explain:'논술문은 보통 <b>서론 → 본론 → 결론</b>의 흐름이 권장돼요. 서론에서 문제와 자신의 입장을 밝히고, 본론에서 주장과 근거를 펼치고, 결론에서 다시 한 번 핵심을 정리하는 구조예요.' },
+];
+
+// ---------- 카테고리 정의 ----------
+const CATEGORIES = [
+  { id:'vocab',    name:'어휘 마스터',    desc:'한자어 · 사자성어의 뜻을 익혀요',          icon:'📖', data: VOCAB },
+  { id:'idiom',    name:'속담 · 관용구',  desc:'우리말의 멋과 지혜가 담긴 표현들',           icon:'💬', data: IDIOM },
+  { id:'spelling', name:'맞춤법 도장깨기', desc:'헷갈리는 맞춤법과 어법을 한 번에',           icon:'✏️', data: SPELL },
+  { id:'reading',  name:'독해 챌린지',    desc:'짧은 글을 읽고 주제·태도를 파악해요',         icon:'🔎', data: READ },
+  { id:'logic',    name:'논리 · 논술',    desc:'주장과 근거, 글의 구조를 다뤄요',             icon:'⚖️', data: LOGIC },
+];
+
+const SESSION_SIZE = 10;   // 한 세션당 문제 수
+const STORAGE_KEY = 'kr-learn-stats-v1';
+
+// ===================================================================
+// 시드 기반 셔플 (오늘의 도전용)
+// ===================================================================
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function dateSeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+function shuffle(arr, rng) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===================================================================
+// 통계 저장
+// ===================================================================
+function loadStats() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultStats();
+    const s = JSON.parse(raw);
+    return { ...defaultStats(), ...s };
+  } catch (e) { return defaultStats(); }
+}
+function defaultStats() {
+  return {
+    totalAnswered: 0,
+    totalCorrect: 0,
+    byCategory: {},     // { vocab: { answered, correct }, ... }
+    lastSessionDate: null,
+    streakDays: 0,
+  };
+}
+function saveStats(s) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e){}
+}
+function updateStats(catId, results) {
+  const s = state.stats;
+  const today = new Date().toISOString().slice(0,10);
+  if (s.lastSessionDate !== today) {
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const yestStr = yest.toISOString().slice(0,10);
+    s.streakDays = (s.lastSessionDate === yestStr) ? (s.streakDays + 1) : 1;
+    s.lastSessionDate = today;
+  }
+  if (!s.byCategory[catId]) s.byCategory[catId] = { answered: 0, correct: 0 };
+  for (const r of results) {
+    s.totalAnswered++;
+    s.byCategory[catId].answered++;
+    if (r.correct) {
+      s.totalCorrect++;
+      s.byCategory[catId].correct++;
+    }
+  }
+  saveStats(s);
+}
+
+// ===================================================================
+// 세션
+// ===================================================================
+function buildSession(catId) {
+  const cat = CATEGORIES.find(c => c.id === catId);
+  const pool = cat.data;
+  const rng = Math.random; // 자유 연습: 매번 다른 순서
+  const picked = shuffle(pool, rng).slice(0, Math.min(SESSION_SIZE, pool.length));
+  return { catId, items: picked, index: 0, results: [] };
+}
+
+// ===================================================================
+// 상태
+// ===================================================================
+const state = {
+  screen: 'title',         // title | quiz | summary
+  stats: loadStats(),
+  session: null,           // { catId, items, index, results }
+  showFeedback: false,
+  lastCorrect: null,
+  lastChoiceIdx: null,
+};
+
+// ===================================================================
+// 화면 렌더링
+// ===================================================================
+const app = document.getElementById('app');
+
+function render() {
+  if (state.screen === 'title') renderTitle();
+  else if (state.screen === 'quiz') renderQuiz();
+  else if (state.screen === 'summary') renderSummary();
+  window.scrollTo(0, 0);
+}
+
+function renderTitle() {
+  const s = state.stats;
+  const rate = s.totalAnswered ? Math.round(s.totalCorrect * 100 / s.totalAnswered) : 0;
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot">국</span> 국어 모험</div>
+      <div class="header-stats">중2 · 문해력 + 논술</div>
+    </div>
+    <div class="card title-card">
+      <h1>오늘도 한 문제씩</h1>
+      <p class="subtitle">읽고, 따져 보고, 표현해요</p>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num">${s.totalAnswered}</div>
+          <div class="stat-label">푼 문제</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num acc">${rate}%</div>
+          <div class="stat-label">정답률</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num streak">${s.streakDays}</div>
+          <div class="stat-label">연속 일수</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">영역 선택</div>
+    <div class="cat-list">
+      ${CATEGORIES.map(c => {
+        const cs = s.byCategory[c.id] || { answered:0, correct:0 };
+        const cr = cs.answered ? Math.round(cs.correct * 100 / cs.answered) : null;
+        return `
+          <button class="cat-item" data-cat="${c.id}">
+            <div class="cat-icon ${c.id}">${c.icon}</div>
+            <div class="cat-body">
+              <div class="cat-name">${c.name}</div>
+              <div class="cat-desc">${c.desc}</div>
+            </div>
+            <div class="cat-meta">
+              <strong>${c.data.length}</strong>문제
+              ${cr !== null ? `<div>정답률 ${cr}%</div>` : '<div>새 도전</div>'}
+            </div>
+          </button>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="card" style="font-size:13px; color:#6b7280; line-height:1.7;">
+      <div style="font-weight:600; color:#374151; margin-bottom:8px;">📚 학습 안내</div>
+      각 영역에서 무작위로 <b>${SESSION_SIZE}문제</b>가 출제돼요.<br>
+      틀린 문제는 <b>해설 카드</b>로 왜 그런지 함께 설명해 줘요.<br>
+      매일 한 영역씩만 해도 한 달이면 한 권 분량이에요.
+    </div>
+  `;
+  document.querySelectorAll('.cat-item').forEach(btn => {
+    btn.onclick = () => startSession(btn.dataset.cat);
+  });
+}
+
+function startSession(catId) {
+  state.session = buildSession(catId);
+  state.showFeedback = false;
+  state.lastCorrect = null;
+  state.lastChoiceIdx = null;
+  state.screen = 'quiz';
+  render();
+}
+
+function categoryById(id) { return CATEGORIES.find(c => c.id === id); }
+
+function renderQuiz() {
+  const sess = state.session;
+  const item = sess.items[sess.index];
+  const cat = categoryById(sess.catId);
+  const total = sess.items.length;
+  const current = sess.index + 1;
+  const progress = (sess.index / total) * 100;
+
+  let promptHTML = '';
+  if (sess.catId === 'vocab') {
+    promptHTML = `
+      <div class="quiz-q">${item.q}</div>
+      <div style="margin-top:14px; padding:14px 18px; background:#f9fafb; border-radius:12px; text-align:center;">
+        <div class="quiz-word">${item.word}<span class="hanja">${item.hanja || ''}</span></div>
+      </div>
+    `;
+  } else if (sess.catId === 'reading') {
+    promptHTML = `
+      <div class="passage">
+        <span class="passage-label">지문</span>
+        ${item.passage}
+      </div>
+      <div class="quiz-q">${item.q}</div>
+    `;
+  } else {
+    promptHTML = `<div class="quiz-q">${item.q}</div>`;
+  }
+
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot">국</span> ${cat.name}</div>
+      <button class="btn-icon" id="quit">✕ 종료</button>
+    </div>
+    <div class="card">
+      <div class="progress-row">
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div class="progress-text">${current} / ${total}</div>
+      </div>
+      <span class="quiz-tag ${cat.id}">${cat.icon} ${cat.name}</span>
+      ${promptHTML}
+      <div class="choices" id="choices">
+        ${item.choices.map((c, i) => `
+          <button class="choice" data-index="${i}">
+            <span class="choice-num">${i + 1}</span>
+            <span class="choice-text">${c}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div id="feedback-area"></div>
+    </div>
+  `;
+  document.getElementById('quit').onclick = quitSession;
+  if (!state.showFeedback) {
+    document.querySelectorAll('.choice').forEach(btn => {
+      btn.onclick = () => handleAnswer(parseInt(btn.dataset.index));
+    });
+  } else {
+    showFeedbackUI();
+  }
+}
+
+function handleAnswer(choiceIdx) {
+  const item = state.session.items[state.session.index];
+  const correct = choiceIdx === item.answer;
+  state.lastCorrect = correct;
+  state.lastChoiceIdx = choiceIdx;
+  state.showFeedback = true;
+  state.session.results.push({ item, choiceIdx, correct });
+
+  if (navigator.vibrate) {
+    navigator.vibrate(correct ? 30 : [30, 60, 30]);
+  }
+
+  const choices = document.querySelectorAll('.choice');
+  choices.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === item.answer) btn.classList.add('correct');
+    if (i === choiceIdx && !correct) btn.classList.add('wrong');
+    if (i !== item.answer && i !== choiceIdx) btn.classList.add('dim');
+  });
+  if (correct) choices[choiceIdx].classList.add('pop');
+  else choices[choiceIdx].classList.add('shake');
+
+  showFeedbackUI();
+
+  requestAnimationFrame(() => {
+    const fb = document.querySelector('.feedback');
+    if (fb && fb.scrollIntoView) {
+      fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+}
+
+function showFeedbackUI() {
+  const item = state.session.items[state.session.index];
+  const isLast = state.session.index >= state.session.items.length - 1;
+  const area = document.getElementById('feedback-area');
+  const ok = state.lastCorrect;
+  area.innerHTML = `
+    <div class="feedback ${ok ? '' : 'wrong'}">
+      <div class="feedback-title ${ok ? 'ok' : 'no'}">${ok ? '✓ 잘했어요!' : '✗ 아쉬워요'}</div>
+      ${ok ? '' : `<div class="feedback-answer">정답: ${item.choices[item.answer]}</div>`}
+      <div class="feedback-explain">${item.explain}</div>
+      <div class="feedback-actions">
+        <button class="btn" id="next-q">${isLast ? '결과 보기' : '다음 문제 →'}</button>
+      </div>
+    </div>
+  `;
+  const btn = document.getElementById('next-q');
+  btn.onclick = nextQuestion;
+  btn.focus();
+  document.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextQuestion(); }
+  };
+}
+
+function nextQuestion() {
+  document.onkeydown = null;
+  state.session.index++;
+  state.showFeedback = false;
+  state.lastCorrect = null;
+  state.lastChoiceIdx = null;
+  if (state.session.index >= state.session.items.length) {
+    updateStats(state.session.catId, state.session.results);
+    state.screen = 'summary';
+    render();
+    return;
+  }
+  render();
+}
+
+function quitSession() {
+  if (state.session.results.length > 0) {
+    if (!confirm('지금까지 푼 문제는 기록되고 종료해요. 그만할까요?')) return;
+    updateStats(state.session.catId, state.session.results);
+  }
+  state.session = null;
+  state.screen = 'title';
+  render();
+}
+
+function renderSummary() {
+  const sess = state.session;
+  const cat = categoryById(sess.catId);
+  const total = sess.results.length;
+  const correct = sess.results.filter(r => r.correct).length;
+  const wrong = total - correct;
+  const rate = Math.round(correct * 100 / total);
+  let emoji = '🎉', title = '훌륭해요!', desc = '오늘도 한 걸음 자랐어요.';
+  if (rate < 50)      { emoji = '💪'; title = '괜찮아요, 다시 한 번!'; desc = '틀린 문제의 해설을 천천히 읽어 보면 다음엔 더 잘할 수 있어요.'; }
+  else if (rate < 80) { emoji = '🌱'; title = '잘했어요'; desc = '꾸준히 하면 분명 늘어요.'; }
+  else if (rate === 100) { emoji = '🏆'; title = '완벽해요!'; desc = '모든 문제를 맞혔어요. 다른 영역도 도전해 봐요.'; }
+
+  const wrongs = sess.results.filter(r => !r.correct);
+
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot">국</span> 결과</div>
+      <div class="header-stats">${cat.name}</div>
+    </div>
+    <div class="card summary">
+      <div class="summary-emoji">${emoji}</div>
+      <h2>${title}</h2>
+      <p>${desc}</p>
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <div class="num correct">${correct}</div>
+          <div class="label">정답</div>
+        </div>
+        <div class="summary-stat">
+          <div class="num wrong">${wrong}</div>
+          <div class="label">오답</div>
+        </div>
+        <div class="summary-stat">
+          <div class="num rate">${rate}%</div>
+          <div class="label">정답률</div>
+        </div>
+      </div>
+      <button class="btn" id="again">한 번 더 풀기</button>
+      <div class="btn-row">
+        <button class="btn secondary" id="other">다른 영역</button>
+        <button class="btn secondary" id="home">홈으로</button>
+      </div>
+      ${wrongs.length > 0 ? `
+        <div class="review-list">
+          <div class="review-list-title">📌 틀린 문제 다시 보기</div>
+          ${wrongs.map(r => {
+            const qText = r.item.word ? `${r.item.word} (${r.item.hanja || ''})` : (r.item.q.replace(/<br>/g,' ').replace(/<[^>]+>/g,'').slice(0, 80) + (r.item.q.length > 80 ? '…' : ''));
+            return `
+              <div class="review-item">
+                <span class="review-mark no">✗</span>
+                <div class="review-q">
+                  ${qText}
+                  <span class="review-correct">정답: ${r.item.choices[r.item.answer]}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+  document.getElementById('again').onclick = () => startSession(sess.catId);
+  document.getElementById('other').onclick = () => { state.session = null; state.screen = 'title'; render(); };
+  document.getElementById('home').onclick  = () => { state.session = null; state.screen = 'title'; render(); };
+}
+
+// ===================================================================
+// 시작
+// ===================================================================
+render();
+</script>
+</body>
+</html>
