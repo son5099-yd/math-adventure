@@ -520,6 +520,55 @@
   }
   .pop { animation: pop 0.3s; }
 
+  /* 학습 화면 */
+  .lesson-intro {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #4b5563;
+    border-left: 3px solid #4338ca;
+  }
+  .lesson-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .lesson-card-num {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4338ca;
+    background: #ede9fe;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .lesson-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 10px;
+    line-height: 1.45;
+  }
+  .lesson-card-body {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.85;
+  }
+  .lesson-card-body b {
+    color: #1e293b;
+    font-weight: 700;
+  }
+  .lesson-actions {
+    margin-top: 18px;
+  }
+
   /* 큰 화면 */
   @media (min-width: 700px) {
     .quiz-q { font-size: 20px; }
@@ -956,6 +1005,83 @@ const LOGIC = [
     explain:'논술문은 보통 <b>서론 → 본론 → 결론</b>의 흐름이 권장돼요. 서론에서 문제와 자신의 입장을 밝히고, 본론에서 주장과 근거를 펼치고, 결론에서 다시 한 번 핵심을 정리하는 구조예요.' },
 ];
 
+// ---------- 사전 학습 카드 (한국사 예시 기반) ----------
+const LESSONS = {
+  vocab: {
+    intro: '문제를 풀기 전 한자어를 익히는 비결을 살짝 알려줄게요. 천천히 읽고 넘어가요.',
+    cards: [
+      { title: '한자어는 글자 하나하나에 뜻이 있어요',
+        body: '예) <b>도래(到來)</b> = 이르다(到) + 오다(來) → "이르러 옴". 그래서 "조선 후기 <b>실학의 도래</b>"처럼 새 시대가 오는 것을 뜻해요.<br>두 글자의 뜻을 합쳐서 생각해보면 어려운 말도 친숙해져요.' },
+      { title: '부정·아닐 때 쓰는 한자: 不 · 無 · 非 · 微',
+        body: '• <b>미온적(微溫的)</b> — 미지근한. "흥선대원군의 <b>미온적</b>인 개방 정책"<br>• <b>무모(無謀)</b> — 꾀가 없음. 무리하게 일을 벌일 때.<br>• <b>비논리(非論理)</b> — 논리가 아님.<br>이 한자들이 보이면 "~가 아닌, ~가 부족한"으로 풀어 읽어요.' },
+      { title: '사자성어는 옛 이야기에서 왔어요',
+        body: '• <b>명불허전(名不虛傳)</b> "이름은 헛되이 전해지지 않는다" → "이순신 장군은 <b>명불허전</b>의 영웅이에요."<br>• <b>설상가상(雪上加霜)</b> "눈 위에 서리까지" → "임진왜란 끝나기도 전에 <b>설상가상</b>으로 정유재란이 일어났어요."<br>• <b>자가당착(自家撞着)</b> "스스로 부딪침" → 말과 행동이 어긋날 때.' },
+      { title: '한 글자만 알아도 뜻을 추측할 수 있어요',
+        body: '• <b>답습(踏襲)</b> — 踏은 "밟다". 옛길을 그대로 <b>밟아</b> 따라감. "조선은 명나라 제도를 답습했다."<br>• <b>도태(淘汰)</b> — 汰는 "가려내다". 가려져 <b>없어짐</b>. "구한말 외세 경쟁에서 도태됐다."<br>• <b>회자(膾炙)</b> — 膾는 "회". 누구나 좋아하는 음식처럼 사람들 입에 자주 오르내림.' },
+    ],
+  },
+
+  idiom: {
+    intro: '속담은 옛 사람의 경험을 짧게 줄인 말, 관용구는 글자 그대로의 뜻이 아닌 통째로 외우는 표현이에요.',
+    cards: [
+      { title: '속담 = 옛 경험에서 나온 짧은 가르침',
+        body: '• <b>"공든 탑이 무너지랴"</b> — 정성껏 쌓은 <b>다보탑·석가탑</b>은 1300년이 지나도 그 자리에 그대로 있어요. 노력은 헛되지 않다는 뜻.<br>• <b>"낫 놓고 ㄱ자도 모른다"</b> — 낫은 옛 농기구. 그 모양이 \'ㄱ\'인데 글자를 못 알아본다는 뜻이라 아주 무식함을 비유해요.' },
+      { title: '관용구는 글자 그대로 읽으면 틀려요',
+        body: '• <b>"발이 넓다"</b> = 발 크기가 큰 게 아니라 → <b>아는 사람이 많다</b><br>• <b>"귀가 얇다"</b> = 귀 두께가 아니라 → <b>남의 말을 너무 쉽게 믿는다</b><br>• <b>"입이 무겁다"</b> = 입이 무거운 게 아니라 → <b>비밀을 잘 지킨다</b><br>한 덩어리로 외워야 해요.' },
+      { title: '신체 관용구는 통째로 외우는 게 빨라요',
+        body: '• <b>손이 크다</b> — 씀씀이가 후하다<br>• <b>눈이 높다</b> — 수준 높은 것만 찾는다<br>• <b>마음을 졸이다</b> — 결과가 어찌 될지 몰라 걱정하다<br>• <b>발 벗고 나서다</b> — 적극적으로 돕다 (예: "임진왜란 때 의병들은 나라를 위해 발 벗고 나섰어요")' },
+      { title: '꼭 알아두면 좋은 속담 5개',
+        body: '• <b>우물 안 개구리</b> — 좁은 세상만 아는 식견 (구한말 쇄국정책의 한계)<br>• <b>빈 수레가 요란하다</b> — 실속 없는 사람일수록 시끄럽다<br>• <b>윗물이 맑아야 아랫물이 맑다</b> — 조선의 청백리(맑은 관리) 사상과 통해요<br>• <b>호미로 막을 것을 가래로 막는다</b> — 작은 일을 미루면 큰일 됨<br>• <b>천 리 길도 한 걸음부터</b> — 큰일도 작은 시작에서' },
+    ],
+  },
+
+  spelling: {
+    intro: '딱 한 글자가 달라서 헷갈리는 표현들. 구분 비결을 알면 평생 안 틀려요.',
+    cards: [
+      { title: '되 vs 돼 — "하"와 "해" 넣어 보세요',
+        body: '<b>되</b> 자리에 \'<b>하</b>\'를, <b>돼</b> 자리에 \'<b>해</b>\'를 넣어 보세요.<br>• "안 ___" → "안 <b>해</b>" 자연스러움 → "안 <b>돼</b>" ✓<br>• "할 수 있게 ___었어" → "할 수 있게 <b>했</b>어" 자연스러움 → "<b>됐</b>어" ✓<br>이 규칙으로 99% 맞아요.' },
+      { title: '안 vs 않 — 둘은 완전 달라요',
+        body: '• <b>안</b>은 짧은 부정 부사. 동사·형용사 앞에 → "안 갔다", "안 예쁘다"<br>• <b>않</b>은 \'-지 않다\' 형태로만 → "가지 <b>않</b>았다", "예쁘지 <b>않</b>다"<br>그래서 "그건 <b>안</b> 돼" / "그건 옳지 <b>않</b>다" 처럼 자리가 달라요.' },
+      { title: '어미 -ㄹ게는 \'께\'가 아니에요',
+        body: '말하는 사람의 약속·의지: <b>-ㄹ게</b>가 표준.<br>• "내가 <b>할게</b>" ✓ / "할께" ✗<br>• "이따 <b>갈게</b>" / "<b>먹을게</b>" / "<b>도와줄게</b>"<br>옛 사극에서 "<b>가오리다</b>" 같은 말은 옛 어미. 지금은 모두 -ㄹ게.' },
+      { title: '한 끗 차이로 뜻이 완전 다른 짝',
+        body: '• <b>부치다</b>(편지를 보내다) vs <b>붙이다</b>(우표를 종이에)<br>• <b>가르치다</b>(지식을 알려주다 — teach) vs <b>가리키다</b>(손가락으로 보이다 — point)<br>예: "정약용은 후학을 <b>가르쳤다</b>" / "왕이 손으로 북쪽을 <b>가리켰다</b>"<br>• <b>다르다</b>(서로 같지 않다 — different) vs <b>틀리다</b>(정답이 아니다 — wrong)<br>"내 생각과 네 생각이 <b>달라</b>" (틀려 X)' },
+      { title: '항상 이렇게! 자주 틀리는 단어',
+        body: '• <b>며칠</b> ✓ / 몇일 ✗ — 항상 며칠로 적어요<br>• <b>왠지</b>(=왜인지) ✓ / 웬지 ✗ — \'웬\'은 "웬일이야?"에만<br>• <b>오랜만에</b> ✓ / 오랫만에 ✗ — \'오랫동안\'과 헷갈리지 마세요<br>• <b>역할</b> ✓ / 역활 ✗ — 한자 役割<br>• <b>일찍이</b> ✓ / 일찌기 ✗' },
+    ],
+  },
+
+  reading: {
+    intro: '독해는 글쓴이가 진짜 하고 싶은 말이 어디 있는지 찾는 일이에요. 단서가 되는 표현들을 알아둬요.',
+    cards: [
+      { title: '글쓴이의 핵심 주장은 보통 이런 자리에 있어요',
+        body: '• <b>첫 문장</b>에 화제를 던지고 <b>마지막 문장</b>에 결론<br>• <b>"따라서", "결국", "그러므로", "요컨대"</b> 뒤에 결론<br>• 같은 말이 두세 번 반복되면 그게 핵심<br>예: "<b>결국</b> 세종이 한글을 만든 까닭은 백성을 사랑하는 마음이었다." → 이 문장이 주제예요.' },
+      { title: '통념 → 반박 구조를 알아두세요',
+        body: '"흔히 ~라고 한다. <b>그러나</b> ~" 같은 글은 진짜 주장이 \'<b>그러나</b>\' 뒤에 있어요.<br>예: "흔히 흥선대원군의 쇄국 정책을 잘못이라 한다. <b>그러나</b> 그는 외세 위협 속에서 ~"<br>여기서 글쓴이는 흥선대원군을 옹호하는 입장이에요.' },
+      { title: '글쓴이의 태도는 단어 선택에 드러나요',
+        body: '같은 사건도 어떤 단어를 쓰느냐에 따라 평가가 보여요.<br>• "광개토대왕은 영토를 <b>넓혔다</b>" — 중립<br>• "광개토대왕은 영토를 <b>크게 확장했다</b>" — 긍정<br>• "광개토대왕은 영토를 <b>침략으로 빼앗았다</b>" — 부정<br>\'위대한, 빛나는, 안타까운, 어두운\' 같은 형용사에 주목해요.' },
+      { title: '글의 흐름을 잇는 신호어',
+        body: '• <b>그러나 · 하지만</b> = 반대 (앞과 뒤가 다르다)<br>• <b>또한 · 게다가</b> = 덧붙임 (같은 방향)<br>• <b>예를 들어 · 가령</b> = 예시<br>• <b>즉 · 요컨대</b> = 정리<br>• <b>따라서 · 그래서</b> = 인과<br>이 단어가 보이면 그 뒤를 더 집중해서 읽으세요.' },
+    ],
+  },
+
+  logic: {
+    intro: '논술은 "잘 따지고 잘 쓰는 일". 주장과 근거를 분리하고, 흔한 오류를 피하는 법을 익혀요.',
+    cards: [
+      { title: '주장과 근거를 분리해요',
+        body: '<b>주장(결론)</b>: 글쓴이가 믿거나 주장하는 것<br><b>근거</b>: 그 주장을 뒷받침하는 사실·자료<br>예) <b>주장</b>: "독도는 우리 땅이다."<br><b>근거 1</b>: 신라 지증왕 13년(512)에 이사부가 우산국을 복속시켰다.<br><b>근거 2</b>: 조선 숙종 때 안용복이 일본에 가서 독도가 조선 땅임을 확인받았다.<br>좋은 논술은 보통 주장 + 근거 2~3개.' },
+      { title: '사실 vs 의견을 구분해요',
+        body: '• <b>사실</b> — 확인 가능한 객관적 정보<br>예: "광개토대왕은 4세기 인물이다."<br>• <b>의견</b> — 주관적 평가·판단<br>예: "광개토대왕이 가장 위대한 왕이다."<br>논술에선 두 가지를 의도적으로 구분해서, 사실을 근거로 의견(주장)을 펼쳐야 설득력이 생겨요.' },
+      { title: '흔한 논리 오류 — 성급한 일반화',
+        body: '한 사례만 보고 전체를 단정 짓는 오류예요.<br>❌ "이성계가 위화도에서 회군을 했다. <b>따라서</b> 모든 장군은 반란을 일으킨다."<br>한 사람의 한 행동을 가지고 "<b>모든</b>"이라고 말하면 무리예요.<br>좋은 글은 <b>여러 사례·통계</b>를 근거로 삼아요.' },
+      { title: '한국어의 호응 — 짝꿍 표현',
+        body: '특정 단어는 반드시 짝과 함께 와요.<br>• <b>결코</b> ~ <b>아니다/없다/못하다</b> ("결코 우연이 <b>아니다</b>")<br>• <b>여간</b> ~ <b>아니다</b> ("여간 어려운 일이 <b>아니다</b>")<br>• <b>비단</b> ~ <b>뿐만 아니라</b> ("비단 한국<b>뿐만 아니라</b>")<br>이 짝을 어기면 어색한 문장이 돼요.' },
+      { title: '좋은 논술의 구조 — 서론·본론·결론',
+        body: '<b>서론</b>: 문제 제시 + 자신의 입장 짧게 밝히기<br><b>본론</b>: 주장 + 근거 2~3개 (역사적 사례 한두 개 곁들이면 더 설득력 ↑)<br><b>결론</b>: 핵심을 다시 한 번 정리<br>예: "한글 창제의 의의는?" → 서론(문제: 왜 의의가 큰가) → 본론(① 백성을 위한 글자 ② 고유 문자의 자주성 ③ 과학적 원리) → 결론(따라서 한글은 단순한 글자가 아니라 ~)' },
+    ],
+  },
+};
+
 // ---------- 카테고리 정의 ----------
 const CATEGORIES = [
   { id:'vocab',    name:'어휘 마스터',    desc:'한자어 · 사자성어의 뜻을 익혀요',          icon:'📖', data: VOCAB },
@@ -1071,9 +1197,10 @@ function buildSession(catId) {
 // 상태
 // ===================================================================
 const state = {
-  screen: 'title',         // title | quiz | summary
+  screen: 'title',         // title | lesson | quiz | summary
   stats: loadStats(),
   session: null,           // { catId, items, index, results }
+  lessonCat: null,         // 현재 학습 중인 카테고리 ID
   showFeedback: false,
   lastCorrect: null,
   lastChoiceIdx: null,
@@ -1086,6 +1213,7 @@ const app = document.getElementById('app');
 
 function render() {
   if (state.screen === 'title') renderTitle();
+  else if (state.screen === 'lesson') renderLesson();
   else if (state.screen === 'quiz') renderQuiz();
   else if (state.screen === 'summary') renderSummary();
   window.scrollTo(0, 0);
@@ -1147,8 +1275,49 @@ function renderTitle() {
     </div>
   `;
   document.querySelectorAll('.cat-item').forEach(btn => {
-    btn.onclick = () => startSession(btn.dataset.cat);
+    btn.onclick = () => startLesson(btn.dataset.cat);
   });
+}
+
+function startLesson(catId) {
+  state.lessonCat = catId;
+  state.screen = 'lesson';
+  render();
+}
+
+function renderLesson() {
+  const cat = categoryById(state.lessonCat);
+  const lesson = LESSONS[cat.id];
+  const cs = state.stats.byCategory[cat.id] || { answered:0, correct:0 };
+  const cr = cs.answered ? Math.round(cs.correct * 100 / cs.answered) : null;
+  app.innerHTML = `
+    <div class="header">
+      <div class="logo"><span class="logo-dot">국</span> 사전 공부</div>
+      <button class="btn-icon" id="back">← 뒤로</button>
+    </div>
+    <div class="card">
+      <span class="quiz-tag ${cat.id}">${cat.icon} ${cat.name}</span>
+      <div class="quiz-q" style="margin-top:6px;">${cat.name} · 공부하기</div>
+      <div class="quiz-sub">${cat.data.length}문제 중 무작위 ${Math.min(SESSION_SIZE, cat.data.length)}문제가 출제돼요${cr !== null ? ` · 누적 정답률 ${cr}%` : ''}</div>
+      <div class="lesson-intro">${lesson.intro}</div>
+      ${lesson.cards.map((c, i) => `
+        <div class="lesson-card">
+          <span class="lesson-card-num">${i + 1} / ${lesson.cards.length}</span>
+          <div class="lesson-card-title">${c.title}</div>
+          <div class="lesson-card-body">${c.body}</div>
+        </div>
+      `).join('')}
+      <div class="lesson-actions">
+        <button class="btn" id="to-quiz">${Math.min(SESSION_SIZE, cat.data.length)}문제 풀러 가기 →</button>
+        <div class="btn-row">
+          <button class="btn secondary" id="lesson-home">홈으로</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('back').onclick = () => { state.lessonCat = null; state.screen = 'title'; render(); };
+  document.getElementById('lesson-home').onclick = () => { state.lessonCat = null; state.screen = 'title'; render(); };
+  document.getElementById('to-quiz').onclick = () => startSession(state.lessonCat);
 }
 
 function startSession(catId) {
@@ -1342,7 +1511,7 @@ function renderSummary() {
       </div>
       <button class="btn" id="again">한 번 더 풀기</button>
       <div class="btn-row">
-        <button class="btn secondary" id="other">다른 영역</button>
+        <button class="btn secondary" id="study">📖 공부 다시 보기</button>
         <button class="btn secondary" id="home">홈으로</button>
       </div>
       ${wrongs.length > 0 ? `
@@ -1365,7 +1534,7 @@ function renderSummary() {
     </div>
   `;
   document.getElementById('again').onclick = () => startSession(sess.catId);
-  document.getElementById('other').onclick = () => { state.session = null; state.screen = 'title'; render(); };
+  document.getElementById('study').onclick = () => { const cid = sess.catId; state.session = null; startLesson(cid); };
   document.getElementById('home').onclick  = () => { state.session = null; state.screen = 'title'; render(); };
 }
 
