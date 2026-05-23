@@ -482,6 +482,60 @@
   .essay-item-actions button.danger { background: #ffd6d6; color: #b00020; }
   .essay-empty { text-align: center; color: #999; padding: 40px 20px; font-size: 16px; }
 
+  /* ===== 학습 통계 ===== */
+  .stats-section { margin-bottom: 14px; }
+  .stats-section-title {
+    font-size: 16px; font-weight: bold; color: #5b2a86;
+    margin-bottom: 8px;
+  }
+  .stats-world-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; margin-bottom: 6px;
+    background: #fff8f0; border-radius: 12px;
+    border: 1px solid #ffe4a8;
+  }
+  .stats-world-icon { font-size: 28px; }
+  .stats-world-info { flex: 1; }
+  .stats-world-name { font-size: 15px; font-weight: bold; color: #2c3e50; }
+  .stats-world-meta { font-size: 12px; color: #888; margin-top: 2px; }
+  .stats-bar {
+    flex: 1; height: 8px; background: #eee;
+    border-radius: 50px; overflow: hidden; margin-top: 4px;
+  }
+  .stats-bar-fill { height: 100%; background: linear-gradient(90deg, #5cd95c, #2eb82e); transition: width 0.4s; }
+  .stats-bar-fill.low { background: linear-gradient(90deg, #ff9a56, #ff6b35); }
+  .stats-bar-fill.mid { background: linear-gradient(90deg, #ffd700, #ffaa00); }
+  .stats-acc {
+    font-size: 18px; font-weight: bold; color: #2eb82e; min-width: 50px; text-align: right;
+  }
+  .stats-acc.low { color: #ff6b35; }
+  .stats-acc.mid { color: #d99000; }
+  .stats-missed-list {
+    background: #fffafa; border: 1px solid #ffd6d6;
+    border-radius: 10px; padding: 8px 12px; margin-top: 4px;
+  }
+  .stats-missed-item {
+    display: flex; justify-content: space-between; gap: 10px;
+    font-size: 13px; padding: 4px 0;
+    border-bottom: 1px dashed #ffe0e0;
+  }
+  .stats-missed-item:last-child { border-bottom: none; }
+  .stats-missed-q { color: #444; flex: 1; }
+  .stats-missed-count { color: #c0392b; font-weight: bold; white-space: nowrap; }
+  .stats-empty { text-align: center; color: #999; padding: 30px 16px; font-size: 15px; }
+  .stats-summary {
+    background: linear-gradient(135deg, #5b2a86 0%, #2c1450 100%);
+    color: white; padding: 14px 18px; border-radius: 14px;
+    margin-bottom: 14px; text-align: center;
+  }
+  .stats-summary-big { font-size: 32px; font-weight: bold; }
+  .stats-summary-label { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+  .stats-reset-btn {
+    width: 100%; margin-top: 8px;
+    background: #ffe0e0; color: #b00020; border: none;
+    padding: 8px; border-radius: 12px; font-size: 13px; cursor: pointer;
+  }
+
   /* ===== 세계 인트로 화면 ===== */
   .world-intro {
     flex: 1;
@@ -1614,18 +1668,60 @@ function genEnglish() {
 }
 
 // 영어 단어 학습 통계 (틀린 문제는 더 자주 다시 등장)
+// 모든 과목 공통 저장소를 사용
 function getEnglishStats() {
-  try { return JSON.parse(localStorage.getItem('mathadv_english_stats') || '{}'); }
+  // 기존 키와 신규 키 둘 다 읽어 합침 (마이그레이션)
+  const stats = {};
+  try {
+    const oldStats = JSON.parse(localStorage.getItem('mathadv_english_stats') || '{}');
+    Object.assign(stats, oldStats);
+  } catch {}
+  try {
+    const all = JSON.parse(localStorage.getItem('mathadv_question_stats') || '{}');
+    for (const k in all) {
+      if (all[k].world === 'english') stats[k] = all[k];
+    }
+  } catch {}
+  return stats;
+}
+
+// 전 과목 공통 통계 헬퍼
+function getQuestionStats() {
+  try { return JSON.parse(localStorage.getItem('mathadv_question_stats') || '{}'); }
   catch { return {}; }
 }
-function saveEnglishStat(qKey, correct) {
-  const stats = getEnglishStats();
-  if (!stats[qKey]) stats[qKey] = { wrong: 0, correct: 0 };
-  if (correct) stats[qKey].correct++;
-  else stats[qKey].wrong++;
-  stats[qKey].lastSeen = Date.now();
-  localStorage.setItem('mathadv_english_stats', JSON.stringify(stats));
+function getWorldStats() {
+  try { return JSON.parse(localStorage.getItem('mathadv_world_stats') || '{}'); }
+  catch { return {}; }
 }
+// 정적 문제 풀(중복되는 문제 텍스트가 의미 있는 세계)
+const STATIC_POOL_WORLDS = ['forest', 'lab', 'library', 'english'];
+
+function saveAnswerStat(worldId, qKey, correct) {
+  // 세계별 집계
+  const ws = getWorldStats();
+  if (!ws[worldId]) ws[worldId] = { attempts: 0, correct: 0, wrong: 0 };
+  ws[worldId].attempts++;
+  if (correct) ws[worldId].correct++; else ws[worldId].wrong++;
+  ws[worldId].lastSeen = Date.now();
+  localStorage.setItem('mathadv_world_stats', JSON.stringify(ws));
+
+  // 정적 풀 세계: 문제별 통계 (자주 틀린 문제 추적)
+  if (STATIC_POOL_WORLDS.includes(worldId)) {
+    const qs = getQuestionStats();
+    if (!qs[qKey]) qs[qKey] = { wrong: 0, correct: 0, world: worldId };
+    if (correct) qs[qKey].correct++; else qs[qKey].wrong++;
+    qs[qKey].lastSeen = Date.now();
+    qs[qKey].world = worldId;
+    localStorage.setItem('mathadv_question_stats', JSON.stringify(qs));
+  }
+}
+
+// 기존 호출 호환용 (영어 가중치 계산에 사용)
+function saveEnglishStat(qKey, correct) {
+  saveAnswerStat('english', qKey, correct);
+}
+
 function englishWeight(stat) {
   if (!stat) return 1;
   const wrong = stat.wrong || 0;
@@ -1870,6 +1966,7 @@ function renderTitle() {
       </div>
       <button class="btn green" onclick="startGame('daily')">🌟 오늘의 도전 시작</button>
       <button class="btn blue small" style="margin-top:14px" onclick="startGame('practice')">🎲 자유 연습 모드</button>
+      <button class="btn small purple" style="margin-top:10px" onclick="renderStatsView()">📊 학습 통계</button>
       ${getEssays().length > 0 ? `<button class="btn small purple" style="margin-top:10px" onclick="renderEssayList()">✍️ 글모음 (${getEssays().length})</button>` : ''}
       ${Object.keys(state.cleared).length > 0 ? '<button class="btn small purple" style="margin-top:10px" onclick="resetGame()">처음부터 다시</button>' : ''}
       <p style="font-size:14px;margin-top:16px;opacity:0.7">오늘의 도전: 같은 문제 세트, 내일이 되면 새로워져요<br>자유 연습: 매번 새로운 문제로 무한 연습</p>
@@ -2118,6 +2215,114 @@ function closeEssayList() {
   if (el) el.remove();
 }
 
+function renderStatsView() {
+  const ws = getWorldStats();
+  const qs = getQuestionStats();
+
+  // 전체 합계
+  let totalAttempts = 0, totalCorrect = 0;
+  for (const id in ws) {
+    totalAttempts += ws[id].attempts || 0;
+    totalCorrect += ws[id].correct || 0;
+  }
+  const overallAcc = totalAttempts > 0 ? Math.round(totalCorrect / totalAttempts * 100) : 0;
+
+  // 세계별 카드
+  const worldsHtml = WORLDS.map(w => {
+    const s = ws[w.id];
+    if (!s || s.attempts === 0) {
+      return `
+        <div class="stats-world-row" style="opacity:0.5">
+          <span class="stats-world-icon">${w.icon}</span>
+          <div class="stats-world-info">
+            <div class="stats-world-name">${w.name}</div>
+            <div class="stats-world-meta">아직 풀어본 적 없어요</div>
+          </div>
+        </div>`;
+    }
+    const acc = Math.round(s.correct / s.attempts * 100);
+    const cls = acc >= 80 ? '' : acc >= 60 ? 'mid' : 'low';
+    return `
+      <div class="stats-world-row">
+        <span class="stats-world-icon">${w.icon}</span>
+        <div class="stats-world-info">
+          <div class="stats-world-name">${w.name}</div>
+          <div class="stats-world-meta">시도 ${s.attempts}회 · ⭕ ${s.correct} · ❌ ${s.wrong}</div>
+          <div class="stats-bar"><div class="stats-bar-fill ${cls}" style="width:${acc}%"></div></div>
+        </div>
+        <div class="stats-acc ${cls}">${acc}%</div>
+      </div>`;
+  }).join('');
+
+  // 정적 풀 세계별 자주 틀린 문제 TOP 5
+  const missedSections = STATIC_POOL_WORLDS.map(wid => {
+    const world = WORLDS.find(w => w.id === wid);
+    if (!world) return '';
+    const items = Object.entries(qs)
+      .filter(([_, v]) => v.world === wid && (v.wrong || 0) > 0)
+      .map(([q, v]) => ({ q, wrong: v.wrong || 0, correct: v.correct || 0 }))
+      .sort((a, b) => b.wrong - a.wrong || (b.wrong - b.correct) - (a.wrong - a.correct))
+      .slice(0, 5);
+    if (items.length === 0) return '';
+    const rows = items.map(it => `
+      <div class="stats-missed-item">
+        <span class="stats-missed-q">${escapeHtml(it.q)}</span>
+        <span class="stats-missed-count">❌ ${it.wrong}회 / ⭕ ${it.correct}회</span>
+      </div>`).join('');
+    return `
+      <div class="stats-section">
+        <div class="stats-section-title">${world.icon} ${world.name} — 자주 틀리는 문제</div>
+        <div class="stats-missed-list">${rows}</div>
+      </div>`;
+  }).join('');
+
+  const hasData = totalAttempts > 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'essay-list-overlay';
+  overlay.id = 'stats-overlay';
+  overlay.innerHTML = `
+    <div class="essay-list-card">
+      <div class="essay-list-header">
+        <span>📊 학습 통계</span>
+        <button onclick="closeStatsView()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#5b2a86">✕</button>
+      </div>
+      <div class="essay-list-body">
+        ${hasData ? `
+          <div class="stats-summary">
+            <div class="stats-summary-big">${overallAcc}%</div>
+            <div class="stats-summary-label">전체 정답률 · 총 ${totalAttempts}문제 풀이</div>
+          </div>
+          <div class="stats-section">
+            <div class="stats-section-title">🗺️ 세계별 진행</div>
+            ${worldsHtml}
+          </div>
+          ${missedSections || '<div class="stats-section"><div class="stats-section-title">🌟 모든 문제를 잘 풀고 있어요!</div></div>'}
+          <button class="stats-reset-btn" onclick="resetStats()">🗑 통계 초기화</button>
+        ` : '<div class="stats-empty">아직 풀어본 문제가 없어요.<br>세계 모험을 시작하면 학습 통계가 쌓여요!</div>'}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeStatsView();
+  });
+}
+
+function closeStatsView() {
+  const el = document.getElementById('stats-overlay');
+  if (el) el.remove();
+}
+
+function resetStats() {
+  if (!confirm('학습 통계를 모두 지울까요?\n(영어 단어 반복 학습 기록도 함께 사라져요)')) return;
+  localStorage.removeItem('mathadv_world_stats');
+  localStorage.removeItem('mathadv_question_stats');
+  localStorage.removeItem('mathadv_english_stats');
+  closeStatsView();
+  renderStatsView();
+}
+
 function deleteEssay(id) {
   if (!confirm('이 글을 정말 삭제할까요?')) return;
   const essays = getEssays().filter(e => e.id !== id);
@@ -2178,9 +2383,9 @@ function answer(i) {
   buttons.forEach(b => b.classList.add('disabled'));
   const correct = i === q.a;
 
-  // 영어 단어 학습 통계 기록 — 다음에 가중치로 반영
-  if (state.currentWorld && state.currentWorld.id === 'english') {
-    saveEnglishStat(q.q, correct);
+  // 모든 세계 결과를 학습 통계에 기록
+  if (state.currentWorld) {
+    saveAnswerStat(state.currentWorld.id, q.q, correct);
   }
 
   if (correct) {
