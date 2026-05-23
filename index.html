@@ -600,6 +600,94 @@
     padding: 8px; border-radius: 12px; font-size: 13px; cursor: pointer;
   }
 
+  /* ===== 마을 꾸미기 ===== */
+  .landmark-choices {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    margin-top: 12px;
+  }
+  .landmark-choice {
+    background: white;
+    border: 4px solid #ffd700;
+    border-radius: 18px;
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    transition: all 0.15s;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    min-width: 110px;
+  }
+  .landmark-choice:hover { transform: translateY(-4px) scale(1.05); border-color: #ff8c42; }
+  .landmark-choice:active { transform: translateY(2px) scale(0.98); }
+  .landmark-choice-icon { font-size: 72px; line-height: 1; }
+  .landmark-choice-label { font-size: 14px; color: #5b2a86; margin-top: 6px; font-weight: bold; }
+
+  .village-district {
+    background: #fff8f0;
+    border: 2px solid #ffe4a8;
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  .village-district.district-forest  { background: linear-gradient(180deg, #e8f5d8 0%, #fff8f0 100%); }
+  .village-district.district-castle  { background: linear-gradient(180deg, #ffe9c8 0%, #fff8f0 100%); }
+  .village-district.district-cave    { background: linear-gradient(180deg, #e0e0e0 0%, #fff8f0 100%); }
+  .village-district.district-village { background: linear-gradient(180deg, #ffe1d6 0%, #fff8f0 100%); }
+  .village-district.district-island  { background: linear-gradient(180deg, #cdeefb 0%, #fff8f0 100%); }
+  .village-district.district-lab     { background: linear-gradient(180deg, #d6f0ff 0%, #fff8f0 100%); }
+  .village-district.district-library { background: linear-gradient(180deg, #ffe8c8 0%, #fff8f0 100%); }
+  .village-district.district-english { background: linear-gradient(180deg, #ead4ff 0%, #fff8f0 100%); }
+
+  .village-district-header {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 6px; margin-bottom: 6px;
+  }
+  .village-district-name { font-weight: bold; color: #2c3e50; font-size: 16px; }
+  .village-district-count { font-size: 12px; color: #888; }
+
+  .village-landmark {
+    background: white; border: 3px solid #ffd700;
+    border-radius: 14px; padding: 8px 14px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+  }
+  .village-landmark-icon { font-size: 44px; line-height: 1; }
+  .village-landmark-label { font-size: 14px; color: #b88a00; font-weight: bold; }
+
+  .village-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+    gap: 4px;
+    padding: 6px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    min-height: 60px;
+  }
+  .village-cell {
+    font-size: 26px; text-align: center; line-height: 1.1;
+    background: white; border-radius: 6px;
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+  }
+  .village-cell:hover { transform: scale(1.2); z-index: 1; }
+  .village-empty {
+    grid-column: 1/-1;
+    text-align: center; color: #999; font-size: 13px;
+    padding: 18px 10px;
+  }
+
+  @media (max-width: 700px) and (orientation: portrait) {
+    .landmark-choice-icon { font-size: 56px; }
+    .village-cell { font-size: 22px; }
+    .village-landmark-icon { font-size: 36px; }
+  }
+  @media (max-height: 600px) {
+    .landmark-choices { gap: 10px; margin-top: 8px; }
+    .landmark-choice { padding: 8px 12px; min-width: 80px; }
+    .landmark-choice-icon { font-size: 44px; }
+    .landmark-choice-label { font-size: 11px; }
+    .village-cell { font-size: 18px; }
+  }
+
   /* ===== 세계 인트로 화면 ===== */
   .world-intro {
     flex: 1;
@@ -1023,6 +1111,54 @@ const REWARDS = [
   { id: 'butterfly',emoji: '🦋', name: '나비',         msg: '훨훨 자유롭게!' },
   { id: 'ladybug',  emoji: '🐞', name: '무당벌레',     msg: '행운을 가져다 줄게요!' },
 ];
+
+// ========== 마을 꾸미기 ==========
+// 각 세계(구역)별 장식 풀 — 정답마다 랜덤으로 하나씩 떨어져요
+const VILLAGE_DECORATIONS = {
+  forest:  ['🌳','🌲','🌴','🌵','🌷','🌻','🌼','🍄','🪨','🪺','🐿️','🦋','🌸','🌿'],
+  castle:  ['🛡️','⚔️','👑','🪙','🎺','🪄','🕯️','🏛️','🗝️','💎','🛕','🪞'],
+  cave:    ['💎','💠','🔮','🪨','🦇','🟣','🟢','🟡','🦴','🕯️','🍇'],
+  village: ['🏠','🏡','🏪','🏬','🌾','🚜','🌽','🥕','🍓','🍅','🐮','🐔','🐑','🌻'],
+  island:  ['🏖️','⛱️','🌴','🐚','🌊','⛵','🐠','🐬','🦀','🪸','🐙','🌺'],
+  lab:     ['🔬','🧪','⚗️','🔭','🚀','🧬','⚙️','🔋','💡','📡','🛸','🪐'],
+  library: ['📚','📖','🖋️','📰','🎭','🎨','🖼️','🪟','🪑','🕯️','📜','✒️'],
+  english: ['🎡','🎠','🎢','🎪','🎨','🌉','🎭','🎯','🎲','🎈','🎁','🎀'],
+};
+// 세계 클리어 시 3개 중 1개를 골라 그 구역의 랜드마크로 설치
+const VILLAGE_LANDMARKS = {
+  forest:  ['🏡','🏞️','⛲'],
+  castle:  ['🏰','🏛️','🗼'],
+  cave:    ['🗿','⛏️','🌋'],
+  village: ['🏘️','⛪','🏤'],
+  island:  ['🗽','🎡','⛴️'],
+  lab:     ['🚀','🛰️','🛸'],
+  library: ['📕','🎭','🏫'],
+  english: ['🗽','🌉','🎢'],
+};
+
+function getVillage() {
+  try { return JSON.parse(localStorage.getItem('mathadv_village') || '{}'); }
+  catch { return {}; }
+}
+function saveVillage(v) {
+  localStorage.setItem('mathadv_village', JSON.stringify(v));
+}
+function dropDecoration(worldId) {
+  const pool = VILLAGE_DECORATIONS[worldId];
+  if (!pool || pool.length === 0) return null;
+  const village = getVillage();
+  if (!village[worldId]) village[worldId] = { decorations: [], landmark: null };
+  const icon = pool[Math.floor(Math.random() * pool.length)];
+  village[worldId].decorations.push(icon);
+  saveVillage(village);
+  return icon;
+}
+function placeLandmark(worldId, icon) {
+  const village = getVillage();
+  if (!village[worldId]) village[worldId] = { decorations: [], landmark: null };
+  village[worldId].landmark = icon;
+  saveVillage(village);
+}
 
 // ========== 사전 학습 카드 (문제 풀기 전 개념 정리) ==========
 const LESSONS = {
@@ -2139,6 +2275,7 @@ function renderTitle() {
       </div>
       <button class="btn green" onclick="startGame('daily')">🌟 오늘의 도전 시작</button>
       <button class="btn blue small" style="margin-top:14px" onclick="startGame('practice')">🎲 자유 연습 모드</button>
+      <button class="btn small purple" style="margin-top:10px" onclick="renderVillage()">🏘️ 내 마을 보기</button>
       <button class="btn small purple" style="margin-top:10px" onclick="renderStatsView()">📊 학습 통계</button>
       ${getEssays().length > 0 ? `<button class="btn small purple" style="margin-top:10px" onclick="renderEssayList()">✍️ 글모음 (${getEssays().length})</button>` : ''}
       ${Object.keys(state.cleared).length > 0 ? '<button class="btn small purple" style="margin-top:10px" onclick="resetGame()">처음부터 다시</button>' : ''}
@@ -2418,6 +2555,49 @@ function closeEssayList() {
   if (el) el.remove();
 }
 
+function renderVillage() {
+  const village = getVillage();
+  const totalDeco = Object.values(village).reduce((s, v) => s + (v.decorations || []).length, 0);
+  const landmarkCount = Object.values(village).filter(v => v.landmark).length;
+
+  const districtsHtml = WORLDS.map(w => {
+    const v = village[w.id] || { decorations: [], landmark: null };
+    const decoCells = v.decorations.map(icon => `<span class="village-cell">${icon}</span>`).join('');
+    return `
+      <div class="village-district district-${w.bg}">
+        <div class="village-district-header">
+          <span class="village-district-name">${w.icon} ${w.name}</span>
+          <span class="village-district-count">장식 ${v.decorations.length}개${v.landmark ? ' · 랜드마크 1개' : ''}</span>
+        </div>
+        ${v.landmark ? `<div class="village-landmark"><span class="village-landmark-icon">${v.landmark}</span><span class="village-landmark-label">우리 마을의 자랑!</span></div>` : ''}
+        <div class="village-grid">${decoCells || '<div class="village-empty">이 자리는 아직 비어 있어요. 문제를 풀면 장식이 떨어져요!</div>'}</div>
+      </div>
+    `;
+  }).join('');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'essay-list-overlay';
+  overlay.id = 'village-overlay';
+  overlay.innerHTML = `
+    <div class="essay-list-card">
+      <div class="essay-list-header">
+        <span>🏘️ 내 마을 (장식 ${totalDeco}개 · 랜드마크 ${landmarkCount}/${WORLDS.length})</span>
+        <button onclick="closeVillage()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#5b2a86">✕</button>
+      </div>
+      <div class="essay-list-body">${districtsHtml}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeVillage();
+  });
+}
+
+function closeVillage() {
+  const el = document.getElementById('village-overlay');
+  if (el) el.remove();
+}
+
 function renderStatsView() {
   const ws = getWorldStats();
   const qs = getQuestionStats();
@@ -2594,7 +2774,9 @@ function answer(i) {
   if (correct) {
     Sound.correct();
     buttons[i].classList.add('correct');
-    floatText(document.getElementById('enemy'), '+1 💝', '#ff8ec7');
+    // 마을에 장식 1개 떨어짐
+    const droppedIcon = state.currentWorld ? dropDecoration(state.currentWorld.id) : null;
+    floatText(document.getElementById('enemy'), droppedIcon ? `+${droppedIcon}` : '+1 💝', '#ff8ec7');
     floatText(document.getElementById('hero'), '🎉', '#ffd700');
     document.getElementById('hero').classList.add('attack-anim');
     document.getElementById('enemy').classList.add('hurt');
@@ -2671,26 +2853,76 @@ function worldClear() {
   const allCleared = WORLDS.every(w => state.cleared[w.id]);
   Sound.win();
 
+  // 세계 클리어 보상으로 랜드마크 선택 화면을 먼저 띄움
+  const landmarks = VILLAGE_LANDMARKS[worldId];
+  const village = getVillage();
+  const alreadyHasLandmark = village[worldId] && village[worldId].landmark;
+  state.pendingClearStars = stars;
+  state.pendingClearAllCleared = allCleared;
+  if (landmarks && !alreadyHasLandmark) {
+    return showLandmarkChoice(worldId, landmarks, stars, allCleared);
+  }
+
   // 오늘의 도전 모드에서 8개 세계를 모두 클리어하고 아직 도장을 안 받았으면 보상 화면
   if (allCleared && state.mode === 'daily' && !getTodayReward()) {
     const reward = grantDailyReward();
     return showDailyReward(reward, stars);
   }
 
+  showWorldClearResult(stars, allCleared);
+}
+
+function showLandmarkChoice(worldId, landmarks, stars, allCleared) {
+  const world = WORLDS.find(w => w.id === worldId);
+  const buttons = landmarks.map(icon => `
+    <button class="landmark-choice" onclick="chooseLandmark('${worldId}','${icon}')">
+      <span class="landmark-choice-icon">${icon}</span>
+      <span class="landmark-choice-label">이걸 세울래요</span>
+    </button>
+  `).join('');
   render(`
     <div class="screen result-screen">
-      <h2>🎉 친구가 되었어요! 🎉</h2>
-      <div class="big-icon">${state.currentWorld.icon}</div>
-      <p><strong>${state.currentWorld.name}</strong>의 친구들과 모두 친해졌어요!</p>
+      <h2>🎊 ${world.name} 완성! 🎊</h2>
+      <div class="reward-list">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+      <p style="font-size:18px;margin:6px 0">우리 마을의 <strong>${world.name}</strong> 자리에<br>큰 건물(랜드마크)을 하나 세워요!</p>
+      <p style="font-size:14px;opacity:0.85;margin-bottom:10px">어떤 걸 세울지 골라 보세요</p>
+      <div class="landmark-choices">${buttons}</div>
+    </div>
+  `);
+}
+
+function chooseLandmark(worldId, icon) {
+  placeLandmark(worldId, icon);
+  const stars = state.pendingClearStars || 0;
+  const allCleared = state.pendingClearAllCleared;
+  if (allCleared && state.mode === 'daily' && !getTodayReward()) {
+    const reward = grantDailyReward();
+    return showDailyReward(reward, stars);
+  }
+  showWorldClearResult(stars, allCleared);
+}
+
+function showWorldClearResult(stars, allCleared) {
+  const world = state.currentWorld;
+  const village = getVillage();
+  const v = village[world.id] || { decorations: [], landmark: null };
+  const decoCount = v.decorations.length;
+  render(`
+    <div class="screen result-screen">
+      <h2>🎉 ${world.name} 완성! 🎉</h2>
+      <div class="big-icon">${v.landmark || world.icon}</div>
+      <p>이번 모험으로 마을 자리에<br><strong>장식 ${decoCount}개</strong>가 추가됐어요!</p>
       <div class="reward-list">
-        ${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}<br>
-        💝 친구 ${state.crystals}명
+        ${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}
       </div>
       ${allCleared ?
-        `<p style="font-size:26px;color:#c0392b;margin-top:20px">🏆 모든 친구를 만났어요! 🏆<br>당신은 멋진 수학 친구예요!</p>` :
-        `<p>다음 친구들을 만나러 가볼까요?</p>`
+        `<p style="font-size:22px;color:#c0392b;margin-top:14px">🏆 모든 마을이 완성됐어요! 🏆</p>` :
+        `<p>다음 마을 자리를 만들러 가볼까요?</p>`
       }
-      <button class="btn green" style="margin-top:24px" onclick="renderMap()">지도로 돌아가기</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px">
+        <button class="btn blue small" onclick="renderVillage()">🏘️ 마을 보기</button>
+        <button class="btn green" onclick="renderMap()">지도로 돌아가기</button>
+      </div>
     </div>
   `);
 }
