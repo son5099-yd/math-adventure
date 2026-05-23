@@ -991,6 +991,25 @@ function shuffle(arr, rng) {
   }
   return a;
 }
+// 선택지를 무작위로 섞고, answer와 explain의 "N번" 표기도 새 위치에 맞춰 갱신
+function shuffleChoices(item, rng) {
+  const n = item.choices.length;
+  const perm = shuffle(Array.from({length: n}, (_, i) => i), rng);
+  // perm[newIdx] = oldIdx
+  const newChoices = perm.map(oldIdx => item.choices[oldIdx]);
+  const newAnswer = perm.indexOf(item.answer);
+  // 원래 (oldIdx+1)번이 → 새 (newIdx+1)번이 됨
+  const oldToNew = {};
+  for (let newIdx = 0; newIdx < perm.length; newIdx++) {
+    oldToNew[perm[newIdx] + 1] = newIdx + 1;
+  }
+  // explain의 "N번" / "N·M번" / "N·M·K번" 등의 번호 표기를 새 위치로 변환
+  // · , / 로 묶인 시퀀스 + "번"을 통째로 잡아 내부 [1-4] 숫자를 모두 변환
+  const replaceDigits = (s) => s.replace(/[1-4]/g, d => String(oldToNew[Number(d)] || d));
+  const newExplain = (item.explain || '')
+    .replace(/[1-4](?:\s*[·,/]\s*[1-4])*\s*번/g, replaceDigits);
+  return { ...item, choices: newChoices, answer: newAnswer, explain: newExplain };
+}
 
 // ===================================================================
 // 통계 저장
@@ -1044,7 +1063,8 @@ function buildSession(catId) {
   const pool = cat.data;
   const rng = Math.random; // 자유 연습: 매번 다른 순서
   const picked = shuffle(pool, rng).slice(0, Math.min(SESSION_SIZE, pool.length));
-  return { catId, items: picked, index: 0, results: [] };
+  const items = picked.map(item => shuffleChoices(item, rng));
+  return { catId, items, index: 0, results: [] };
 }
 
 // ===================================================================
