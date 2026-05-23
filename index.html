@@ -1606,7 +1606,51 @@ function genEnglish() {
     { q: '"Thank you"에 어울리는 대답은?', visual: '😊', opts: ['Sorry', 'Goodbye', "You're welcome", 'Yes'], a: 2, explain: '누가 "Thank you(고마워요)"라고 하면 "You\'re welcome(천만에요)"이라고 대답해요.' },
     { q: '"It\'s raining cats and dogs!"의 뜻은?', visual: '🌧️', opts: ['고양이와 강아지가 떨어져요', '비가 아주 많이 와요', '동물이 비를 좋아해요', '비가 멈췄어요'], a: 1, explain: '"raining cats and dogs"는 "비가 억수같이 쏟아진다"라는 재미있는 영어 표현이에요.' },
   ];
+  // 자유 연습 모드: 틀린 단어 가중치 두고 반복 학습. 오늘의 도전: 결정론적 균등.
+  if (state.mode === 'practice') {
+    return pickEnglishWeighted(questions);
+  }
   return questions[Math.floor(R() * questions.length)];
+}
+
+// 영어 단어 학습 통계 (틀린 문제는 더 자주 다시 등장)
+function getEnglishStats() {
+  try { return JSON.parse(localStorage.getItem('mathadv_english_stats') || '{}'); }
+  catch { return {}; }
+}
+function saveEnglishStat(qKey, correct) {
+  const stats = getEnglishStats();
+  if (!stats[qKey]) stats[qKey] = { wrong: 0, correct: 0 };
+  if (correct) stats[qKey].correct++;
+  else stats[qKey].wrong++;
+  stats[qKey].lastSeen = Date.now();
+  localStorage.setItem('mathadv_english_stats', JSON.stringify(stats));
+}
+function englishWeight(stat) {
+  if (!stat) return 1;
+  const wrong = stat.wrong || 0;
+  const correct = stat.correct || 0;
+  // 한 번도 못 맞춘 단어 → 최우선 반복
+  if (wrong > 0 && correct === 0) return 5;
+  // 틀린 횟수가 더 많음 → 자주 반복
+  if (wrong > correct) return 3;
+  // 잘 맞추기 시작 → 보통
+  if (wrong === correct && wrong > 0) return 1.5;
+  // 마스터: 연속 정답
+  if (correct >= 5 && wrong === 0) return 0.25;
+  if (correct >= 3 && wrong === 0) return 0.4;
+  return 1;
+}
+function pickEnglishWeighted(questions) {
+  const stats = getEnglishStats();
+  const weights = questions.map(q => englishWeight(stats[q.q]));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < questions.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return questions[i];
+  }
+  return questions[questions.length - 1];
 }
 
 function genMultiply(diff) {
@@ -2133,6 +2177,11 @@ function answer(i) {
   const buttons = document.querySelectorAll('.answer-btn');
   buttons.forEach(b => b.classList.add('disabled'));
   const correct = i === q.a;
+
+  // 영어 단어 학습 통계 기록 — 다음에 가중치로 반영
+  if (state.currentWorld && state.currentWorld.id === 'english') {
+    saveEnglishStat(q.q, correct);
+  }
 
   if (correct) {
     Sound.correct();
