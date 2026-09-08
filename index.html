@@ -462,35 +462,35 @@ const HERO_NAME = '꼬마 여우';
 
 const WORLDS = [
   {
-    id: 'forest', name: '도형의 숲', icon: '🌳', topic: '도형 찾기',
+    id: 'forest', name: '도형의 숲', icon: '🌳', topic: '도형과 각도',
     bg: 'forest',
     enemies:     ['🐿️',       '🦝',        '🐰',       '🦋',       '🐝',       '🦉'],
     enemyNames:  ['다람쥐 친구','너구리 친구','토끼 친구','나비 친구','꿀벌 친구','부엉이 어르신'],
     story: '도형의 숲에 사는 친구들이 도형 모양을 잊어버렸대요! 함께 떠올려서 도와줘요.'
   },
   {
-    id: 'castle', name: '구구단 성', icon: '🏰', topic: '곱셈 구구단',
+    id: 'castle', name: '곱셈 성', icon: '🏰', topic: '큰 수 곱셈',
     bg: 'castle',
     enemies:     ['🐱',           '🐶',         '🦄',          '🐴',       '🦓',         '🐲'],
-    enemyNames:  ['고양이 마법사','강아지 기사','유니콘 친구','말 기사','얼룩말 친구','구구단 용'],
+    enemyNames:  ['고양이 마법사','강아지 기사','유니콘 친구','말 기사','얼룩말 친구','곱셈 용'],
     story: '성에 사는 친구들이 곱셈 문제로 고민 중이에요. 함께 풀어주면 친구가 될 수 있어요!'
   },
   {
-    id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈',
+    id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈과 나머지',
     bg: 'cave',
     enemies:     ['🐹',         '🦔',           '🐢',          '🦇',       '🐭',       '🐻'],
     enemyNames:  ['햄스터 친구','고슴도치 친구','거북이 친구','박쥐 친구','생쥐 친구','곰 어르신'],
     story: '동굴 친구들이 모은 도토리를 똑같이 나누고 싶대요. 나눗셈으로 도와줘요!'
   },
   {
-    id: 'village', name: '덧셈 마을', icon: '🏘️', topic: '덧셈과 뺄셈',
+    id: 'village', name: '숫자 마을', icon: '🏘️', topic: '큰 수와 소수 계산',
     bg: 'village',
     enemies:     ['🐮',     '🐷',       '🐑',     '🐔',       '🐴',     '🦒'],
     enemyNames:  ['소 친구','돼지 친구','양 친구','닭 친구','말 친구','기린 이장님'],
     story: '마을에 큰 잔치가 열려요! 친구들이 음식 개수를 세는 걸 도와달래요.'
   },
   {
-    id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수 기초',
+    id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수의 덧셈과 뺄셈',
     bg: 'island',
     enemies:     ['🐠',          '🐬',          '🐙',       '🦀',     '🐚',       '🧜‍♀️'],
     enemyNames:  ['물고기 친구','돌고래 친구','문어 친구','게 친구','조개 친구','인어 공주'],
@@ -715,6 +715,35 @@ function genShape() {
     { q: '책의 표지 모양은?', visual: '📖', opts: ['원', '삼각형', '직사각형', '오각형'], a: 2, explain: '책의 표지는 가로와 세로 길이가 다른 직사각형이에요.' },
     { q: '시계 모양은 어떤 도형일까요?', visual: '🕒', opts: ['삼각형', '원', '사각형', '별'], a: 1, explain: '동그란 시계의 모양은 원이에요.' },
     { q: '교통 표지판 중 삼각형은?', visual: '⚠️', opts: ['주의 표지판', '주차 표지판', '횡단보도 표지판', '신호등'], a: 0, explain: '주의 표지판은 삼각형 모양으로 위험을 알려줘요.' },
+
+    // ===== 4학년: 각도 =====
+    { q: '90도인 각을 무엇이라고 할까요?', visual: '📐', opts: ['예각', '직각', '둔각', '평각'], a: 1, explain: '정확히 90°인 각을 직각이라고 해요. 책 모서리, 창문 모서리가 직각이에요.' },
+    { q: '0도보다 크고 90도보다 작은 각을 무엇이라고 할까요?', visual: '📐', opts: ['예각', '직각', '둔각', '평각'], a: 0, explain: '0° < 예각 < 90°. 뾰족한 각이 예각이에요.' },
+    { q: '90도보다 크고 180도보다 작은 각을 무엇이라고 할까요?', visual: '📐', opts: ['예각', '직각', '둔각', '평각'], a: 2, explain: '90° < 둔각 < 180°. 직각보다 벌어진 넓은 각이 둔각이에요.' },
+    { q: '180도인 각을 무엇이라고 할까요?', visual: '➖', opts: ['예각', '직각', '둔각', '평각'], a: 3, explain: '180°는 평각이에요. 두 반직선이 반대 방향으로 이어져 직선처럼 보여요.' },
+    { q: '삼각형 세 각의 합은?', visual: '🔺', opts: ['90°', '180°', '270°', '360°'], a: 1, explain: '어떤 삼각형이든 세 각을 모두 더하면 180°예요.' },
+    { q: '사각형 네 각의 합은?', visual: '⬜', opts: ['180°', '270°', '360°', '540°'], a: 2, explain: '사각형은 삼각형 2개로 나뉘므로 180° × 2 = 360°예요.' },
+    { q: '한 각이 100도인 삼각형의 나머지 두 각의 합은?', visual: '🔺', opts: ['60°', '80°', '90°', '180°'], a: 1, explain: '삼각형 세 각의 합은 180°. 180° - 100° = 80°가 나머지 두 각의 합이에요.' },
+
+    // ===== 4학년: 삼각형 분류 =====
+    { q: '세 변의 길이가 모두 같은 삼각형은?', visual: '🔺', opts: ['이등변삼각형', '정삼각형', '직각삼각형', '둔각삼각형'], a: 1, explain: '정삼각형은 세 변의 길이가 모두 같고, 세 각도 모두 60°로 같아요.' },
+    { q: '두 변의 길이가 같은 삼각형은?', visual: '🔺', opts: ['정삼각형', '이등변삼각형', '직각삼각형', '둔각삼각형'], a: 1, explain: '이등변삼각형은 두 변의 길이가 같고, 그 두 변에 딸린 두 각도 같아요.' },
+    { q: '한 각이 직각(90°)인 삼각형은?', visual: '📐', opts: ['예각삼각형', '직각삼각형', '둔각삼각형', '정삼각형'], a: 1, explain: '한 각이 90°인 삼각형을 직각삼각형이라고 해요.' },
+    { q: '세 각이 모두 예각(90°보다 작음)인 삼각형은?', visual: '🔺', opts: ['예각삼각형', '직각삼각형', '둔각삼각형', '평각삼각형'], a: 0, explain: '세 각이 모두 90°보다 작으면 예각삼각형이에요.' },
+    { q: '한 각이 둔각(90°보다 큼)인 삼각형은?', visual: '🔻', opts: ['예각삼각형', '직각삼각형', '둔각삼각형', '이등변삼각형'], a: 2, explain: '한 각이 90°보다 크면 둔각삼각형이에요. 나머지 두 각은 예각이 돼요.' },
+    { q: '정삼각형의 한 각의 크기는?', visual: '🔺', opts: ['30°', '45°', '60°', '90°'], a: 2, explain: '정삼각형은 세 각이 같은데, 세 각의 합이 180°이므로 180° ÷ 3 = 60°예요.' },
+
+    // ===== 4학년: 사각형 분류 =====
+    { q: '마주 보는 두 쌍의 변이 서로 평행한 사각형은?', visual: '▱', opts: ['사다리꼴', '평행사변형', '마름모', '직사각형'], a: 1, explain: '평행사변형은 마주 보는 두 쌍의 변이 각각 평행해요. 직사각형·정사각형·마름모도 모두 평행사변형이에요.' },
+    { q: '네 변의 길이가 모두 같은 사각형(정사각형 제외)은?', visual: '🔷', opts: ['평행사변형', '직사각형', '마름모', '사다리꼴'], a: 2, explain: '마름모는 네 변의 길이가 모두 같아요. 대각선이 서로 수직으로 만나요.' },
+    { q: '평행사변형의 마주 보는 두 각은?', visual: '▱', opts: ['서로 같다', '항상 90도', '합이 180도', '항상 다르다'], a: 0, explain: '평행사변형에서 마주 보는 두 각의 크기는 같아요.' },
+    { q: '평행사변형의 이웃한 두 각의 합은?', visual: '▱', opts: ['90°', '180°', '270°', '360°'], a: 1, explain: '평행사변형의 이웃한 두 각의 합은 항상 180°예요.' },
+    { q: '다음 중 항상 정사각형이라고 할 수 있는 것은?', visual: '⬜', opts: ['네 각이 같은 사각형', '네 변이 같은 사각형', '네 변과 네 각이 모두 같은 사각형', '마주 보는 변이 평행한 사각형'], a: 2, explain: '네 변의 길이가 모두 같고 네 각이 모두 직각인 사각형이 정사각형이에요.' },
+    { q: '사다리꼴의 조건은?', visual: '⏢', opts: ['마주 보는 한 쌍의 변이 평행', '네 변의 길이가 같다', '네 각이 직각', '대각선이 서로 수직'], a: 0, explain: '사다리꼴은 마주 보는 한 쌍(또는 그 이상)의 변이 평행한 사각형이에요.' },
+
+    // ===== 4학년: 다각형 =====
+    { q: '변이 8개인 다각형은?', visual: '🛑', opts: ['오각형', '육각형', '칠각형', '팔각형'], a: 3, explain: '팔각형(八角形)은 변과 꼭짓점이 각각 8개예요. 정지 표지판이 팔각형이에요.' },
+    { q: '변의 길이가 모두 같고 각의 크기도 모두 같은 다각형을?', visual: '⬢', opts: ['다각형', '정다각형', '평행사변형', '입체도형'], a: 1, explain: '변의 길이와 각의 크기가 모두 같은 다각형을 정다각형이라고 해요.' },
   ];
   return shapes[Math.floor(R() * shapes.length)];
 }
@@ -748,6 +777,42 @@ function genScience() {
     { q: '지구 주위를 도는 천체는?', visual: '🌙', opts: ['해', '별', '달', '구름'], a: 2, explain: '달이 지구 주위를 빙글빙글 돌아요. 지구는 태양 주위를 돌고요.' },
     { q: '우리가 사는 행성의 이름은?', visual: '🌍', opts: ['달', '태양', '지구', '화성'], a: 2, explain: '우리가 사는 곳은 지구예요. 태양계의 세 번째 행성이랍니다.' },
     { q: '낮에 하늘에서 빛나는 것은?', visual: '☀️', opts: ['달', '태양', '별', '구름'], a: 1, explain: '낮에는 태양이 하늘에서 환하게 빛나요. 우리에게 빛과 따뜻함을 줘요.' },
+
+    // ===== 4학년: 지층과 화석 =====
+    { q: '오랜 시간 동안 자갈·모래·진흙이 쌓여 만들어진 층은?', visual: '⛰️', opts: ['지층', '지진', '화산', '용암'], a: 0, explain: '지층은 자갈·모래·진흙이 오랜 시간 쌓이고 굳어져 만들어진 층이에요. 아래층이 더 오래된 층이에요.' },
+    { q: '옛날 생물의 몸이나 흔적이 돌 속에 남아있는 것을?', visual: '🦖', opts: ['보석', '화석', '광석', '조약돌'], a: 1, explain: '화석은 옛날에 살던 생물의 몸이나 발자국이 돌에 남아있는 거예요. 공룡 뼈가 대표적인 화석이에요.' },
+    { q: '화석으로 알 수 없는 것은?', visual: '🦴', opts: ['옛날 생물의 모양', '옛날 환경', '옛날 생물이 살던 시대', '오늘의 날씨'], a: 3, explain: '화석으로 옛날 생물의 모습·환경·시대는 알 수 있지만, 오늘의 날씨는 알 수 없어요.' },
+    { q: '지층은 어떤 순서로 만들어질까요?', visual: '📚', opts: ['위쪽부터', '아래쪽부터', '동시에', '오른쪽부터'], a: 1, explain: '지층은 아래층이 먼저 쌓이고 그 위에 계속 쌓여요. 그래서 아래층이 위층보다 더 오래된 층이에요.' },
+
+    // ===== 4학년: 화산과 지진 =====
+    { q: '땅속의 뜨거운 마그마가 밖으로 나오는 곳은?', visual: '🌋', opts: ['지진', '화산', '폭포', '동굴'], a: 1, explain: '화산은 땅속의 마그마가 지표 밖으로 나와 만들어지는 지형이에요.' },
+    { q: '화산이 폭발할 때 흘러나오는 뜨거운 액체는?', visual: '🌋', opts: ['용암', '얼음', '눈', '비'], a: 0, explain: '땅속에서는 "마그마", 땅 밖으로 나오면 "용암"이라고 불러요. 매우 뜨거워요!' },
+    { q: '땅이 흔들리는 자연 현상을?', visual: '🏚️', opts: ['화산', '지진', '태풍', '홍수'], a: 1, explain: '지진은 땅속의 힘이 갑자기 풀리면서 땅이 흔들리는 현상이에요.' },
+    { q: '지진이 일어났을 때 안전한 행동은?', visual: '⚠️', opts: ['뛰어서 도망가기', '책상 아래로 숨기', '창문 열기', '엘리베이터 타기'], a: 1, explain: '지진 중에는 튼튼한 책상 아래로 몸을 숨기고 머리를 보호해야 해요. 엘리베이터는 절대 이용하지 마세요.' },
+
+    // ===== 4학년: 혼합물의 분리 =====
+    { q: '서로 다른 물질이 섞여 있는 것을?', visual: '🥗', opts: ['순물질', '혼합물', '용액', '결정'], a: 1, explain: '두 가지 이상의 물질이 섞여 있는 것을 혼합물이라고 해요. 김밥, 팥빙수도 혼합물이에요.' },
+    { q: '자석으로 분리할 수 있는 혼합물은?', visual: '🧲', opts: ['소금과 물', '모래와 철가루', '설탕과 물', '기름과 물'], a: 1, explain: '자석은 철(쇠)에 붙는 성질이 있어요. 모래와 철가루를 섞은 뒤 자석을 대면 철가루만 쏙 붙어요.' },
+    { q: '소금물에서 소금을 얻으려면?', visual: '🧂', opts: ['얼려서', '물을 증발시켜서', '자석으로', '체로 걸러서'], a: 1, explain: '햇빛과 바람으로 물을 증발시키면 소금만 남아요. 이런 방법으로 바닷물에서 소금을 얻어요(염전).' },
+    { q: '콩과 좁쌀을 분리하는 가장 좋은 방법은?', visual: '🫘', opts: ['자석 사용', '체로 거르기', '물에 녹이기', '얼리기'], a: 1, explain: '알갱이 크기가 다른 혼합물은 알맞은 크기의 체로 걸러 분리해요.' },
+    { q: '물과 기름을 분리하는 방법은?', visual: '💧', opts: ['얼려서', '위에 뜬 기름을 걷어내기', '자석으로', '햇빛에 말리기'], a: 1, explain: '기름은 물보다 가벼워서 위에 떠요. 위쪽 기름을 걷어내거나 아래 물을 따라내서 분리해요.' },
+
+    // ===== 4학년: 그림자와 거울 =====
+    { q: '그림자가 생기려면 꼭 필요한 것은?', visual: '👤', opts: ['물', '빛', '바람', '온도'], a: 1, explain: '그림자는 빛이 물체에 막혀서 뒤에 어둡게 생기는 부분이에요. 빛이 없으면 그림자도 없어요.' },
+    { q: '빛이 나아가는 방향은?', visual: '💡', opts: ['곧게 나아감', '휘어져 나아감', '원을 그림', '아무 방향'], a: 0, explain: '빛은 곧게(직진) 나아가요. 그래서 그림자의 모양이 물체의 모양과 비슷해요.' },
+    { q: '거울에 비친 모습은 실제 모습과 어떻게 다를까요?', visual: '🪞', opts: ['똑같다', '위아래가 바뀐다', '왼쪽과 오른쪽이 바뀐다', '색깔이 바뀐다'], a: 2, explain: '거울에 비친 모습은 실제와 좌우가 반대로 보여요. 그래서 글자가 뒤집혀 보이는 거예요.' },
+    { q: '빛이 거울에 부딪혀 방향을 바꾸는 것을?', visual: '💡🪞', opts: ['굴절', '반사', '흡수', '증발'], a: 1, explain: '빛이 거울 같은 면에 부딪혀 튕겨 나가는 것을 반사라고 해요.' },
+
+    // ===== 4학년: 소리의 성질 =====
+    { q: '소리가 나는 물체의 공통점은?', visual: '🔔', opts: ['빛난다', '떨린다', '뜨겁다', '움직이지 않는다'], a: 1, explain: '소리가 나는 모든 물체는 떨리고 있어요. 이 떨림을 "진동"이라고 해요.' },
+    { q: '소리는 무엇을 통해 우리 귀에 전달될까요?', visual: '👂', opts: ['공기 등의 물질', '빛', '자석', '진공'], a: 0, explain: '소리는 공기·물·나무 같은 물질을 통해 전달돼요. 아무것도 없는 진공에서는 소리가 전달되지 않아요.' },
+    { q: '더 큰 소리를 내려면?', visual: '📢', opts: ['살짝 친다', '세게 친다', '가만히 둔다', '빛을 비춘다'], a: 1, explain: '물체를 세게 치면 크게 떨려서 큰 소리(큰 세기)가 나요.' },
+    { q: '높은 소리와 낮은 소리는 무엇이 다를까요?', visual: '🎵', opts: ['소리의 세기(크기)', '소리의 높낮이(진동수)', '소리의 색깔', '소리의 온도'], a: 1, explain: '높은 소리는 빠르게 떨리고, 낮은 소리는 천천히 떨려요. 이걸 소리의 높낮이라고 해요.' },
+
+    // ===== 4학년: 물체의 무게 =====
+    { q: '물체의 무게를 잴 때 쓰는 도구는?', visual: '⚖️', opts: ['자', '저울', '온도계', '시계'], a: 1, explain: '무게는 저울로 재요. 양팔저울, 용수철저울, 전자저울 등이 있어요.' },
+    { q: '용수철저울은 어떤 성질을 이용해 무게를 잴까요?', visual: '⚖️', opts: ['용수철이 늘어나는 성질', '자석의 성질', '물의 성질', '빛의 성질'], a: 0, explain: '용수철저울은 무거울수록 용수철이 더 많이 늘어나는 성질을 이용해 무게를 재요.' },
+    { q: '양팔저울로 물체의 무게를 비교하려면?', visual: '⚖️', opts: ['한쪽에만 올린다', '양쪽에 하나씩 올려 기울어진 쪽을 본다', '가운데에 올린다', '한 손으로 든다'], a: 1, explain: '양팔저울은 양쪽에 물건을 올려 기울어진 쪽이 더 무거운 것을 알려줘요.' },
   ];
   return questions[Math.floor(R() * questions.length)];
 }
@@ -810,39 +875,189 @@ function genKorean() {
     // 띄어쓰기
     { q: '올바르게 띄어 쓴 것은?', visual: '✍️', opts: ['학교에간다', '학교에 간다', '학 교에 간 다', '학교에간 다'], a: 1, explain: '낱말과 낱말 사이는 띄어 써요. "학교에"와 "간다"는 따로 띄어 써야 해요.' },
     { q: '올바르게 띄어 쓴 것은?', visual: '✍️', opts: ['나는밥을먹는다', '나는 밥을 먹는다', '나는밥을 먹는다', '나 는 밥 을 먹 는 다'], a: 1, explain: '"나는", "밥을", "먹는다" 세 부분으로 띄어 써요. 한 낱말 안은 붙여 쓰고요.' },
+
+    // ===== 4학년: 관용어 =====
+    { q: '"발이 넓다"의 뜻은?', visual: '👥', opts: ['발 크기가 크다', '아는 사람이 많다', '멀리 걸을 수 있다', '신발이 크다'], a: 1, explain: '"발이 넓다"는 아는 사람이 많고 사귀는 사람이 많다는 뜻의 관용어예요.' },
+    { q: '"손이 크다"의 뜻은?', visual: '🤲', opts: ['손이 크다', '음식을 많이 만들어 준다', '힘이 세다', '요리를 잘한다'], a: 1, explain: '"손이 크다"는 씀씀이가 넉넉해 음식이나 물건을 많이 준비한다는 뜻이에요.' },
+    { q: '"입이 무겁다"의 뜻은?', visual: '🤐', opts: ['말이 느리다', '비밀을 잘 지킨다', '많이 먹는다', '잘 웃지 않는다'], a: 1, explain: '"입이 무겁다"는 함부로 말하지 않고 비밀을 잘 지키는 사람을 뜻해요.' },
+    { q: '"눈이 높다"의 뜻은?', visual: '👀', opts: ['키가 크다', '고르는 기준이 까다롭다', '멀리 본다', '눈물이 많다'], a: 1, explain: '"눈이 높다"는 어떤 것을 고를 때 기준이 까다롭거나 수준이 높다는 뜻이에요.' },
+    { q: '"귀가 얇다"의 뜻은?', visual: '👂', opts: ['귀 크기가 작다', '남의 말을 잘 믿는다', '잘 듣는다', '소리에 예민하다'], a: 1, explain: '"귀가 얇다"는 남의 말에 쉽게 흔들리고 잘 믿어버린다는 뜻이에요.' },
+
+    // ===== 4학년: 이어주는 말(접속어) =====
+    { q: '"비가 왔다. ___ 소풍이 취소되었다." 빈칸에 알맞은 이어주는 말은?', visual: '🌧️', opts: ['그리고', '그래서', '하지만', '왜냐하면'], a: 1, explain: '"그래서"는 앞의 일이 원인이 되어 뒤의 일이 일어났을 때 써요. 비가 원인 → 취소가 결과.' },
+    { q: '"연필이 필요해요. ___ 지우개도 사고 싶어요." 빈칸에 알맞은 말은?', visual: '✏️', opts: ['그러나', '그리고', '그래서', '하지만'], a: 1, explain: '앞뒤 내용을 나란히 이어줄 때는 "그리고"를 써요.' },
+    { q: '"공부를 열심히 했다. ___ 시험 결과는 좋지 않았다." 빈칸에는?', visual: '📝', opts: ['그래서', '그리고', '하지만', '왜냐하면'], a: 2, explain: '"하지만"은 앞뒤 내용이 반대일 때 써요. 열심히 했지만 결과가 안 좋았다는 반대 상황이에요.' },
+    { q: '이유를 나타낼 때 쓰는 이어주는 말은?', visual: '❓', opts: ['그리고', '왜냐하면', '그러나', '그런데'], a: 1, explain: '"왜냐하면 ~ 때문이다"는 뒤에 이유를 설명할 때 쓰는 말이에요.' },
+
+    // ===== 4학년: 문장의 짜임 =====
+    { q: '"누가/무엇이"에 해당하는 문장 성분은?', visual: '📝', opts: ['서술어', '주어', '목적어', '보어'], a: 1, explain: '주어는 문장에서 동작이나 상태의 주인공을 나타내요. "새가 난다"에서 "새가"가 주어예요.' },
+    { q: '"어찌하다/어떠하다"에 해당하는 문장 성분은?', visual: '📝', opts: ['주어', '목적어', '서술어', '관형어'], a: 2, explain: '서술어는 주어의 동작이나 상태를 나타내요. "새가 난다"에서 "난다"가 서술어예요.' },
+    { q: '"동생이 밥을 먹는다."에서 "밥을"의 문장 성분은?', visual: '🍚', opts: ['주어', '서술어', '목적어', '수식어'], a: 2, explain: '목적어는 서술어의 대상이 되는 말이에요. "무엇을"에 해당하며 주로 "을/를"이 붙어요.' },
+    { q: '"예쁜 꽃이 활짝 피었다."에서 서술어는?', visual: '🌸', opts: ['예쁜', '꽃이', '활짝', '피었다'], a: 3, explain: '서술어는 "어떠하다/어찌하다"에 해당하는 말로, 이 문장에서는 "피었다"예요.' },
+
+    // ===== 4학년: 낱말의 종류 =====
+    { q: '사람이나 물건의 이름을 나타내는 낱말은?', visual: '📚', opts: ['동사', '형용사', '명사', '부사'], a: 2, explain: '명사는 사람·동물·물건 등의 이름을 나타내는 낱말이에요. "책, 강아지, 학교" 같은 말이에요.' },
+    { q: '움직임을 나타내는 낱말은?', visual: '🏃', opts: ['명사', '동사', '형용사', '조사'], a: 1, explain: '동사는 "달리다, 먹다, 쓰다"처럼 움직임을 나타내는 낱말이에요.' },
+    { q: '모양이나 성질을 나타내는 낱말은?', visual: '🌈', opts: ['명사', '동사', '형용사', '감탄사'], a: 2, explain: '형용사는 "예쁘다, 크다, 빠르다"처럼 모양이나 성질을 나타내는 낱말이에요.' },
+
+    // ===== 4학년: 높임말 =====
+    { q: '"밥"의 높임말은?', visual: '🍚', opts: ['진지', '식사', '음식', '반찬'], a: 0, explain: '어른께 드릴 때는 "밥" 대신 "진지"라고 해요. "진지 드세요"처럼 써요.' },
+    { q: '"자다"의 높임말은?', visual: '😴', opts: ['자시다', '주무시다', '주무다', '자다'], a: 1, explain: '어른께는 "잠자다" 대신 "주무시다"라고 해요.' },
+    { q: '"있다"의 높임말은?', visual: '🙋', opts: ['있으시다', '계시다', '있다', '있어라'], a: 1, explain: '사람에 대해 어른께 말할 때는 "있다" 대신 "계시다"를 써요. "어머니께서 방에 계세요".' },
+    { q: '어른께 사용하는 알맞은 표현은?', visual: '🙇', opts: ['밥 먹었어요?', '진지 잡수셨어요?', '밥 먹었니?', '먹었니?'], a: 1, explain: '어른께는 "밥→진지", "먹다→잡수시다/드시다"처럼 높임말을 써요.' },
+    { q: '"우리 할머니께서 오셨다."에서 "께서"의 역할은?', visual: '👵', opts: ['목적어를 만든다', '주어를 높인다', '서술어를 높인다', '문장을 잇는다'], a: 1, explain: '"께서"는 "이/가" 대신 주어를 높일 때 써요. 문장의 주인공(주어)이 높임의 대상일 때 쓴답니다.' },
+
+    // ===== 4학년: 국어 지식 =====
+    { q: '한글을 만든 사람은?', visual: '📜', opts: ['이순신', '세종대왕', '이황', '정약용'], a: 1, explain: '한글은 1443년 조선 4대 임금 세종대왕이 만들고 1446년에 반포한 우리 글자예요.' },
+    { q: '한글을 반포한 날을 기념하는 날은?', visual: '📅', opts: ['어린이날', '한글날', '개천절', '광복절'], a: 1, explain: '10월 9일은 한글날이에요. 세종대왕이 훈민정음을 세상에 알린 것을 기념하는 날이에요.' },
+    { q: '"바다"와 같이 우리말에만 있는 낱말을 무엇이라고 할까요?', visual: '🌊', opts: ['한자어', '외래어', '순우리말', '외국어'], a: 2, explain: '"바다·하늘·꽃"처럼 오래 전부터 우리말로 써 온 낱말을 순우리말(고유어)이라고 해요.' },
+    { q: '"컴퓨터, 버스" 같이 다른 나라에서 들어와 우리말처럼 쓰는 낱말은?', visual: '🚌', opts: ['순우리말', '한자어', '외래어', '표준어'], a: 2, explain: '외래어는 다른 나라 말이 우리말처럼 자리 잡은 낱말이에요. 컴퓨터·버스·라디오 등이에요.' },
   ];
   return questions[Math.floor(R() * questions.length)];
 }
 
 function genMultiply(diff) {
-  // 작은 단(2~5) → 큰 단(6~9)으로 난이도 증가
-  const minTable = diff <= 4 ? 2 : 5;
-  const maxTable = diff <= 4 ? 5 : 9;
-  const a = randInt(minTable, maxTable);
-  const b = randInt(2, 9);
+  // 4학년 큰 수 곱셈
+  // diff 1~2: 두 자리 × 한 자리 (예: 34 × 6)
+  // diff 3~5: 세 자리 × 한 자리 (예: 234 × 7)
+  // diff 6~8: 두 자리 × 두 자리 (예: 27 × 34) 또는 세 자리 × 두 자리(보스)
+  let a, b, explain;
+  if (diff <= 2) {
+    a = randInt(12, 99);
+    b = randInt(3, 9);
+    explain = `${a} × ${b}은(는) ${a}을(를) ${b}번 더한 값이에요.\n일의 자리부터 계산: ${a % 10} × ${b} = ${(a%10)*b}, 십의 자리 ${Math.floor(a/10)} × ${b} = ${Math.floor(a/10)*b} → ${a} × ${b} = ${a*b}`;
+  } else if (diff <= 5) {
+    a = randInt(102, 999);
+    b = randInt(3, 9);
+    explain = `세 자리 수 × 한 자리 수는 일·십·백의 자리를 각각 곱해서 더해요.\n${a} × ${b} = ${a*b}`;
+  } else if (diff <= 7) {
+    a = randInt(12, 99);
+    b = randInt(12, 99);
+    const bOnes = b % 10;
+    const bTens = Math.floor(b / 10);
+    explain = `두 자리 × 두 자리: 일의 자리와 십의 자리를 각각 곱해서 더해요.\n${a} × ${bOnes} = ${a*bOnes}\n${a} × ${bTens}0 = ${a*bTens*10}\n합: ${a*bOnes} + ${a*bTens*10} = ${a*b}`;
+  } else {
+    // 보스: 세 자리 × 두 자리
+    a = randInt(102, 500);
+    b = randInt(12, 50);
+    explain = `세 자리 × 두 자리는 아래에서 위로 자리별로 곱하고 각 결과를 더해줘요.\n${a} × ${b} = ${a*b}`;
+  }
   const ans = a * b;
-  const explain = `${a} × ${b}은(는) ${a}을(를) ${b}번 더한 값이에요.\n${Array(b).fill(a).join(' + ')} = ${ans}`;
   return makeNumberQuestion(`${a} × ${b} = ?`, ans, '✖️', explain);
 }
 
 function genDivide(diff) {
-  // 나누어떨어지는 문제만
-  const divisor = randInt(2, diff <= 4 ? 5 : 9);
-  const quotient = randInt(2, diff <= 4 ? 5 : 9);
-  const dividend = divisor * quotient;
-  const explain = `${dividend}을(를) ${divisor}묶음으로 똑같이 나누면 한 묶음에 ${quotient}씩이에요.\n곱셈으로 확인: ${divisor} × ${quotient} = ${dividend}`;
-  return makeNumberQuestion(`${dividend} ÷ ${divisor} = ?`, quotient, '➗', explain);
+  // 4학년 나눗셈: 나머지 있는 나눗셈 포함
+  // diff 1~2: 두 자리 ÷ 한 자리 (나머지 있는)
+  // diff 3~5: 세 자리 ÷ 한 자리 (몫 구하기)
+  // diff 6~8: 두 자리 ÷ 두 자리, 세 자리 ÷ 두 자리(보스)
+  let dividend, divisor, quotient, remainder, ansType, ans, qText, explain;
+  if (diff <= 2) {
+    divisor = randInt(3, 9);
+    quotient = randInt(4, 12);
+    remainder = randInt(1, divisor - 1);
+    dividend = divisor * quotient + remainder;
+    // 몫 or 나머지 중 하나를 묻기
+    if (R() < 0.5) {
+      ansType = 'quotient';
+      ans = quotient;
+      qText = `${dividend} ÷ ${divisor}의 몫은?`;
+    } else {
+      ansType = 'remainder';
+      ans = remainder;
+      qText = `${dividend} ÷ ${divisor}의 나머지는?`;
+    }
+    explain = `${dividend}을(를) ${divisor}씩 묶으면 ${quotient}묶음이 되고 ${remainder}이 남아요.\n곱셈으로 확인: ${divisor} × ${quotient} = ${divisor*quotient}, ${divisor*quotient} + ${remainder} = ${dividend}\n→ 몫: ${quotient}, 나머지: ${remainder}`;
+  } else if (diff <= 5) {
+    divisor = randInt(3, 9);
+    quotient = randInt(20, 99);
+    // 30%는 나머지 있게, 70%는 딱 떨어지게
+    remainder = R() < 0.3 ? randInt(1, divisor - 1) : 0;
+    dividend = divisor * quotient + remainder;
+    if (remainder === 0) {
+      ansType = 'quotient';
+      ans = quotient;
+      qText = `${dividend} ÷ ${divisor} = ?`;
+      explain = `세 자리 ÷ 한 자리: 백의 자리부터 차례로 나누고 남는 것은 아래 자리로 내려요.\n${dividend} ÷ ${divisor} = ${quotient}`;
+    } else {
+      ansType = 'quotient';
+      ans = quotient;
+      qText = `${dividend} ÷ ${divisor}의 몫은? (나머지 ${remainder})`;
+      explain = `${dividend} ÷ ${divisor}은(는) 몫 ${quotient}, 나머지 ${remainder}이에요.\n확인: ${divisor} × ${quotient} + ${remainder} = ${dividend}`;
+    }
+  } else if (diff <= 7) {
+    // 두 자리 ÷ 두 자리
+    divisor = randInt(11, 30);
+    quotient = randInt(2, 8);
+    remainder = R() < 0.4 ? randInt(1, divisor - 1) : 0;
+    dividend = divisor * quotient + remainder;
+    ansType = 'quotient';
+    ans = quotient;
+    qText = remainder === 0
+      ? `${dividend} ÷ ${divisor} = ?`
+      : `${dividend} ÷ ${divisor}의 몫은? (나머지 ${remainder})`;
+    explain = `두 자리로 나눌 때는 나눠지는 수가 나누는 수보다 큰지 확인하며 몫을 어림해봐요.\n${dividend} ÷ ${divisor}: 몫 ${quotient}${remainder ? `, 나머지 ${remainder}` : ''}\n확인: ${divisor} × ${quotient}${remainder ? ` + ${remainder}` : ''} = ${dividend}`;
+  } else {
+    // 보스: 세 자리 ÷ 두 자리
+    divisor = randInt(12, 40);
+    quotient = randInt(6, 30);
+    remainder = R() < 0.5 ? randInt(1, divisor - 1) : 0;
+    dividend = divisor * quotient + remainder;
+    ansType = 'quotient';
+    ans = quotient;
+    qText = remainder === 0
+      ? `${dividend} ÷ ${divisor} = ?`
+      : `${dividend} ÷ ${divisor}의 몫은? (나머지 ${remainder})`;
+    explain = `세 자리 ÷ 두 자리: 앞의 두세 자리를 보고 몫을 어림한 후 곱해서 빼요.\n${dividend} ÷ ${divisor}: 몫 ${quotient}${remainder ? `, 나머지 ${remainder}` : ''}\n확인: ${divisor} × ${quotient}${remainder ? ` + ${remainder}` : ''} = ${dividend}`;
+  }
+  return makeNumberQuestion(qText, ans, '➗', explain);
 }
 
 function genAddSub(diff) {
+  // 4학년: 큰 수(네 자리~만 단위) + 소수(0.1, 0.01 자리)
+  // 30% 확률로 소수 문제, 나머지는 큰 수 정수 문제
+  const useDecimal = R() < 0.35;
   const op = R() < 0.5 ? '+' : '-';
+
+  if (useDecimal) {
+    // 소수 덧셈/뺄셈 (4학년: 소수점 아래 한 자리 또는 두 자리)
+    const dp = diff <= 4 ? 1 : 2; // 소수점 아래 자릿수
+    const mult = Math.pow(10, dp);
+    let a = randInt(15, diff <= 4 ? 90 : 900);
+    let b = randInt(10, diff <= 4 ? 90 : 500);
+    // 소수로 변환
+    const aFloat = (a / mult).toFixed(dp);
+    const bFloat = (b / mult).toFixed(dp);
+    let ansInt;
+    if (op === '+') { ansInt = a + b; }
+    else {
+      if (b > a) [a, b] = [b, a];
+      const aF2 = (a / mult).toFixed(dp);
+      const bF2 = (b / mult).toFixed(dp);
+      ansInt = a - b;
+      const ansFloat = (ansInt / mult).toFixed(dp);
+      const explain = `소수의 뺄셈은 소수점 위치를 맞추고 자연수처럼 계산해요.\n${aF2} - ${bF2} = ${ansFloat}`;
+      return makeDecimalQuestion(`${aF2} - ${bF2} = ?`, ansFloat, '➖', explain, dp);
+    }
+    const ansFloat = (ansInt / mult).toFixed(dp);
+    const explain = `소수의 덧셈은 소수점 위치를 맞추고 자연수처럼 계산해요.\n${aFloat} + ${bFloat} = ${ansFloat}`;
+    return makeDecimalQuestion(`${aFloat} + ${bFloat} = ?`, ansFloat, '➕', explain, dp);
+  }
+
+  // 큰 수 정수 덧셈/뺄셈
   let a, b, ans;
-  if (diff <= 4) {
-    a = randInt(20, 99);
-    b = randInt(10, 99);
+  if (diff <= 2) {
+    // 세 자리 수
+    a = randInt(200, 999);
+    b = randInt(100, 500);
+  } else if (diff <= 5) {
+    // 네 자리 수
+    a = randInt(2000, 9999);
+    b = randInt(1000, 5000);
   } else {
-    a = randInt(100, 800);
-    b = randInt(50, 200);
+    // 다섯 자리 수 (만 단위)
+    a = randInt(15000, 90000);
+    b = randInt(5000, 40000);
   }
   if (op === '+') { ans = a + b; }
   else {
@@ -850,9 +1065,28 @@ function genAddSub(diff) {
     ans = a - b;
   }
   const explain = op === '+'
-    ? `일의 자리부터 차근차근 더해보세요.\n${a} + ${b} = ${ans}`
-    : `일의 자리부터 차근차근 빼보세요. 모자라면 윗자리에서 빌려와요.\n${a} - ${b} = ${ans}`;
-  return makeNumberQuestion(`${a} ${op} ${b} = ?`, ans, op === '+' ? '➕' : '➖', explain);
+    ? `자릿값을 맞춰 오른쪽(일의 자리)부터 더해요. 10이 넘으면 윗자리로 올림!\n${a.toLocaleString()} + ${b.toLocaleString()} = ${ans.toLocaleString()}`
+    : `자릿값을 맞춰 오른쪽부터 빼요. 부족하면 윗자리에서 10을 빌려와요.\n${a.toLocaleString()} - ${b.toLocaleString()} = ${ans.toLocaleString()}`;
+  return makeNumberQuestion(`${a.toLocaleString()} ${op} ${b.toLocaleString()} = ?`, ans, op === '+' ? '➕' : '➖', explain);
+}
+
+function makeDecimalQuestion(q, ans, visual, explain, dp) {
+  // ans는 문자열 소수 (예: "3.14")
+  const ansNum = parseFloat(ans);
+  const mult = Math.pow(10, dp);
+  const wrongs = new Set();
+  let tries = 0;
+  while (wrongs.size < 3 && tries < 40) {
+    // 소수 자릿수 유지하며 오답 생성
+    const delta = randInt(-15, 15);
+    const wInt = Math.round(ansNum * mult) + delta;
+    if (wInt >= 0 && wInt !== Math.round(ansNum * mult)) {
+      wrongs.add((wInt / mult).toFixed(dp));
+    }
+    tries++;
+  }
+  const opts = shuffleArr([ans, ...wrongs]);
+  return { q, visual, opts, a: opts.indexOf(ans), explain };
 }
 
 function svgBar(numer, denom, color) {
@@ -886,8 +1120,8 @@ function svgCompareBars(label1, n1, d1, label2, n2, d2, color) {
 }
 
 function genFraction(diff) {
-  // 그림 기반 분수
-  const denom = randInt(2, diff <= 4 ? 4 : 8);
+  // 4학년 분수 계산: 같은 분모 덧뺄셈, 진분수/가분수/대분수 개념
+  const denom = randInt(3, diff <= 4 ? 6 : 10);
   const numer = randInt(1, denom - 1);
   const types = [
     // 1. 색칠된 부분 분수로 나타내기
@@ -967,6 +1201,82 @@ function genFraction(diff) {
         opts,
         a: opts.indexOf(correct),
         explain: `${denom}조각에서 ${numer}조각을 먹었으니 ${denom} - ${numer} = ${left}조각이 남았어요.\n남은 양을 분수로 쓰면 ${left}/${denom}이에요. (그림에서 흰 부분의 개수)`
+      };
+    },
+    // 6. [4학년] 같은 분모 분수 덧셈
+    () => {
+      const d = randInt(4, 9);
+      const n1 = randInt(1, d - 2);
+      const n2 = randInt(1, d - n1);
+      const sum = n1 + n2;
+      const correct = sum === d ? `1` : (sum > d ? `${sum}/${d}` : `${sum}/${d}`);
+      const opts = shuffleArr([correct,
+        `${sum}/${d + d}`,
+        `${n1 * n2}/${d}`,
+        `${sum + 1}/${d}`
+      ]);
+      return {
+        q: `${n1}/${d} + ${n2}/${d} = ?`,
+        visual: svgCompareBars(`${n1}/${d}`, n1, d, `${n2}/${d}`, n2, d, '#ff8c42'),
+        opts,
+        a: opts.indexOf(correct),
+        explain: `분모가 같은 분수의 덧셈은 분모는 그대로, 분자끼리만 더해요.\n${n1}/${d} + ${n2}/${d} = (${n1}+${n2})/${d} = ${sum}/${d}${sum === d ? ' = 1' : ''}`
+      };
+    },
+    // 7. [4학년] 같은 분모 분수 뺄셈
+    () => {
+      const d = randInt(4, 9);
+      const n1 = randInt(2, d - 1);
+      const n2 = randInt(1, n1 - 1);
+      const diffN = n1 - n2;
+      const correct = `${diffN}/${d}`;
+      const opts = shuffleArr([correct,
+        `${n1 + n2}/${d}`,
+        `${diffN}/${d + d}`,
+        `${d - diffN}/${d}`
+      ]);
+      return {
+        q: `${n1}/${d} - ${n2}/${d} = ?`,
+        visual: svgBar(diffN, d, '#5bc0eb'),
+        opts,
+        a: opts.indexOf(correct),
+        explain: `분모가 같은 분수의 뺄셈은 분모는 그대로, 분자끼리만 빼요.\n${n1}/${d} - ${n2}/${d} = (${n1}-${n2})/${d} = ${diffN}/${d}`
+      };
+    },
+    // 8. [4학년] 진분수/가분수 구별
+    () => {
+      const d = randInt(3, 7);
+      // 진분수, 가분수 중 하나
+      const isProper = R() < 0.5;
+      const n = isProper ? randInt(1, d - 1) : randInt(d, d + 4);
+      const type = isProper ? '진분수' : '가분수';
+      const opts = shuffleArr(['진분수', '가분수', '대분수', '자연수']);
+      return {
+        q: `${n}/${d}은(는) 어떤 분수일까요?`,
+        visual: `<div style="font-size:48px;font-weight:bold;color:#5b2a86;margin:10px">${n}/${d}</div>`,
+        opts,
+        a: opts.indexOf(type),
+        explain: `분자(${n})가 분모(${d})보다 ${isProper ? '작으면 진분수' : '크거나 같으면 가분수'}예요.\n${n}/${d}: 분자 ${n} ${n < d ? '<' : (n === d ? '=' : '>')} 분모 ${d} → ${type}${!isProper ? ' (1보다 크거나 같아요)' : ' (1보다 작아요)'}`
+      };
+    },
+    // 9. [4학년] 대분수를 가분수로 바꾸기
+    () => {
+      const whole = randInt(1, 4);
+      const d = randInt(3, 7);
+      const n = randInt(1, d - 1);
+      const impN = whole * d + n;
+      const correct = `${impN}/${d}`;
+      const opts = shuffleArr([correct,
+        `${whole + n}/${d}`,
+        `${whole * n}/${d}`,
+        `${impN}/${d + 1}`
+      ]);
+      return {
+        q: `대분수 ${whole}과(와) ${n}/${d}을(를) 가분수로 나타내면?`,
+        visual: `<div style="font-size:36px;font-weight:bold;color:#5b2a86;margin:10px">${whole} <span style="font-size:24px">${n}/${d}</span></div>`,
+        opts,
+        a: opts.indexOf(correct),
+        explain: `대분수를 가분수로: (자연수 × 분모 + 분자) / 분모\n${whole} × ${d} + ${n} = ${impN}\n답: ${impN}/${d}`
       };
     }
   ];
