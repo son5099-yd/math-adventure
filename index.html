@@ -1031,35 +1031,35 @@ const HERO_NAME = '꼬마 여우';
 
 const WORLDS = [
   {
-    id: 'forest', name: '도형의 숲', icon: '🌳', topic: '도형 찾기',
+    id: 'forest', name: '도형의 숲', icon: '🌳', topic: '각도와 도형',
     bg: 'forest',
     enemies:     ['🐿️',       '🦝',        '🐰',       '🦋',       '🐝',       '🦉'],
     enemyNames:  ['다람쥐 친구','너구리 친구','토끼 친구','나비 친구','꿀벌 친구','부엉이 어르신'],
     story: '도형의 숲에 사는 친구들이 도형 모양을 잊어버렸대요! 함께 떠올려서 도와줘요.'
   },
   {
-    id: 'castle', name: '구구단 성', icon: '🏰', topic: '곱셈 구구단',
+    id: 'castle', name: '곱셈 성', icon: '🏰', topic: '큰 수 곱셈',
     bg: 'castle',
     enemies:     ['🐱',           '🐶',         '🦄',          '🐴',       '🦓',         '🐲'],
-    enemyNames:  ['고양이 마법사','강아지 기사','유니콘 친구','말 기사','얼룩말 친구','구구단 용'],
+    enemyNames:  ['고양이 마법사','강아지 기사','유니콘 친구','말 기사','얼룩말 친구','곱셈 용'],
     story: '성에 사는 친구들이 곱셈 문제로 고민 중이에요. 함께 풀어주면 친구가 될 수 있어요!'
   },
   {
-    id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈',
+    id: 'cave', name: '나눗셈 동굴', icon: '🕳️', topic: '나눗셈과 나머지',
     bg: 'cave',
     enemies:     ['🐹',         '🦔',           '🐢',          '🦇',       '🐭',       '🐻'],
     enemyNames:  ['햄스터 친구','고슴도치 친구','거북이 친구','박쥐 친구','생쥐 친구','곰 어르신'],
     story: '동굴 친구들이 모은 도토리를 똑같이 나누고 싶대요. 나눗셈으로 도와줘요!'
   },
   {
-    id: 'village', name: '덧셈 마을', icon: '🏘️', topic: '덧셈과 뺄셈',
+    id: 'village', name: '숫자 마을', icon: '🏘️', topic: '큰 수·소수·규칙',
     bg: 'village',
     enemies:     ['🐮',     '🐷',       '🐑',     '🐔',       '🐴',     '🦒'],
     enemyNames:  ['소 친구','돼지 친구','양 친구','닭 친구','말 친구','기린 이장님'],
     story: '마을에 큰 잔치가 열려요! 친구들이 음식 개수를 세는 걸 도와달래요.'
   },
   {
-    id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수 기초',
+    id: 'island', name: '분수 섬', icon: '🏝️', topic: '분수의 덧셈과 뺄셈',
     bg: 'island',
     enemies:     ['🐠',          '🐬',          '🐙',       '🦀',     '🐚',       '🧜‍♀️'],
     enemyNames:  ['물고기 친구','돌고래 친구','문어 친구','게 친구','조개 친구','인어 공주'],
@@ -1861,6 +1861,45 @@ function genShape() {
     { q: '책의 표지 모양은?', visual: '📖', opts: ['원', '삼각형', '직사각형', '오각형'], a: 2, explain: '책의 표지는 가로와 세로 길이가 다른 직사각형이에요.' },
     { q: '시계 모양은 어떤 도형일까요?', visual: '🕒', opts: ['삼각형', '원', '사각형', '별'], a: 1, explain: '동그란 시계의 모양은 원이에요.' },
     { q: '교통 표지판 중 삼각형은?', visual: '⚠️', opts: ['주의 표지판', '주차 표지판', '횡단보도 표지판', '신호등'], a: 0, explain: '주의 표지판은 삼각형 모양으로 위험을 알려줘요.' },
+
+    // ===== 4학년 [각도] =====
+    { q: '90도인 각을 무엇이라고 할까요?', visual: '📐', opts: ['예각', '직각', '둔각', '평각'], a: 1, explain: '정확히 90°인 각을 직각이라고 해요. 책 모서리, 창문 모서리가 직각이에요.' },
+    { q: '0도보다 크고 90도보다 작은 각은?', visual: '📐', opts: ['예각', '직각', '둔각', '평각'], a: 0, explain: '0° < 예각 < 90°. 직각보다 작은 뾰족한 각이 예각이에요.' },
+    { q: '90도보다 크고 180도보다 작은 각은?', visual: '📐', opts: ['예각', '직각', '둔각', '평각'], a: 2, explain: '90° < 둔각 < 180°. 직각보다 더 벌어진 각이 둔각이에요.' },
+    { q: '180도인 각을 무엇이라고 할까요?', visual: '➖', opts: ['예각', '직각', '둔각', '평각'], a: 3, explain: '180°는 평각이에요. 두 반직선이 반대 방향으로 이어져 직선처럼 보여요.' },
+    { q: '각의 크기를 재는 도구는?', visual: '📐', opts: ['자', '각도기', '컴퍼스', '삼각자'], a: 1, explain: '각도기(분도기)로 각의 크기를 재요. 각의 꼭짓점을 각도기 중심에 맞추고 읽어요.' },
+    { q: '삼각형 세 각의 크기의 합은?', visual: '🔺', opts: ['90°', '180°', '270°', '360°'], a: 1, explain: '어떤 삼각형이든 세 각을 모두 더하면 항상 180°예요.' },
+    { q: '사각형 네 각의 크기의 합은?', visual: '⬜', opts: ['180°', '270°', '360°', '540°'], a: 2, explain: '사각형은 삼각형 2개로 나눌 수 있어서 180° × 2 = 360°예요.' },
+    { q: '한 각이 100도인 삼각형에서 나머지 두 각의 합은?', visual: '🔺', opts: ['60°', '80°', '90°', '100°'], a: 1, explain: '세 각의 합이 180°이므로 180° - 100° = 80°가 나머지 두 각의 합이에요.' },
+
+    // ===== 4학년 [삼각형 분류] =====
+    { q: '세 변의 길이가 모두 같은 삼각형은?', visual: '🔺', opts: ['이등변삼각형', '정삼각형', '직각삼각형', '둔각삼각형'], a: 1, explain: '정삼각형은 세 변의 길이가 같고 세 각도 모두 60°로 같아요.' },
+    { q: '두 변의 길이가 같은 삼각형은?', visual: '🔺', opts: ['정삼각형', '이등변삼각형', '직각삼각형', '예각삼각형'], a: 1, explain: '이등변삼각형은 두 변의 길이가 같고, 그 두 변에 딸린 두 각의 크기도 같아요.' },
+    { q: '한 각이 직각인 삼각형은?', visual: '📐', opts: ['예각삼각형', '직각삼각형', '둔각삼각형', '정삼각형'], a: 1, explain: '한 각이 90°인 삼각형을 직각삼각형이라고 해요.' },
+    { q: '세 각이 모두 예각인 삼각형은?', visual: '🔺', opts: ['예각삼각형', '직각삼각형', '둔각삼각형', '평각삼각형'], a: 0, explain: '세 각이 모두 90°보다 작으면 예각삼각형이에요.' },
+    { q: '정삼각형의 한 각의 크기는?', visual: '🔺', opts: ['30°', '45°', '60°', '90°'], a: 2, explain: '정삼각형은 세 각이 같고 합이 180°이므로 180° ÷ 3 = 60°예요.' },
+
+    // ===== 4학년 [사각형: 수직과 평행] =====
+    { q: '두 직선이 만나서 이루는 각이 직각일 때, 두 직선의 관계는?', visual: '➕', opts: ['평행', '수직', '교차', '대칭'], a: 1, explain: '두 직선이 만나 이루는 각이 90°일 때 "서로 수직"이라고 하고, 한 직선을 다른 직선의 수선이라고 해요.' },
+    { q: '한 직선에 수직인 두 직선은 서로 어떤 관계일까요?', visual: '🚂', opts: ['수직이다', '평행하다', '만난다', '기울어진다'], a: 1, explain: '같은 직선에 수직인 두 직선은 아무리 늘여도 만나지 않아요. 이런 관계를 평행이라고 해요.' },
+    { q: '평행한 두 직선 사이의 거리를 무엇이라고 할까요?', visual: '📏', opts: ['평행선 사이의 거리', '수선의 발', '대각선', '둘레'], a: 0, explain: '평행선 사이에 수직으로 그은 선분의 길이를 평행선 사이의 거리라고 해요. 어디서 재도 같아요.' },
+    { q: '마주 보는 두 쌍의 변이 서로 평행한 사각형은?', visual: '▱', opts: ['사다리꼴', '평행사변형', '마름모', '직사각형'], a: 1, explain: '평행사변형은 마주 보는 두 쌍의 변이 각각 평행한 사각형이에요.' },
+    { q: '평행한 변이 한 쌍이라도 있는 사각형은?', visual: '⏢', opts: ['사다리꼴', '마름모', '정사각형', '오각형'], a: 0, explain: '사다리꼴은 평행한 변이 한 쌍이라도 있는 사각형이에요. 평행사변형도 사다리꼴에 포함돼요.' },
+    { q: '네 변의 길이가 모두 같은 사각형은?', visual: '🔷', opts: ['평행사변형', '직사각형', '마름모', '사다리꼴'], a: 2, explain: '마름모는 네 변의 길이가 모두 같은 사각형이에요. 두 대각선이 서로 수직으로 만나요.' },
+    { q: '평행사변형에서 마주 보는 두 각의 크기는?', visual: '▱', opts: ['서로 같다', '항상 90도', '합이 90도', '항상 다르다'], a: 0, explain: '평행사변형은 마주 보는 두 변의 길이가 같고, 마주 보는 두 각의 크기도 같아요.' },
+    { q: '평행사변형에서 이웃한 두 각의 합은?', visual: '▱', opts: ['90°', '180°', '270°', '360°'], a: 1, explain: '평행사변형에서 이웃한(붙어 있는) 두 각의 합은 항상 180°예요.' },
+
+    // ===== 4학년 [평면도형의 이동] =====
+    { q: '도형을 밀었을 때 변하지 않는 것은?', visual: '➡️', opts: ['위치', '모양과 크기', '방향', '없다'], a: 1, explain: '도형을 밀면 위치만 바뀌고 모양과 크기는 그대로예요.' },
+    { q: '도형을 오른쪽으로 뒤집으면 어떻게 될까요?', visual: '🔄', opts: ['위쪽과 아래쪽이 바뀐다', '왼쪽과 오른쪽이 바뀐다', '크기가 커진다', '아무 변화 없다'], a: 1, explain: '도형을 좌우로 뒤집으면 왼쪽과 오른쪽이 서로 바뀌어요. 거울에 비친 모습과 같아요.' },
+    { q: '도형을 위쪽으로 뒤집으면 어떻게 될까요?', visual: '🔃', opts: ['위쪽과 아래쪽이 바뀐다', '왼쪽과 오른쪽이 바뀐다', '색이 바뀐다', '크기가 줄어든다'], a: 0, explain: '도형을 위아래로 뒤집으면 위쪽과 아래쪽이 서로 바뀌어요.' },
+    { q: '도형을 시계 방향으로 360도 돌리면?', visual: '🔁', opts: ['처음과 같아진다', '뒤집힌다', '커진다', '작아진다'], a: 0, explain: '360°를 돌리면 한 바퀴를 완전히 돌아 처음 모양과 똑같아져요.' },
+    { q: '도형을 시계 방향으로 180도 돌린 것과 같은 결과는?', visual: '🔄', opts: ['시계 반대 방향으로 180도 돌리기', '90도 돌리기', '밀기', '확대하기'], a: 0, explain: '180°는 반 바퀴라서 시계 방향이든 반대 방향이든 결과가 같아요.' },
+
+    // ===== 4학년 [다각형] =====
+    { q: '변이 8개인 다각형은?', visual: '🛑', opts: ['오각형', '육각형', '칠각형', '팔각형'], a: 3, explain: '팔각형은 변과 꼭짓점이 각각 8개예요. 정지(STOP) 표지판이 팔각형이에요.' },
+    { q: '변의 길이가 모두 같고 각의 크기도 모두 같은 다각형은?', visual: '⬢', opts: ['다각형', '정다각형', '평행사변형', '사다리꼴'], a: 1, explain: '변의 길이와 각의 크기가 모두 같은 다각형을 정다각형이라고 해요.' },
+    { q: '다각형에서 이웃하지 않은 두 꼭짓점을 이은 선분은?', visual: '⬜', opts: ['변', '대각선', '반지름', '높이'], a: 1, explain: '이웃하지 않은 두 꼭짓점을 이은 선분을 대각선이라고 해요. 사각형의 대각선은 2개예요.' },
   ];
   return shapes[Math.floor(R() * shapes.length)];
 }
@@ -1894,6 +1933,45 @@ function genScience() {
     { q: '지구 주위를 도는 천체는?', visual: '🌙', opts: ['해', '별', '달', '구름'], a: 2, explain: '달이 지구 주위를 빙글빙글 돌아요. 지구는 태양 주위를 돌고요.' },
     { q: '우리가 사는 행성의 이름은?', visual: '🌍', opts: ['달', '태양', '지구', '화성'], a: 2, explain: '우리가 사는 곳은 지구예요. 태양계의 세 번째 행성이랍니다.' },
     { q: '낮에 하늘에서 빛나는 것은?', visual: '☀️', opts: ['달', '태양', '별', '구름'], a: 1, explain: '낮에는 태양이 하늘에서 환하게 빛나요. 우리에게 빛과 따뜻함을 줘요.' },
+
+    // ===== 4학년 [지층과 화석] =====
+    { q: '자갈·모래·진흙이 오랜 시간 쌓여 만들어진 층을?', visual: '⛰️', opts: ['지층', '화산', '지진', '용암'], a: 0, explain: '지층은 자갈·모래·진흙이 오랜 시간 쌓이고 굳어져 만들어진 층이에요. 줄무늬처럼 보여요.' },
+    { q: '지층에서 가장 오래된 층은 어디일까요?', visual: '📚', opts: ['맨 위층', '맨 아래층', '가운데층', '알 수 없다'], a: 1, explain: '지층은 아래부터 차례로 쌓이기 때문에 맨 아래층이 가장 먼저 만들어진 오래된 층이에요.' },
+    { q: '옛날에 살던 생물의 몸이나 흔적이 돌에 남은 것은?', visual: '🦖', opts: ['보석', '화석', '광물', '조약돌'], a: 1, explain: '화석은 옛날 생물의 뼈·껍데기·발자국 등이 지층 속에 남아 굳어진 것이에요.' },
+    { q: '화석으로 알 수 <b>없는</b> 것은?', visual: '🦴', opts: ['옛날 생물의 생김새', '옛날의 환경', '옛날 생물이 살던 시대', '내일의 날씨'], a: 3, explain: '화석으로 옛날 생물의 모습·환경·시대는 알 수 있지만, 미래 날씨는 알 수 없어요.' },
+
+    // ===== 4학년 [물체의 무게] =====
+    { q: '물체의 무게를 재는 도구는?', visual: '⚖️', opts: ['자', '저울', '온도계', '각도기'], a: 1, explain: '무게는 저울로 재요. 양팔저울, 용수철저울, 전자저울 등이 있어요.' },
+    { q: '용수철저울은 어떤 성질을 이용할까요?', visual: '⚖️', opts: ['무거울수록 용수철이 많이 늘어남', '자석의 힘', '물에 뜨는 성질', '빛의 반사'], a: 0, explain: '용수철은 매단 물체가 무거울수록 더 많이 늘어나요. 이 성질로 무게를 잴 수 있어요.' },
+    { q: '양팔저울에서 더 무거운 쪽은?', visual: '⚖️', opts: ['위로 올라간 쪽', '아래로 내려간 쪽', '가운데', '알 수 없다'], a: 1, explain: '양팔저울에서 무거운 쪽이 아래로 내려가요. 수평을 이루면 두 물체의 무게가 같아요.' },
+    { q: '무게의 단위로 알맞은 것은?', visual: '⚖️', opts: ['cm', 'g(그램)', 'mL', '분'], a: 1, explain: '무게는 g(그램), kg(킬로그램) 단위를 써요. cm는 길이, mL는 부피 단위예요.' },
+
+    // ===== 4학년 [혼합물의 분리] =====
+    { q: '두 가지 이상의 물질이 섞여 있는 것을?', visual: '🥗', opts: ['순물질', '혼합물', '결정', '용매'], a: 1, explain: '두 가지 이상의 물질이 섞여 있는 것을 혼합물이라고 해요. 김밥, 팥빙수도 혼합물이에요.' },
+    { q: '모래와 철가루를 분리하는 가장 좋은 방법은?', visual: '🧲', opts: ['자석 사용', '물에 녹이기', '햇빛에 말리기', '체로 거르기'], a: 0, explain: '철은 자석에 붙는 성질이 있어요. 자석을 대면 철가루만 붙어서 분리돼요.' },
+    { q: '소금물에서 소금을 얻는 방법은?', visual: '🧂', opts: ['얼리기', '물을 증발시키기', '자석 사용', '체로 거르기'], a: 1, explain: '소금물의 물을 증발시키면 소금만 남아요. 바닷물로 소금을 만드는 염전이 이 방법이에요.' },
+    { q: '콩·팥·좁쌀처럼 알갱이 크기가 다른 혼합물을 분리하려면?', visual: '🫘', opts: ['자석', '체(거름망)', '물에 녹이기', '가열하기'], a: 1, explain: '알갱이 크기가 다르면 알맞은 크기의 체로 걸러서 분리할 수 있어요.' },
+    { q: '물에 녹지 않는 가루와 물을 분리하는 방법은?', visual: '☕', opts: ['거름 장치로 거르기', '자석 사용', '얼리기', '흔들기'], a: 0, explain: '거름종이를 이용한 거름 장치로 물에 녹지 않는 물질을 걸러낼 수 있어요.' },
+
+    // ===== 4학년 [그림자와 거울] =====
+    { q: '그림자가 생기려면 꼭 필요한 것 두 가지는?', visual: '👤', opts: ['빛과 물체', '물과 공기', '거울과 물', '자석과 철'], a: 0, explain: '빛이 물체에 막히면 그 뒤쪽에 어두운 그림자가 생겨요. 빛과 물체가 모두 있어야 해요.' },
+    { q: '빛이 나아가는 성질은?', visual: '💡', opts: ['곧게 나아간다(직진)', '휘어져 나아간다', '원을 그린다', '멈춘다'], a: 0, explain: '빛은 곧게 나아가요(직진). 그래서 그림자 모양이 물체 모양과 비슷해요.' },
+    { q: '물체를 빛에 가까이 하면 그림자 크기는?', visual: '🔦', opts: ['커진다', '작아진다', '그대로다', '없어진다'], a: 0, explain: '물체를 빛(광원)에 가까이 할수록 그림자가 커지고, 멀리 할수록 작아져요.' },
+    { q: '거울에 비친 물체는 실제와 어떻게 다를까요?', visual: '🪞', opts: ['위아래가 바뀐다', '좌우가 바뀐다', '색이 바뀐다', '크기가 커진다'], a: 1, explain: '거울에 비친 모습은 좌우가 바뀌어 보여요. 상하는 그대로예요.' },
+    { q: '빛이 거울에 부딪혀 방향이 바뀌는 현상은?', visual: '💡🪞', opts: ['굴절', '반사', '흡수', '증발'], a: 1, explain: '빛이 거울 같은 매끄러운 면에 부딪혀 되돌아 나오는 것을 빛의 반사라고 해요.' },
+
+    // ===== 4학년 [화산과 지진] =====
+    { q: '땅속 마그마가 분출하여 만들어진 지형은?', visual: '🌋', opts: ['화산', '지진', '폭포', '동굴'], a: 0, explain: '화산은 땅속 마그마가 지표로 분출하면서 만들어지는 지형이에요.' },
+    { q: '땅속에 있을 때는 마그마, 땅 밖으로 나오면?', visual: '🌋', opts: ['용암', '화산재', '수증기', '암석'], a: 0, explain: '땅속의 뜨거운 물질은 마그마, 지표로 흘러나오면 용암이라고 불러요.' },
+    { q: '땅이 흔들리고 갈라지는 현상은?', visual: '🏚️', opts: ['화산', '지진', '태풍', '해일'], a: 1, explain: '지진은 땅속에서 지층이 힘을 받아 끊어지면서 땅이 흔들리는 현상이에요.' },
+    { q: '지진의 세기를 나타내는 단위는?', visual: '📊', opts: ['도(°)', '규모', '그램', '미터'], a: 1, explain: '지진의 세기는 "규모"로 나타내요. 숫자가 클수록 강한 지진이에요.' },
+    { q: '지진이 발생했을 때 실내에서 가장 안전한 행동은?', visual: '⚠️', opts: ['엘리베이터 타기', '책상 아래로 몸을 숨기기', '창문 열기', '뛰어다니기'], a: 1, explain: '흔들리는 동안에는 튼튼한 책상 아래로 들어가 머리를 보호하고, 흔들림이 멈추면 계단으로 대피해요.' },
+
+    // ===== 4학년 [물의 여행 / 상태 변화] =====
+    { q: '물이 수증기로 변해 공기 중으로 날아가는 현상은?', visual: '💨', opts: ['증발', '응결', '결빙', '융해'], a: 0, explain: '물이 표면에서 천천히 수증기로 변하는 것을 증발이라고 해요. 빨래가 마르는 것도 증발이에요.' },
+    { q: '수증기가 물방울로 맺히는 현상은?', visual: '🥤', opts: ['증발', '응결', '융해', '승화'], a: 1, explain: '차가운 컵 표면에 물방울이 맺히는 것처럼, 수증기가 물로 변하는 것을 응결이라고 해요.' },
+    { q: '물이 지구를 돌고 도는 과정을 무엇이라고 할까요?', visual: '🌧️', opts: ['물의 순환', '물의 분리', '물의 정지', '물의 소멸'], a: 0, explain: '바다→증발→구름→비→강→바다처럼 물이 계속 돌고 도는 것을 물의 순환이라고 해요.' },
+    { q: '물이 얼면 부피는 어떻게 될까요?', visual: '🧊', opts: ['늘어난다', '줄어든다', '그대로다', '없어진다'], a: 0, explain: '물이 얼음이 되면 부피가 늘어나요. 그래서 겨울에 물이 든 페트병을 얼리면 볼록해져요.' },
   ];
   return questions[Math.floor(R() * questions.length)];
 }
@@ -2124,34 +2202,141 @@ function pickEnglishWeighted(questions) {
 }
 
 function genMultiply(diff) {
-  // 작은 단(2~5) → 큰 단(6~9)으로 난이도 증가
-  const minTable = diff <= 10 ? 2 : 5;
-  const maxTable = diff <= 10 ? 5 : 9;
-  const a = randInt(minTable, maxTable);
-  const b = randInt(2, 9);
-  const ans = a * b;
-  const explain = `${a} × ${b}은(는) ${a}을(를) ${b}번 더한 값이에요.\n${Array(b).fill(a).join(' + ')} = ${ans}`;
-  return makeNumberQuestion(`${a} × ${b} = ?`, ans, '✖️', explain);
+  // 4학년 큰 수 곱셈 (diff는 1~12 범위로 들어옴)
+  let a, b, explain;
+  if (diff <= 3) {
+    // 두 자리 × 한 자리
+    a = randInt(12, 99);
+    b = randInt(3, 9);
+    explain = `${a} × ${b}: 일의 자리와 십의 자리를 각각 곱해서 더해요.\n${a % 10} × ${b} = ${(a%10)*b}\n${Math.floor(a/10)}0 × ${b} = ${Math.floor(a/10)*10*b}\n합: ${a*b}`;
+  } else if (diff <= 7) {
+    // 세 자리 × 한 자리
+    a = randInt(102, 999);
+    b = randInt(3, 9);
+    explain = `세 자리 × 한 자리는 일·십·백의 자리를 각각 곱해서 더해요.\n${a} × ${b} = ${a*b}`;
+  } else if (diff <= 10) {
+    // 두 자리 × 두 자리
+    a = randInt(12, 99);
+    b = randInt(12, 99);
+    const bOnes = b % 10, bTens = Math.floor(b / 10);
+    explain = `두 자리 × 두 자리: 일의 자리와 십의 자리로 나눠 곱한 뒤 더해요.\n${a} × ${bOnes} = ${a*bOnes}\n${a} × ${bTens}0 = ${a*bTens*10}\n합: ${a*bOnes} + ${a*bTens*10} = ${a*b}`;
+  } else {
+    // 보스: 세 자리 × 두 자리
+    a = randInt(102, 500);
+    b = randInt(12, 50);
+    explain = `세 자리 × 두 자리는 자리별로 곱한 뒤 각 결과를 자리 맞춰 더해요.\n${a} × ${b} = ${a*b}`;
+  }
+  return makeNumberQuestion(`${a} × ${b} = ?`, a * b, '✖️', explain);
 }
 
 function genDivide(diff) {
-  // 나누어떨어지는 문제만
-  const divisor = randInt(2, diff <= 10 ? 5 : 9);
-  const quotient = randInt(2, diff <= 10 ? 5 : 9);
-  const dividend = divisor * quotient;
-  const explain = `${dividend}을(를) ${divisor}묶음으로 똑같이 나누면 한 묶음에 ${quotient}씩이에요.\n곱셈으로 확인: ${divisor} × ${quotient} = ${dividend}`;
-  return makeNumberQuestion(`${dividend} ÷ ${divisor} = ?`, quotient, '➗', explain);
+  // 4학년 나눗셈: 나머지 있는 나눗셈 포함
+  let dividend, divisor, quotient, remainder, ans, qText, explain;
+  if (diff <= 3) {
+    // 두 자리 ÷ 한 자리, 나머지 있음
+    divisor = randInt(3, 9);
+    quotient = randInt(4, 12);
+    remainder = randInt(1, divisor - 1);
+    dividend = divisor * quotient + remainder;
+    if (R() < 0.5) {
+      ans = quotient;
+      qText = `${dividend} ÷ ${divisor}의 몫은?`;
+    } else {
+      ans = remainder;
+      qText = `${dividend} ÷ ${divisor}의 나머지는?`;
+    }
+    explain = `${dividend}을(를) ${divisor}씩 묶으면 ${quotient}묶음이 되고 ${remainder}이 남아요.\n확인: ${divisor} × ${quotient} + ${remainder} = ${dividend}\n→ 몫 ${quotient}, 나머지 ${remainder}`;
+  } else if (diff <= 7) {
+    // 세 자리 ÷ 한 자리
+    divisor = randInt(3, 9);
+    quotient = randInt(20, 99);
+    remainder = R() < 0.3 ? randInt(1, divisor - 1) : 0;
+    dividend = divisor * quotient + remainder;
+    ans = quotient;
+    qText = remainder === 0 ? `${dividend} ÷ ${divisor} = ?` : `${dividend} ÷ ${divisor}의 몫은? (나머지 ${remainder})`;
+    explain = `세 자리 ÷ 한 자리: 백의 자리부터 차례로 나누고 남은 것은 아래 자리로 내려요.\n${dividend} ÷ ${divisor} = ${quotient}${remainder ? ` … ${remainder}` : ''}\n확인: ${divisor} × ${quotient}${remainder ? ` + ${remainder}` : ''} = ${dividend}`;
+  } else if (diff <= 10) {
+    // 두 자리 ÷ 두 자리
+    divisor = randInt(11, 30);
+    quotient = randInt(2, 8);
+    remainder = R() < 0.4 ? randInt(1, divisor - 1) : 0;
+    dividend = divisor * quotient + remainder;
+    ans = quotient;
+    qText = remainder === 0 ? `${dividend} ÷ ${divisor} = ?` : `${dividend} ÷ ${divisor}의 몫은? (나머지 ${remainder})`;
+    explain = `두 자리로 나눌 때는 몫을 어림한 뒤 곱해서 확인해요.\n${dividend} ÷ ${divisor} = ${quotient}${remainder ? ` … ${remainder}` : ''}\n확인: ${divisor} × ${quotient}${remainder ? ` + ${remainder}` : ''} = ${dividend}`;
+  } else {
+    // 보스: 세 자리 ÷ 두 자리
+    divisor = randInt(12, 40);
+    quotient = randInt(6, 30);
+    remainder = R() < 0.5 ? randInt(1, divisor - 1) : 0;
+    dividend = divisor * quotient + remainder;
+    ans = quotient;
+    qText = remainder === 0 ? `${dividend} ÷ ${divisor} = ?` : `${dividend} ÷ ${divisor}의 몫은? (나머지 ${remainder})`;
+    explain = `세 자리 ÷ 두 자리: 앞의 두세 자리를 보고 몫을 어림한 후 곱해서 빼요.\n${dividend} ÷ ${divisor} = ${quotient}${remainder ? ` … ${remainder}` : ''}\n확인: ${divisor} × ${quotient}${remainder ? ` + ${remainder}` : ''} = ${dividend}`;
+  }
+  return makeNumberQuestion(qText, ans, '➗', explain);
+}
+
+function genNumberSense() {
+  // 2022 개정 4학년: 큰 수 / 규칙 찾기 / 자료와 그래프
+  const items = [
+    // --- 큰 수 (자릿값) ---
+    { q: '10000이 3개, 1000이 5개인 수는?', visual: '🔢', opts: ['3500', '35000', '30500', '350000'], a: 1, explain: '10000이 3개 = 30000, 1000이 5개 = 5000.\n30000 + 5000 = 35000 (삼만 오천)' },
+    { q: '숫자 47251에서 밑줄 친 7이 나타내는 값은? (4<u>7</u>251)', visual: '🔢', opts: ['7', '700', '7000', '70000'], a: 2, explain: '47251에서 7은 천의 자리에 있어요. 그래서 7000을 나타내요.' },
+    { q: '1억은 1만이 몇 개일까요?', visual: '🔢', opts: ['100개', '1000개', '10000개', '100000개'], a: 2, explain: '1만 × 10000 = 1억이에요. 만이 만 개 모이면 억이 돼요.' },
+    { q: '"삼백이십오만"을 숫자로 쓰면?', visual: '🔢', opts: ['325000', '3250000', '32500000', '3025000'], a: 1, explain: '325만 = 325 × 10000 = 3,250,000이에요.' },
+    { q: '10000은 9000보다 얼마나 큰 수일까요?', visual: '🔢', opts: ['10', '100', '1000', '10000'], a: 2, explain: '10000 - 9000 = 1000이에요.' },
+    { q: '1조는 1억이 몇 개일까요?', visual: '🔢', opts: ['100개', '1000개', '10000개', '100000개'], a: 2, explain: '1억 × 10000 = 1조예요. 만 → 억 → 조 순서로 10000배씩 커져요.' },
+    { q: '가장 큰 수는?', visual: '🔢', opts: ['58900', '59800', '58090', '59080'], a: 1, explain: '자릿수가 같으면 높은 자리부터 비교해요.\n만의 자리는 모두 5, 천의 자리를 보면 9가 가장 커요 → 59800' },
+
+    // --- 규칙 찾기 ---
+    { q: '2, 6, 18, 54, ? 다음에 올 수는?', visual: '🔁', opts: ['108', '162', '216', '72'], a: 1, explain: '앞의 수에 3씩 곱하는 규칙이에요.\n54 × 3 = 162' },
+    { q: '100, 90, 81, 73, ? 다음에 올 수는?', visual: '🔁', opts: ['66', '65', '64', '63'], a: 0, explain: '빼는 수가 10, 9, 8, 7…로 1씩 줄어드는 규칙이에요.\n73 - 7 = 66' },
+    { q: '1, 4, 9, 16, 25, ? 다음에 올 수는?', visual: '🔁', opts: ['30', '32', '36', '49'], a: 2, explain: '1×1, 2×2, 3×3, 4×4, 5×5… 규칙이에요.\n6 × 6 = 36' },
+    { q: '5, 10, 20, 40, ? 다음에 올 수는?', visual: '🔁', opts: ['60', '70', '80', '100'], a: 2, explain: '앞의 수를 2배씩 하는 규칙이에요.\n40 × 2 = 80' },
+    { q: '달력에서 같은 요일은 며칠마다 반복될까요?', visual: '📅', opts: ['5일', '6일', '7일', '10일'], a: 2, explain: '일주일은 7일이므로 같은 요일은 7일마다 반복돼요.' },
+
+    // --- 자료와 그래프 ---
+    { q: '자료의 많고 적음을 막대의 길이로 나타낸 그래프는?', visual: '📊', opts: ['막대그래프', '꺾은선그래프', '그림그래프', '원그래프'], a: 0, explain: '막대그래프는 막대의 길이로 수량의 많고 적음을 한눈에 비교할 수 있어요.' },
+    { q: '시간에 따라 변하는 모습을 나타내기에 가장 좋은 그래프는?', visual: '📈', opts: ['막대그래프', '꺾은선그래프', '그림그래프', '표'], a: 1, explain: '꺾은선그래프는 점을 선으로 이어서 시간에 따른 변화를 잘 보여줘요. 기온 변화 등에 써요.' },
+    { q: '꺾은선그래프에서 선이 가파르게 올라가면?', visual: '📈', opts: ['변화가 크다', '변화가 없다', '값이 줄었다', '오류이다'], a: 0, explain: '선이 가파를수록 값이 빠르게 변한 거예요. 완만하면 천천히 변한 거고요.' },
+    { q: '그래프에서 가로축과 세로축이 무엇을 나타내는지 알려주는 것은?', visual: '📊', opts: ['제목', '눈금', '항목 이름(축 이름)', '범례'], a: 2, explain: '각 축에 무엇을 나타내는지 이름을 적어야 그래프를 바르게 읽을 수 있어요.' },
+    { q: '막대그래프에서 막대가 가장 긴 항목의 뜻은?', visual: '📊', opts: ['가장 적은 항목', '가장 많은 항목', '평균 항목', '알 수 없음'], a: 1, explain: '막대가 길수록 수량이 많아요. 가장 긴 막대가 가장 많은 항목이에요.' },
+  ];
+  return items[Math.floor(R() * items.length)];
 }
 
 function genAddSub(diff) {
+  // 2022 개정 4학년: 큰 수 / 소수 / 규칙·그래프 혼합
+  if (R() < 0.25) return genNumberSense();
+  const useDecimal = R() < 0.35;
   const op = R() < 0.5 ? '+' : '-';
+
+  if (useDecimal) {
+    const dp = diff <= 6 ? 1 : 2;
+    const mult = Math.pow(10, dp);
+    let a = randInt(15, diff <= 6 ? 90 : 900);
+    let b = randInt(10, diff <= 6 ? 90 : 500);
+    if (op === '-') {
+      if (b > a) [a, b] = [b, a];
+      const aF = (a / mult).toFixed(dp), bF = (b / mult).toFixed(dp);
+      const ansF = ((a - b) / mult).toFixed(dp);
+      return makeDecimalQuestion(`${aF} - ${bF} = ?`, ansF, '➖',
+        `소수의 뺄셈은 소수점 위치를 맞추고 자연수처럼 계산한 뒤, 소수점을 그대로 내려 찍어요.\n${aF} - ${bF} = ${ansF}`, dp);
+    }
+    const aF = (a / mult).toFixed(dp), bF = (b / mult).toFixed(dp);
+    const ansF = ((a + b) / mult).toFixed(dp);
+    return makeDecimalQuestion(`${aF} + ${bF} = ?`, ansF, '➕',
+      `소수의 덧셈은 소수점 위치를 맞추고 자연수처럼 계산한 뒤, 소수점을 그대로 내려 찍어요.\n${aF} + ${bF} = ${ansF}`, dp);
+  }
+
   let a, b, ans;
-  if (diff <= 10) {
-    a = randInt(20, 99);
-    b = randInt(10, 99);
+  if (diff <= 3) {
+    a = randInt(200, 999); b = randInt(100, 500);
+  } else if (diff <= 7) {
+    a = randInt(2000, 9999); b = randInt(1000, 5000);
   } else {
-    a = randInt(100, 800);
-    b = randInt(50, 200);
+    a = randInt(15000, 90000); b = randInt(5000, 40000);
   }
   if (op === '+') { ans = a + b; }
   else {
@@ -2159,9 +2344,24 @@ function genAddSub(diff) {
     ans = a - b;
   }
   const explain = op === '+'
-    ? `일의 자리부터 차근차근 더해보세요.\n${a} + ${b} = ${ans}`
-    : `일의 자리부터 차근차근 빼보세요. 모자라면 윗자리에서 빌려와요.\n${a} - ${b} = ${ans}`;
-  return makeNumberQuestion(`${a} ${op} ${b} = ?`, ans, op === '+' ? '➕' : '➖', explain);
+    ? `자릿값을 맞춰 오른쪽(일의 자리)부터 더해요. 10이 넘으면 윗자리로 올림!\n${a.toLocaleString()} + ${b.toLocaleString()} = ${ans.toLocaleString()}`
+    : `자릿값을 맞춰 오른쪽부터 빼요. 부족하면 윗자리에서 10을 빌려와요.\n${a.toLocaleString()} - ${b.toLocaleString()} = ${ans.toLocaleString()}`;
+  return makeNumberQuestion(`${a.toLocaleString()} ${op} ${b.toLocaleString()} = ?`, ans, op === '+' ? '➕' : '➖', explain);
+}
+
+function makeDecimalQuestion(q, ans, visual, explain, dp) {
+  const ansNum = parseFloat(ans);
+  const mult = Math.pow(10, dp);
+  const target = Math.round(ansNum * mult);
+  const wrongs = new Set();
+  let tries = 0;
+  while (wrongs.size < 3 && tries < 60) {
+    const wInt = target + randInt(-15, 15);
+    if (wInt >= 0 && wInt !== target) wrongs.add((wInt / mult).toFixed(dp));
+    tries++;
+  }
+  const opts = shuffleArr([ans, ...wrongs]);
+  return { q, visual, opts, a: opts.indexOf(ans), explain };
 }
 
 function svgBar(numer, denom, color) {
@@ -2194,9 +2394,40 @@ function svgCompareBars(label1, n1, d1, label2, n2, d2, color) {
   </div>`;
 }
 
+// 정답 1개 + 서로 다른 오답 3개를 보장하는 보기 생성기
+// candidates 중 중복/정답과 같은 것은 걸러내고, 모자라면 fallback으로 채움
+function makeChoices(correct, candidates, fallback) {
+  const seen = new Set([String(correct)]);
+  const wrongs = [];
+  for (const c of candidates) {
+    const s = String(c);
+    if (!seen.has(s)) { seen.add(s); wrongs.push(s); }
+    if (wrongs.length === 3) break;
+  }
+  let guard = 0;
+  while (wrongs.length < 3 && guard < 60) {
+    const s = String(fallback(guard, wrongs.length));
+    if (!seen.has(s)) { seen.add(s); wrongs.push(s); }
+    guard++;
+  }
+  const opts = shuffleArr([String(correct), ...wrongs]);
+  return { opts, a: opts.indexOf(String(correct)) };
+}
+
+// 분수 오답용 fallback: 분자/분모를 살짝 바꾼 값 생성
+function fracFallback(n, d) {
+  return (i) => {
+    const dn = [1, -1, 2, -2, 3][i % 5];
+    const dd = [0, 1, -1, 2, 0][i % 5];
+    const nn = Math.max(1, n + dn);
+    const ndd = Math.max(2, d + dd);
+    return `${nn}/${ndd}`;
+  };
+}
+
 function genFraction(diff) {
-  // 그림 기반 분수
-  const denom = randInt(2, diff <= 10 ? 4 : 8);
+  // 4학년 분수: 같은 분모 덧뺄셈, 진분수/가분수/대분수 포함
+  const denom = randInt(3, diff <= 6 ? 6 : 10);
   const numer = randInt(1, denom - 1);
   const types = [
     // 1. 색칠된 부분 분수로 나타내기
@@ -2292,6 +2523,76 @@ function genFraction(diff) {
         opts,
         a: opts.indexOf(correct),
         explain: `${denom}조각에서 ${numer}조각을 먹었으니 ${denom} - ${numer} = ${left}조각이 남았어요.\n남은 양을 분수로 쓰면 ${left}/${denom}이에요. (그림에서 흰 부분의 개수)`
+      };
+    },
+    // [4학년] 같은 분모 분수 덧셈
+    () => {
+      const d = randInt(4, 9);
+      const n1 = randInt(1, d - 2);
+      const n2 = randInt(1, d - n1);
+      const sum = n1 + n2;
+      const correct = sum === d ? '1' : `${sum}/${d}`;
+      const ch = makeChoices(correct,
+        [`${sum}/${d + d}`, `${sum + 1}/${d}`, `${n1 * n2}/${d}`, `${sum}/${d + 1}`],
+        fracFallback(sum, d));
+      return {
+        q: `${n1}/${d} + ${n2}/${d} = ?`,
+        visual: svgCompareBars(`${n1}/${d}`, n1, d, `${n2}/${d}`, n2, d),
+        opts: ch.opts,
+        a: ch.a,
+        explain: `분모가 같은 분수의 덧셈은 분모는 그대로 두고 분자끼리만 더해요.\n${n1}/${d} + ${n2}/${d} = (${n1}+${n2})/${d} = ${sum}/${d}${sum === d ? ' = 1' : ''}`
+      };
+    },
+    // [4학년] 같은 분모 분수 뺄셈
+    () => {
+      const d = randInt(4, 9);
+      const n1 = randInt(2, d - 1);
+      const n2 = randInt(1, n1 - 1);
+      const diffN = n1 - n2;
+      const correct = `${diffN}/${d}`;
+      const ch = makeChoices(correct,
+        [`${n1 + n2}/${d}`, `${diffN}/${d + d}`, `${d - diffN}/${d}`, `${diffN + 1}/${d}`],
+        fracFallback(diffN, d));
+      return {
+        q: `${n1}/${d} - ${n2}/${d} = ?`,
+        visual: svgBar(diffN, d, '#5bc0eb'),
+        opts: ch.opts,
+        a: ch.a,
+        explain: `분모가 같은 분수의 뺄셈은 분모는 그대로 두고 분자끼리만 빼요.\n${n1}/${d} - ${n2}/${d} = (${n1}-${n2})/${d} = ${diffN}/${d}`
+      };
+    },
+    // [4학년] 진분수 / 가분수 구별
+    () => {
+      const d = randInt(3, 7);
+      const isProper = R() < 0.5;
+      const n = isProper ? randInt(1, d - 1) : randInt(d, d + 4);
+      const type = isProper ? '진분수' : '가분수';
+      const opts = shuffleArr(['진분수', '가분수', '대분수', '자연수']);
+      return {
+        q: `${n}/${d}은(는) 어떤 분수일까요?`,
+        visual: `<div style="font-size:52px;font-weight:bold;color:#5b2a86;margin:8px">${n}/${d}</div>`,
+        opts,
+        a: opts.indexOf(type),
+        explain: `분자가 분모보다 작으면 진분수, 분자가 분모와 같거나 크면 가분수예요.\n${n}/${d}: 분자 ${n} ${n < d ? '<' : (n === d ? '=' : '>')} 분모 ${d} → ${type}${isProper ? ' (1보다 작아요)' : ' (1보다 크거나 같아요)'}`
+      };
+    },
+    // [4학년] 대분수 → 가분수
+    () => {
+      const whole = randInt(1, 4);
+      const d = randInt(3, 7);
+      const n = randInt(1, d - 1);
+      const impN = whole * d + n;
+      const correct = `${impN}/${d}`;
+      const ch = makeChoices(correct,
+        [`${whole + n}/${d}`, `${whole * n}/${d}`, `${impN}/${d + 1}`, `${impN + 1}/${d}`],
+        fracFallback(impN, d));
+      const opts = ch.opts;
+      return {
+        q: `대분수 ${whole}과(와) ${n}/${d}을(를) 가분수로 나타내면?`,
+        visual: `<div style="font-size:40px;font-weight:bold;color:#5b2a86;margin:8px">${whole} <span style="font-size:28px">${n}/${d}</span></div>`,
+        opts,
+        a: opts.indexOf(correct),
+        explain: `대분수를 가분수로 바꿀 때는 (자연수 × 분모 + 분자) ÷ 분모로 계산해요.\n${whole} × ${d} + ${n} = ${impN}\n답: ${impN}/${d}`
       };
     }
   ];
